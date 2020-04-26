@@ -1,3 +1,4 @@
+import sys
 import errno
 import socket
 import select
@@ -13,7 +14,7 @@ my_username = "User" + str(random.randint(1,9999))
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((IP, PORT))
-client_socket.setblocking(False)
+client_socket.setblocking(0)
 
 username = my_username.encode('utf-8')
 username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
@@ -37,8 +38,22 @@ def envoyer():
 	client_socket.send(message_header + message)
 	filMessages.insert(END, my_username + " : " + entre.get())
 	entre.delete(0, 'end')
+	
+def reception():
+	try:
+		messageRecu = client_socket.recv(2048)
+		print(messageRecu)
+		
+	except IOError as e:
+		if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
+			print('Reading error: {}'.format(str(e)))
+
+	finally:	
+		fen.after(3000, reception)
 
 envoyer = Button(fen, text="Envoyer", command=envoyer)
 envoyer.pack()
+
+fen.after(100, reception)
 
 fen.mainloop()
