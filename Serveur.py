@@ -1,11 +1,12 @@
-import socket
-import errno
 import time
+import socket
+
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(("127.0.0.1", 1234))
-
 server_socket.setblocking(0)
+
+print("Serveur démarré à", time.strftime("%H:%M:%S"))
 
 server_socket.listen()
 
@@ -30,5 +31,6 @@ while True:
 					if aenvoyer != client:
 						aenvoyer.send(bytes(message, "utf-8"))
 					else:
+						pass
 		except Exception as E:
 			time.sleep(0.5)
