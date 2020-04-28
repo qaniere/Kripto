@@ -25,7 +25,7 @@ while True:
 	try:
 		infosClients, IPClient = Serveur.accept()
 		listeClient.append(infosClients) #On stocke les infos du client dans la liste dédiées
-		print("Nouveau client connecté ! IP =>", str(IPClient))
+		print(f"[{time.strftime('%H:%M:%S')}] Nouveau client connecté ! IP => {IPClient}")
 	except IOError:
 	#Si personne n'essaie de se connecter, on ralenti le programme pour préserver les ressources de la machine
 		time.sleep(0.1)
