@@ -2,8 +2,9 @@
 
 ## Liste de choses essentielles à faire :
 
-- Ajouter un menu sur l'application client => Permet de choisir le port, de démarrer le serveur et de le parametrer si hôte et si client interface de connexion à un autre serveur. 
+- Ajouter un menu sur l'application client => Permet de choisir le port, de démarrer le serveur, son d'user et de le parametrer si hôte et si client interface de connexion à un autre serveur. 
 - Implémenter des paramétres dans le code du serveur => Taux de rafraissement, logs, ect... 
+- Gérer les exeptions (Déconnexions, crash ect)
 - Revoir totalemnt l'interface coté client
 - Implémenter le chiffrage coté serveur et client (Envoie les message au serveur de manière chiffrée, puis ensuite le serveur les rechiffre pour chaque client, ce qui permet un nombre illimité de clients)
 
