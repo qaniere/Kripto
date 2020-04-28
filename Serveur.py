@@ -1,21 +1,22 @@
+import sys
 import time
 import socket
 
 #Constantes d'application
-IP = "127.0.0.1"
-Port = 1234
+IP = sys.argv[1]
+Port = int(sys.argv[2])
 
 #On défini les paramêtres du socket 
 Serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 Serveur.bind((IP, Port))
 
-#On configure le serveur en mode non-bloquant : Au lieu d'attendre une réponse et de bloquer le programme, l'instruction retourne 
-#une exeception si jamais aucune données n'est envoyée
+#On configure le serveur en mode non-bloquant : Au lieu d'attendre une réponse et de bloquer le programme, l'instruction retourne
+#une exeception si jamais aucune données n'est envoyée, ce qui empecherait la gestion de plusieurs clients
 Serveur.setblocking(0)
 
 #Démarrage du serveur
 Serveur.listen()
-print("Serveur démarré à", time.strftime("%H:%M:%S"))
+print("Serveur démarré à", time.strftime("%H:%M:%S"), "sur le port", Port)
 
 #On initialise la liste qui contient les coordonnées des clients connectés
 listeClient = []
