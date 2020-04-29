@@ -57,7 +57,9 @@ def affichageConversation():
 	placeholder(True)
 
 def connexion():
-	global IP, Port, nomUser, entreNom, client_socket
+	global IP, Port, nomUser, entreNom, client_socket, entreIP
+	IP = entreIP.get()
+	print(IP)
 	client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	client_socket.connect((IP, Port))
 	client_socket.setblocking(0)
@@ -65,15 +67,15 @@ def connexion():
 
 
 def démarrerServeur():
-	global entrePort, IP, Port
+	global entreIP, entrePort, IP, Port
+	IP = entreIP.get()
 	Port = int(entrePort.get())
 	subprocess.Popen(f"python Serveur.py {IP} {Port}")
-	print("Je suis là !")
 	connexion()
 	affichageConversation()
 
 def hote():
-	global entrePort, IP, nomUser, cadreParametres, entreNom
+	global entrePort, IP, nomUser, cadreParametres, entreNom, entreIP
 
 	messageBienvenue.pack_forget()
 	cadreBouttons.pack_forget()
@@ -84,8 +86,12 @@ def hote():
 	cadreParametres = Frame(fen, bg="grey")
 	cadreParametres.pack()       
 
-	votreIP = Label(cadreParametres, text=f"Votre adresse IP locale : {IP}", font=policeIP, bg="Grey")
-	votreIP.pack()
+	votreIP = Label(cadreParametres, text="Votre Adresse IP", bg="Grey")
+	votreIP.pack(anchor=CENTER, pady=7)
+
+	entreIP = Entry(cadreParametres)
+	entreIP.insert("end", IP)
+	entreIP.pack(anchor=CENTER)
 
 	votrePort = Label(cadreParametres, text="Port", bg="Grey")
 	votrePort.pack(anchor=CENTER, pady=7)
