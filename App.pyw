@@ -7,6 +7,8 @@ import tkinter.font as tkFont
 from tkinter import messagebox
 
 #OUI LE CODE EST DEGEU ET PAS COMMENTE PARCE QUE J'AI PAS LE TEMPS GNAGNAGNA
+global listeNoms
+listeNoms = ["Autruche", "JeanBon", "Poulette", "AmiralBenson", "TomNook", "Karamazov", "MonsieurPreskovic", "OdileDeray"]
 
 def envoyer():
 	global entre, nomUser, filMessages, client_socket
@@ -87,7 +89,7 @@ def démarrerServeur():
 		affichageConversation()
 
 def hote():
-	global entrePort, IP, nomUser, cadreParametres, entreNom, entreIP
+	global entrePort, IP, nomUser, cadreParametres, entreNom, entreIP, listeNoms
 
 	messageBienvenue.pack_forget()
 	cadreBouttons.pack_forget()
@@ -114,24 +116,29 @@ def hote():
 	entrePort.insert("end", portRecommande)
 	entrePort.pack(anchor=CENTER)
 
+	suggestionNom = random.choices(listeNoms)
+
 	votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
 	votreNom.pack(anchor=CENTER, pady=7)
 
 	entreNom = Entry(cadreParametres)
+	entreNom.insert("end", suggestionNom)
 	entreNom.pack(anchor=CENTER)
 
 	bouttonStart = Button(cadreParametres, text="Démarrer", command=démarrerServeur)
 	bouttonStart.pack(pady=20)
 
 def seConnecter():
-	global entreIP, entrePort, IP, Port
+	global entreIP, entrePort, IP, Port, Role
+	Role = "Client"
 	Port = int(entrePort.get())
 	IP = entreIP.get()
-	connexion()
-	affichageConversation()
+	if connexion() == True: 
+		
+		affichageConversation()
 
 def client():
-	global entreIP, entrePort, entreNom, cadreParametres
+	global entreIP, entrePort, entreNom, cadreParametres, listeNoms
 	messageBienvenue.pack_forget()
 	cadreBouttons.pack_forget()
 
@@ -142,6 +149,7 @@ def client():
 	IpduServeur.pack(anchor=CENTER, pady=7)
 
 	entreIP = Entry(cadreParametres)
+	entreIP.insert("end", "192.168.1.")
 	entreIP.pack(anchor=CENTER)
 
 	PortduServeur = Label(cadreParametres, text="Port du serveur", bg="Grey")
@@ -150,10 +158,13 @@ def client():
 	entrePort = Entry(cadreParametres)
 	entrePort.pack(anchor=CENTER)
 
+	suggestionNom = random.choices(listeNoms)
+
 	votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
 	votreNom.pack(anchor=CENTER, pady=7)
 
 	entreNom = Entry(cadreParametres)
+	entreNom.insert("end", suggestionNom)
 	entreNom.pack(anchor=CENTER)
 
 	bouttonStart = Button(cadreParametres, text="Se connecter",  command=seConnecter)
