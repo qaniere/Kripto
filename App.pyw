@@ -1,8 +1,10 @@
 import socket
 import random
+import tkinter
 import subprocess	
 from tkinter import *
 import tkinter.font as tkFont
+from tkinter import messagebox
 
 #OUI LE CODE EST DEGEU ET PAS COMMENTE PARCE QUE J'AI PAS LE TEMPS GNAGNAGNA
 
@@ -57,22 +59,32 @@ def affichageConversation():
 	placeholder(True)
 
 def connexion():
-	global IP, Port, nomUser, entreNom, client_socket, entreIP
+	global IP, Port, nomUser, entreNom, client_socket, entreIP, Role
 	IP = entreIP.get()
 	print(IP)
 	client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	client_socket.connect((IP, Port))
-	client_socket.setblocking(0)
-	nomUser = entreNom.get()
+	client_socket.settimeout(5)
+	try:
+		client_socket.connect((IP, Port))
+		client_socket.setblocking(0)
+		nomUser = entreNom.get()
+		return True
+	except (ConnectionRefusedError, socket.timeout):
+		if Role == "Hote":
+			return False
+		else:
+			tkinter.messagebox.showerror(title="Aïe...", message="IL semblerait que l'adresse IP fournie ne soit pas valide. Réferez vous à l'aide pour régler ce problème.")
+			return False
 
 
 def démarrerServeur():
-	global entreIP, entrePort, IP, Port
+	global entreIP, entrePort, IP, Port, Role
+	Role = "Hote"
 	IP = entreIP.get()
 	Port = int(entrePort.get())
 	subprocess.Popen(f"python Serveur.py {IP} {Port}")
-	connexion()
-	affichageConversation()
+	if connexion() == True:
+		affichageConversation()
 
 def hote():
 	global entrePort, IP, nomUser, cadreParametres, entreNom, entreIP
