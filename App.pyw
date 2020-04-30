@@ -4,6 +4,7 @@ import random
 import tkinter
 import subprocess	
 from tkinter import *
+import simpleaudio as SiAud
 import tkinter.font as tkFont
 from tkinter import messagebox
 
@@ -34,6 +35,8 @@ def envoyer():
 	if len(message) != 0:
 		messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} : {message}"
 		filMessages.insert(END, messageInterface)
+		sonEnvoi= SiAud.WaveObject.from_wave_file("Médias/SonEnvoi.wav")
+		sonEnvoi.play()
 		message = formaterPaquet("Message", nomUser, message)
 		message = message.encode('utf-8')
 		client_socket.send(bytes(message))
@@ -47,10 +50,12 @@ def reception():
 		messageRecu = client_socket.recv(2048)
 		messageRecu = messageRecu.decode("utf-8")
 		filMessages.insert(END, messageRecu)
+		sonMessage = SiAud.WaveObject.from_wave_file("Médias/SonMessage.wav")
+		sonMessage.play()
 	except:
 		pass
 	finally:	
-		fen.after(3000, reception)
+		fen.after(10, reception)
 
 def placeholder(affichage):
 	if affichage == True:
