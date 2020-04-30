@@ -12,7 +12,7 @@ from tkinter import messagebox
 
 global listeNoms
 
-listeNoms = ["Autruche", "JeanBon", "Poulette", "AmiralBenson", "TomNook", "Karamazov", "MonsieurPreskovic", "OdileDeray", "PatéEnCroute"]
+listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Nagui", "Shrek", "Clown"]
 
 def formaterPaquet(TypePaquet, NomUser, Contenu):
 #Type#Longueur#Heure
@@ -35,6 +35,7 @@ def envoyer():
 	if len(message) != 0:
 		messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} : {message}"
 		filMessages.insert(END, messageInterface)
+		filMessages.yview(END)
 		sonEnvoi= SiAud.WaveObject.from_wave_file("Médias/SonEnvoi.wav")
 		sonEnvoi.play()
 		message = formaterPaquet("Message", nomUser, message)
@@ -50,6 +51,7 @@ def reception():
 		messageRecu = client_socket.recv(2048)
 		messageRecu = messageRecu.decode("utf-8")
 		filMessages.insert(END, messageRecu)
+		filMessages.yview(END)
 		sonMessage = SiAud.WaveObject.from_wave_file("Médias/SonMessage.wav")
 		sonMessage.play()
 	except:
@@ -63,13 +65,16 @@ def placeholder(affichage):
 	else:
 		entre.delete(0, "end")
 
+def toucheEntre(argumentUseless):
+    envoyer()
+
 def affichageConversation():
 	global cadreParametres, entre, nomUser, filMessages
 
 	logo.pack_forget()
 	cadreParametres.pack_forget()
 
-	filMessages = Listbox(fen, width="70", height="20")
+	filMessages = Listbox(fen, width="70", height="20", activestyle=UNDERLINE, highlightbackground=None, selectbackground=None)
 	filMessages.pack(pady=15)
 
 	entre = Entry(fen, width="60")
@@ -79,6 +84,7 @@ def affichageConversation():
 	bouttonEnvoyer.pack(pady=15)
 
 	entre.bind("<Button-1>", placeholder)
+	fen.bind_all('<Return>', toucheEntre)
 
 	reception()
 	placeholder(True)
