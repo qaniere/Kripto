@@ -34,6 +34,8 @@
 
 - Pouvoir enregistrer des serveurs : Leur ip, leur port, leur nom
 
+- Commenter, Nettoyer et si possible, répartir le code
+
 ## Quand tout cela sera fait
 
 Il faudra alors rédiger de l'aide et de la documentation, à la fois en toplevel dans l'application et aussi faire une page HTML, si jamais le programme ne marche pas. Ensuite, remplir ce README.MD. On pourra alors envisager d'implémenter des fonctions bonus.
