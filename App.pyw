@@ -99,11 +99,16 @@ def connexion():
 	client_socket.settimeout(5)
 	try:
 		client_socket.connect((IP, Port))
-		client_socket.setblocking(0)
 		données = f"{nomUser}|{CléPublique}"
 		données = données.encode('utf-8')
 		client_socket.send(bytes(données))
-		return True
+		autorisation = client_socket.recv(2048)
+		autorisation = autorisation.decode("utf-8")
+		client_socket.setblocking(0)
+		if autorisation == "True":
+			return True
+		else:
+			tkinter.messagebox.showerror(title="Aïe...", message="Un utilisateur avec le même nom d'utilisateur que le votre est déja connecté. Changez de nom d'utilisateur pour accéder à ce serveur.")	
 	except (ConnectionRefusedError, socket.timeout):
 		if Role == "Hote":
 			return False

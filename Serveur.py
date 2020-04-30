@@ -42,6 +42,7 @@ else:
 
 	#On initialise la liste qui contient les coordonnées des clients connectés
 	listeClient = []
+	listeDesPseudos = []
 	nomClient = {}
 	RoleClient= {}
 	CléPubliqueClient = {}
@@ -57,19 +58,26 @@ else:
 
 			données = données.split("|")
 
-			nomClient[objetClient] = données[0]
+			if données[0] not in listeDesPseudos:
+    				
+				objetClient.send(bytes("True", "utf-8"))
+    			
+				nomClient[objetClient] = données[0]
+				listeDesPseudos.append(données[0])
 
-			if listeClient == []:
-				RoleClient[objetClient] = "Hôte"
+				if listeClient == []:
+					RoleClient[objetClient] = "Hôte"
 
-				print(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
+					print(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
+				else:
+					RoleClient[objetClient] = "Client"
+					annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[objetClient]} vient de rejoindre le chat"
+					print(annonce)
+					envoi(annonce, "Annonce")
+
+				listeClient.append(objetClient) #On stocke l'objet client
 			else:
-				RoleClient[objetClient] = "Client"
-				annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[objetClient]} vient de rejoindre le chat"
-				print(annonce)
-				envoi(annonce, "Annonce")
-
-			listeClient.append(objetClient) #On stocke l'objet client
+				objetClient.send(bytes("False", "utf-8"))
 			
 		except IOError:
 		#Si personne n'essaie de se connecter, on ne fait rien et on ralenti le programme pour préserver les ressources de la machine
