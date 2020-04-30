@@ -10,9 +10,11 @@ from tkinter import messagebox
 
 #OUI LE CODE EST DEGEU ET PAS COMMENTE PARCE QUE J'AI PAS LE TEMPS GNAGNAGNA
 
-global listeNoms
+global listeNoms, CléPublique
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Nagui", "Shrek", "Clown"]
+
+CléPublique = 5467893874673890021842109
 
 def formaterPaquet(TypePaquet, NomUser, Contenu):
 #Type#Longueur#Heure
@@ -90,14 +92,17 @@ def affichageConversation():
 	placeholder(True)
 
 def connexion():
-	global IP, Port, nomUser, entreNom, client_socket, entreIP, Role
+	global IP, Port, nomUser, entreNom, client_socket, entreIP, Role, CléPublique
 	IP = entreIP.get()
+	nomUser = entreNom.get()
 	client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	client_socket.settimeout(5)
 	try:
 		client_socket.connect((IP, Port))
 		client_socket.setblocking(0)
-		nomUser = entreNom.get()
+		données = f"{nomUser}|{CléPublique}"
+		données = données.encode('utf-8')
+		client_socket.send(bytes(données))
 		return True
 	except (ConnectionRefusedError, socket.timeout):
 		if Role == "Hote":

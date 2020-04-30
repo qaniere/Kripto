@@ -13,13 +13,16 @@ IP = sys.argv[1]
 Port = int(sys.argv[2])
 NbrMessageVides = 0
 
-def envoi(message):
+def envoi(message, type):
 	global listeClient
+
 	for destinataire in listeClient:
 	#On désigne les destinaires du message, à savoir tout les clients connectés
 	
 		if destinataire != client:
 		#Si le destinaire n'est pas l'expéditeur
+			destinataire.send(bytes(message, "utf-8"))
+		elif type == "Annonce":
 			destinataire.send(bytes(message, "utf-8"))
 
 #On défini les paramêtres du socket 
@@ -39,15 +42,37 @@ else:
 
 	#On initialise la liste qui contient les coordonnées des clients connectés
 	listeClient = []
+	nomClient = {}
+	RoleClient= {}
+	CléPubliqueClient = {}
 
 	while True:
 	#Si il y'a une nouvelle connnexion, on traite la connexion
 		try:
-			infosClients, IPClient = Serveur.accept()
-			listeClient.append(infosClients) #On stocke les infos du client dans la liste dédiées
-			print(f"[{time.strftime('%H:%M:%S')}] Nouveau client connecté ! IP => {IPClient}")
+			objetClient, IPClient = Serveur.accept()
+			
+
+			données = objetClient.recv(2048)
+			données = données.decode("utf-8")	
+
+			données = données.split("|")
+
+			nomClient[objetClient] = données[0]
+
+			if listeClient == []:
+				RoleClient[objetClient] = "Hôte"
+
+				print(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
+			else:
+				RoleClient[objetClient] = "Client"
+				annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[objetClient]} vient de rejoindre le chat"
+				print(annonce)
+				envoi(annonce, "Annonce")
+
+			listeClient.append(objetClient) #On stocke l'objet client
+			
 		except IOError:
-		#Si personne n'essaie de se connecter, on ralenti le programme pour préserver les ressources de la machine
+		#Si personne n'essaie de se connecter, on ne fait rien et on ralenti le programme pour préserver les ressources de la machine
 			time.sleep(0.1)
 	
 		for client in listeClient:
@@ -71,7 +96,7 @@ else:
 							Contenu = MessageListe[4]
 							messageFormaté = f"[{HeureMessage}] {Expediteur} : {Contenu}"
 							print(messageFormaté)
-							envoi(messageFormaté)
+							envoi(messageFormaté, "Message")
 
 					else:
 						print(f"Message recu invalide ! => {message} ")
