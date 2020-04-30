@@ -1,3 +1,4 @@
+import time
 import socket
 import random
 import tkinter
@@ -7,19 +8,36 @@ import tkinter.font as tkFont
 from tkinter import messagebox
 
 #OUI LE CODE EST DEGEU ET PAS COMMENTE PARCE QUE J'AI PAS LE TEMPS GNAGNAGNA
+
 global listeNoms
-listeNoms = ["Autruche", "JeanBon", "Poulette", "AmiralBenson", "TomNook", "Karamazov", "MonsieurPreskovic", "OdileDeray"]
+
+listeNoms = ["Autruche", "JeanBon", "Poulette", "AmiralBenson", "TomNook", "Karamazov", "MonsieurPreskovic", "OdileDeray", "PatéEnCroute"]
+
+def formaterPaquet(TypePaquet, NomUser, Contenu):
+#Type#Longueur#Heure
+#Message#Longeur#Heure#Auteur
+    if TypePaquet == "Message":
+
+        Paquet = f"Message|&|{time.strftime('%H:%M:%S')}|{NomUser}|{Contenu}"
+
+        longueurPaquet = len(Paquet) - 1
+        longueurPaquet += len(str(longueurPaquet))
+
+        Paquet = Paquet.replace("&", str(longueurPaquet))
+
+    return Paquet
 
 def envoyer():
 	global entre, nomUser, filMessages, client_socket
 
 	message = entre.get()
 	if len(message) != 0:
-		message = nomUser + " : " + message
-		filMessages.insert(END, message)
+		messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} : {message}"
+		filMessages.insert(END, messageInterface)
+		message = formaterPaquet("Message", nomUser, message)
 		message = message.encode('utf-8')
 		client_socket.send(bytes(message))
-		entre.delete(0, 'end')
+		entre.delete(0, 'end') 
 	else:
 		entre.delete(0, 'end')
 
@@ -28,7 +46,7 @@ def reception():
 	try:
 		messageRecu = client_socket.recv(2048)
 		messageRecu = messageRecu.decode("utf-8")
-		filMessages.insert(END, messageRecu)	
+		filMessages.insert(END, messageRecu)
 	except:
 		pass
 	finally:	
@@ -63,7 +81,6 @@ def affichageConversation():
 def connexion():
 	global IP, Port, nomUser, entreNom, client_socket, entreIP, Role
 	IP = entreIP.get()
-	print(IP)
 	client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	client_socket.settimeout(5)
 	try:
@@ -134,7 +151,6 @@ def seConnecter():
 	Port = int(entrePort.get())
 	IP = entreIP.get()
 	if connexion() == True: 
-		
 		affichageConversation()
 
 def client():
