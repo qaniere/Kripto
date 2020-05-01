@@ -201,7 +201,7 @@ g, A, a = génération(16)
 
 ### Impression des clefs et du module de chiffrement ###
 
-
+"""
 print("Module de chiffrement (g) : " + str(g) + "\n        Clef publique (A) : (" + str(g) + ", " + str(A) + ")\n          Clef privée (a) : (" + str(g) + ", " + str(a) + ")\n")
 
 
@@ -259,3 +259,4 @@ m = déchiffrement(n)
 print("\nLe message dechiffré est :\n\n", m)
 
 input("\n\nVous êtes arrivés à la fin du programme\n\n")
+"""

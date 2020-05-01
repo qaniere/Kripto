@@ -1,26 +1,27 @@
 # coding: utf8
 import time
 import socket
-import random
 import tkinter
 import winsound
 import subprocess	
 from tkinter import *
+from ChiffrementRSA import *
+from random import randint, choices
 import tkinter.font as tkFont
 from tkinter import messagebox
 
 #OUI LE CODE EST DEGEU ET PAS COMMENTE PARCE QUE J'AI PAS LE TEMPS GNAGNAGNA
 
-global listeNoms, CléPublique, NombreErreurs
+global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Nagui", "Shrek", "Clown"]
-CléPublique = 5467893874673890021842109
+Module, CléPublique, CléPrivée = génération(16)
 NombreErreurs = 0
 
 def formaterPaquet(TypePaquet, NomUser, Contenu):
-#Type#Longueur#Heure
-#Message#Longeur#Heure#Auteur
+
     if TypePaquet == "Message":
+    #Message|Longeur|Heure|Auteur
 
         Paquet = f"Message|&|{time.strftime('%H:%M:%S')}|{NomUser}|{Contenu}"
 
@@ -32,13 +33,23 @@ def formaterPaquet(TypePaquet, NomUser, Contenu):
     return Paquet
 
 def envoyer():
-	global entre, nomUser, filMessages, client_socket, NombreErreurs
-
+	global entre, nomUser, filMessages, client_socket, NombreErreurs, CléPubliqueServeur, ModuleServeur
 	message = entre.get()
+
 	if len(message) != 0:
+    		
 		messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} : {message}"
 		message = formaterPaquet("Message", nomUser, message)
-		message = message.encode('utf-8')
+		message = chiffrement(message)
+		message = cryptage(message, CléPubliqueServeur, ModuleServeur)
+
+		ChaineMessage = ""
+
+		for index in message:
+			ChaineMessage += str(index) + "/"
+    		
+		message = ChaineMessage.encode('utf-8')
+
 		try:
 			client_socket.send(bytes(message))
 		except ConnectionResetError:
@@ -55,10 +66,20 @@ def envoyer():
 			entre.delete(0, 'end')
 
 def reception():
-	global filMessages, client_socket
+	global filMessages, client_socket, CléPrivée, Module
 	try:
 		messageRecu = client_socket.recv(2048)
 		messageRecu = messageRecu.decode("utf-8")
+
+		messageRecu = messageRecu.split("/")
+		messageRecu.remove("")
+		
+		for index in range (len(messageRecu)):
+			messageRecu[index] = int(messageRecu[index])
+
+		messageRecu = décryptage(messageRecu, CléPrivée, Module)
+		messageRecu = déchiffrement(messageRecu)
+
 		filMessages.insert(END, messageRecu)
 		filMessages.yview(END)
 		winsound.PlaySound("Médias/SonMessage.wav", winsound.SND_ASYNC)
@@ -66,6 +87,13 @@ def reception():
 		pass
 	finally:	
 		fen.after(10, reception)
+
+
+
+
+
+
+
 
 def placeholder(affichage):
 	if affichage == True:
@@ -98,20 +126,30 @@ def affichageConversation():
 	placeholder(True)
 
 def connexion():
-	global IP, Port, nomUser, entreNom, client_socket, entreIP, Role, CléPublique
+	global IP, Port, nomUser, entreNom, client_socket, entreIP, Role, CléPublique, CléPubliqueServeur, ModuleServeur
+
 	IP = entreIP.get()
 	nomUser = entreNom.get()
+
 	client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	client_socket.settimeout(5)
+
 	try:
 		client_socket.connect((IP, Port))
-		données = f"{nomUser}|{CléPublique}"
+
+		données = f"{nomUser}|{CléPublique}|{Module}"
 		données = données.encode('utf-8')
+
 		client_socket.send(bytes(données))
+
 		autorisation = client_socket.recv(2048)
 		autorisation = autorisation.decode("utf-8")
+
 		client_socket.setblocking(0)
-		if autorisation == "True":
+		if autorisation != "False":
+			autorisation = autorisation.split("|")
+			CléPubliqueServeur = int(autorisation[0])
+			ModuleServeur = int(autorisation[1])
 			return True
 		else:
 			tkinter.messagebox.showerror(title="Aïe...", message="Un utilisateur avec le même nom d'utilisateur que le votre est déja connecté. Changez de nom d'utilisateur pour accéder à ce serveur.")	
@@ -131,6 +169,11 @@ def démarrerServeur():
 	subprocess.Popen(f"python Serveur.py {IP} {Port}")
 	if connexion() == True:
 		affichageConversation()
+
+
+
+
+
 
 def hote():
 	global entrePort, IP, nomUser, cadreParametres, entreNom, entreIP, listeNoms
@@ -154,13 +197,13 @@ def hote():
 	votrePort = Label(cadreParametres, text="Port", bg="Grey")
 	votrePort.pack(anchor=CENTER, pady=7)
 
-	portRecommande = random.randint(49152, 65535)
+	portRecommande = randint(49152, 65535)
 
 	entrePort = Entry(cadreParametres)
 	entrePort.insert("end", portRecommande)
 	entrePort.pack(anchor=CENTER)
 
-	suggestionNom = random.choices(listeNoms)
+	suggestionNom = choices(listeNoms)
 
 	votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
 	votreNom.pack(anchor=CENTER, pady=7)
@@ -172,6 +215,11 @@ def hote():
 	bouttonStart = Button(cadreParametres, text="Démarrer", command=démarrerServeur)
 	bouttonStart.pack(pady=20)
 
+
+
+
+
+
 def seConnecter():
 	global entreIP, entrePort, IP, Port, Role
 	Role = "Client"
@@ -179,6 +227,10 @@ def seConnecter():
 	IP = entreIP.get()
 	if connexion() == True: 
 		affichageConversation()
+
+
+
+
 
 def client():
 	global entreIP, entrePort, entreNom, cadreParametres, listeNoms
@@ -201,7 +253,7 @@ def client():
 	entrePort = Entry(cadreParametres)
 	entrePort.pack(anchor=CENTER)
 
-	suggestionNom = random.choices(listeNoms)
+	suggestionNom = choices(listeNoms)
 
 	votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
 	votreNom.pack(anchor=CENTER, pady=7)
@@ -212,6 +264,12 @@ def client():
 
 	bouttonStart = Button(cadreParametres, text="Se connecter",  command=seConnecter)
 	bouttonStart.pack(pady=20)
+
+
+
+
+
+
 
 fen = Tk()
 fen.geometry("550x450")

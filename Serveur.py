@@ -4,10 +4,15 @@ import time
 import socket
 import tkinter
 from tkinter import *
+from ChiffrementRSA import *
 from tkinter import messagebox
 
 fen = Tk()
 fen.withdraw()
+
+global Module, CléPublique, CléPrivée
+
+Module, CléPublique, CléPrivée = génération(16)
 
 #Constantes d'application
 IP = sys.argv[1]
@@ -21,9 +26,29 @@ def envoi(message, type):
 	
 		if destinataire != client:
 		#Si le destinaire n'est pas l'expéditeur
-			destinataire.send(bytes(message, "utf-8"))
+			message = chiffrement(message)
+			message = cryptage(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+			
+			ChaineMessage = ""
+
+			for index in message:
+				ChaineMessage += str(index) + "/"
+    		
+			message = ChaineMessage.encode('utf-8')
+			destinataire.send(bytes(message))
+
 		elif type == "Annonce":
-			destinataire.send(bytes(message, "utf-8"))
+			
+			message = chiffrement(message)
+			message = cryptage(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+			
+			ChaineMessage = ""
+
+			for index in message:
+				ChaineMessage += str(index) + "/"
+    		
+			message = ChaineMessage.encode('utf-8')
+			destinataire.send(bytes(message))
 
 #On défini les paramêtres du socket 
 Serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -46,6 +71,7 @@ else:
 	nomClient = {}
 	RoleClient= {}
 	CléPubliqueClient = {}
+	ModuleClient = {}
 
 	while True:
 	#Si il y'a une nouvelle connnexion, on traite la connexion
@@ -60,9 +86,11 @@ else:
 
 			if données[0] not in listeDesPseudos:
     				
-				objetClient.send(bytes("True", "utf-8"))
+				objetClient.send(bytes(f"{str(CléPublique)}|{str(Module)}", "utf-8"))
     			
 				nomClient[objetClient] = données[0]
+				CléPubliqueClient[objetClient] = int(données[1])
+				ModuleClient[objetClient] = int(données[2])
 				listeDesPseudos.append(données[0])
 
 				if listeClient == []:
@@ -90,6 +118,15 @@ else:
 			try:
 				message = client.recv(2048)
 				message = message.decode("utf-8")
+
+				message = message.split("/")
+				message.remove("")
+
+				for index in range (len(message)):
+					message[index] = int(message[index])
+
+				message = décryptage(message, CléPrivée, Module)
+				message = déchiffrement(message)
 
 				if message == "":
 					print("Message vide")

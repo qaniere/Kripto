@@ -14,8 +14,6 @@
 
 ## Liste de choses essentielles à faire
 
-- Gérer les déconnexions coté client : échec d'envoi du message, déconnexion du serveur.
-
 - Afficher les coordonnées du serveur
 
 - Gérer la longeur des paquets
@@ -25,8 +23,6 @@
 - Si le message est trop long, retour à la ligne
 
 - Fermeture du serveur quand l'hôte ferme sa fenêtre
-
-- Chiffrer les conversations : Le client envoi sa clé publique au serveur,  le serveur envoit sa clé au client. Le client chiffre avec la clé du serveur, le serveur déchiffre et réchiffre spécifiquement pour chaque client.
 
 - Gestion des paramétres : Son et remplissage automatique des champs
 
