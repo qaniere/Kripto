@@ -1,3 +1,4 @@
+# coding: utf8
 from random import *
 
 
@@ -23,7 +24,7 @@ sous formes de variables au nom court.
 ### Définition de la fonction de chiffrement ###
 
 
-def chiffrement(m):
+def transformationChiffres(m):
 
     """Fonction de chiffrement : transforme le message clair en message chiffré"""
 
@@ -62,7 +63,7 @@ def décryptage(c, a, g):
 ### Définition de la fonction de déchiffrement ###
 
 
-def déchiffrement(n):
+def transformationCaratères(n):
 
     """Fonction de déchiffrement : transforme le message chiffré en message clair"""
 

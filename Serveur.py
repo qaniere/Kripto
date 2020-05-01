@@ -26,7 +26,7 @@ def envoi(message, type):
 	
 		if destinataire != client:
 		#Si le destinaire n'est pas l'expéditeur
-			messageEnvoi = chiffrement(message)
+			messageEnvoi = transformationChiffres(message)
 			messageEnvoi = cryptage(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
 			
 			ChaineMessage = ""
@@ -39,7 +39,7 @@ def envoi(message, type):
 
 		elif type == "Annonce":
 			
-			messageEnvoi = chiffrement(message)
+			messageEnvoi = transformationChiffres(message)
 			messageEnvoi = cryptage(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
 			
 			ChaineMessage = ""
@@ -126,7 +126,7 @@ else:
 					message[index] = int(message[index])
 
 				message = décryptage(message, CléPrivée, Module)
-				message = déchiffrement(message)
+				message = transformationCaratères(message)
 
 				if message == "":
 					print("Message vide")

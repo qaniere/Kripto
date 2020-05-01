@@ -18,6 +18,8 @@
 
 - Gérer la longeur des paquets
 
+- Refaire les placeholders et ajouter un sur la suggestion de nom d'utilisateur
+
 - Confirmation de fermeture de la fenêtre coté client
 
 - Si le message est trop long, retour à la ligne
@@ -26,9 +28,13 @@
 
 - Gestion des paramétres : Son et remplissage automatique des champs
 
+- Empêcher l'envoi de messsage vide ("      ")
+
 - Ajouter des commandes : /stop pour stopper le serveur, /ban pour bannir un utilisateur, /op pour le promouvoir
 
 - Pouvoir retourner facilement au menu
+
+- Fusioner clé publique et module de chiffrement au niveau de la structure des données
 
 - Pouvoir enregistrer des serveurs : Leur ip, leur port, leur nom
 
