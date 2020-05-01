@@ -26,29 +26,29 @@ def envoi(message, type):
 	
 		if destinataire != client:
 		#Si le destinaire n'est pas l'expéditeur
-			message = chiffrement(message)
-			message = cryptage(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+			messageEnvoi = chiffrement(message)
+			messageEnvoi = cryptage(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
 			
 			ChaineMessage = ""
 
-			for index in message:
+			for index in messageEnvoi:
 				ChaineMessage += str(index) + "/"
     		
-			message = ChaineMessage.encode('utf-8')
-			destinataire.send(bytes(message))
+			messageEnvoi = ChaineMessage.encode('utf-8')
+			destinataire.send(bytes(messageEnvoi))
 
 		elif type == "Annonce":
 			
-			message = chiffrement(message)
-			message = cryptage(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+			messageEnvoi = chiffrement(message)
+			messageEnvoi = cryptage(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
 			
 			ChaineMessage = ""
 
-			for index in message:
+			for index in messageEnvoi:
 				ChaineMessage += str(index) + "/"
     		
-			message = ChaineMessage.encode('utf-8')
-			destinataire.send(bytes(message))
+			messageEnvoi = ChaineMessage.encode('utf-8')
+			destinataire.send(bytes(messageEnvoi))
 
 #On défini les paramêtres du socket 
 Serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
