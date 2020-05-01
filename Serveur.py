@@ -1,3 +1,4 @@
+# coding: utf8
 import sys
 import time
 import socket
@@ -11,7 +12,6 @@ fen.withdraw()
 #Constantes d'application
 IP = sys.argv[1]
 Port = int(sys.argv[2])
-NbrMessageVides = 0
 
 def envoi(message, type):
 	global listeClient
@@ -92,8 +92,7 @@ else:
 				message = message.decode("utf-8")
 
 				if message == "":
-					NbrMessageVides += 1
-
+					print("Message vide")
 				else:
 					MessageListe = message.split("|")
 					Type = MessageListe[0]
@@ -109,6 +108,18 @@ else:
 					else:
 						print(f"Message recu invalide ! => {message} ")
 
-			except:
-				#Si aucun message n'a été envoyé
-				time.sleep(0.1)
+			except BlockingIOError:
+				pass
+
+			except ConnectionResetError:
+				annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[client]} vient de se déconnecter"
+				print(annonce)
+				listeClient.remove(client)
+				listeDesPseudos.remove(nomClient[client])
+				del nomClient[client]
+				#del CléPubliqueClient[client]
+				del RoleClient[client]
+				envoi(annonce, "Annonce")
+				
+
+
