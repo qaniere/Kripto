@@ -14,8 +14,6 @@
 
 ## Liste de choses essentielles à faire
 
-- Gérer les déconnexions coté serveur : Supprimer les données des clients déconnectés.
-
 - Gérer les déconnexions coté client : échec d'envoi du message, déconnexion du serveur.
 
 - Afficher les coordonnées du serveur
