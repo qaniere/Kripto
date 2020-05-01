@@ -11,11 +11,11 @@ from tkinter import messagebox
 
 #OUI LE CODE EST DEGEU ET PAS COMMENTE PARCE QUE J'AI PAS LE TEMPS GNAGNAGNA
 
-global listeNoms, CléPublique
+global listeNoms, CléPublique, NombreErreurs
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Nagui", "Shrek", "Clown"]
-
 CléPublique = 5467893874673890021842109
+NombreErreurs = 0
 
 def formaterPaquet(TypePaquet, NomUser, Contenu):
 #Type#Longueur#Heure
@@ -32,20 +32,27 @@ def formaterPaquet(TypePaquet, NomUser, Contenu):
     return Paquet
 
 def envoyer():
-	global entre, nomUser, filMessages, client_socket
+	global entre, nomUser, filMessages, client_socket, NombreErreurs
 
 	message = entre.get()
 	if len(message) != 0:
 		messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} : {message}"
-		filMessages.insert(END, messageInterface)
-		filMessages.yview(END)
-		winsound.PlaySound("Médias/SonEnvoi.wav", winsound.SND_ASYNC)
 		message = formaterPaquet("Message", nomUser, message)
 		message = message.encode('utf-8')
-		client_socket.send(bytes(message))
-		entre.delete(0, 'end') 
-	else:
-		entre.delete(0, 'end')
+		try:
+			client_socket.send(bytes(message))
+		except ConnectionResetError:
+			if NombreErreurs < 3:
+				tkinter.messagebox.showerror(title="Aïe...", message="Impossible de joindre le serveur. Veuillez réessayer.")
+				NombreErreurs += 1
+			else:
+				tkinter.messagebox.showerror(title="Aïe...", message="Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide")
+				exit()
+		else:
+			filMessages.insert(END, messageInterface)
+			filMessages.yview(END)
+			winsound.PlaySound("Médias/SonEnvoi.wav", winsound.SND_ASYNC)
+			entre.delete(0, 'end')
 
 def reception():
 	global filMessages, client_socket
