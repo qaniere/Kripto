@@ -20,7 +20,11 @@
 
 - Afficher les coordonnées du serveur
 
+- Gérer la longeur des paquets
+
 - Confirmation de fermeture de la fenêtre coté client
+
+- Si le message est trop long, retour à la ligne
 
 - Fermeture du serveur quand l'hôte ferme sa fenêtre
 
