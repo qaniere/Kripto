@@ -14,11 +14,11 @@
 
 ## Liste de choses essentielles à faire
 
-- Corriger le problème de librarie sonore : simpleaudio nécessite le VC++14BT, donc il faut passer sur Winsound
-
 - Gérer les déconnexions coté serveur : Supprimer les données des clients déconnectés.
 
 - Gérer les déconnexions coté client : échec d'envoi du message, déconnexion du serveur.
+
+- Afficher les coordonnées du serveur
 
 - Confirmation de fermeture de la fenêtre coté client
 
