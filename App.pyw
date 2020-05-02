@@ -13,7 +13,7 @@ from tkinter import messagebox
 #Variables d'applications
 global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs
 
-listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Nagui", "Shrek", "Clown"]
+listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
 
 Module, CléPublique, CléPrivée = génération(16)
@@ -272,7 +272,7 @@ def connexion():
 		else:
 		#Si le serveur ne donne pas son autorisation
 
-			messageErreur = "Un utilisateur avec le même nom d'utilisateur que le votre est déja connecté. Changez de nom d'utilisateur pour accéder à ce serveur."
+			MessageErreur = "Un utilisateur avec le même nom d'utilisateur que le votre est déja connecté. Changez de nom d'utilisateur pour accéder à ce serveur."
 			#On raccourci la ligne du dessous avec cette variable
 			tkinter.messagebox.showerror(title="Aïe...", message=MessageErreur)	
 
