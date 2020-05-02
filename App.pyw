@@ -184,6 +184,9 @@ def toucheEntre(argumentUseless):
 
 	envoyer()
 
+def pasCode():
+		""" Fonction qui affiche un message come quoi j'ai eu la flemme de coder la fonction pour le moment"""
+		tkinter.messagebox.showwarning(title="Aïe...", message="Cette fonction n'a pas encore été codée")
 
 
 def affichageConversation():
@@ -196,6 +199,10 @@ def affichageConversation():
 	logo.pack_forget()
 	cadreParametres.pack_forget()
 	#On efface les élements de connexion / paramétrage du serveur
+
+	barreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
+	barreMenu.insert_command(0, label="Menu", command=pasCode)
+	#On insère les boutons dans le menu au index donnés
 
 	filMessages = Listbox(fen, width="70", height="20")
 	filMessages.pack(pady=15)
@@ -420,17 +427,69 @@ def client():
 	bouttonStart.pack(pady=20)
 
 
+def infosServeur():
+	""" Cette fonction affiches les informations du serveur dans une fenêtre en top level"""
+
+	global IP, Port
+	#On récupere les variables d'adresse du serveur
+
+	def QuitterInfos():
+		"""Fonction qui détruit la fenêtre des infos du serveur"""
+		fenInfos.destroy()
+		
+	fenInfos = Toplevel()
+	fenInfos.geometry("300x280")
+	fenInfos.configure(bg="grey")
+	fenInfos.resizable(width=False, height=False)
+	fenInfos.iconbitmap(bitmap="Médias/information.ico")
+	fenInfos.title("Infos du serveur")
+	#Définition de l'apparence de la fenêtre
+
+	TitreAdresseServeur = Label(fenInfos, text="Adresse du serveur", bg="Grey", font=policeTitre)
+	TitreAdresseServeur.pack(pady=10)
+
+	AdresseServeur = Label(fenInfos, text=IP, bg="Grey", font=policeSousTitre)
+	AdresseServeur.pack()
+
+	TitrePortServeur = Label(fenInfos, text="Port du serveur", bg="Grey", font=policeTitre)
+	TitrePortServeur.pack(pady=10)
+
+	PortServeur = Label(fenInfos, text=Port, bg="Grey", font=policeSousTitre)
+	PortServeur.pack() 
+
+	TitreUtilisateursCo = Label(fenInfos, text="Utiliseurs connectées", bg="Grey", font=policeTitre)
+	TitreUtilisateursCo.pack(pady=10)
+
+	UtilisateurCo = Label(fenInfos, text="N/C", bg="Grey", font=policeSousTitre)
+	UtilisateurCo.pack()
+
+	BouttonFermer = Button(fenInfos, text="Fermer", command=QuitterInfos)
+	BouttonFermer.pack(pady=20, side=BOTTOM)
+
+	fenInfos.focus_force()
+	#On affiche la fenêtre au premier plan
+
+	fenInfos.mainloop()
 
 fen = Tk()
-fen.geometry("550x450")
+fen.geometry("550x460")
 fen.title("Kripto - Un chat chiffré")
 fen.configure(bg="grey")
 fen.resizable(width=False, height=False)
 fen.iconbitmap(bitmap="Médias/icone.ico")
 
+barreMenu = Menu(fen)
+barreMenu.add_command(label="Aide", command=pasCode)
+barreMenu.add_command(label="Couper le son", command=pasCode)
+barreMenu.add_command(label="Paramètres", command=pasCode)
+barreMenu.add_command(label="Contact", command=pasCode)
+fen.configure(menu=barreMenu)
+#On configure la barre de menu
+
 policeBienvenue = tkFont.Font(family="Verdanna",size=16,weight="bold")
 policeBoutton = tkFont.Font(family="Arial",size=12,weight="bold")
-policeIP = tkFont.Font(size=14,weight="bold")
+policeTitre = tkFont.Font(size=14,weight="bold")
+policeSousTitre = tkFont.Font(size=12)
 
 imageLogo = PhotoImage(file="Médias/Logo.png")
  
