@@ -14,8 +14,6 @@
 
 ## Liste de choses essentielles à faire
 
-- Afficher les coordonnées du serveur
-
 - Gérer la longeur des paquets
 
 - Refaire les placeholders et ajouter un sur la suggestion de nom d'utilisateur
