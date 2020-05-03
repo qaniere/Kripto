@@ -14,9 +14,11 @@
 
 ## Liste de choses essentielles à faire
 
-- Gérer la longeur des paquets
+- Corriger le bug chez l'hôte en cas de déconnexion du serveur (Pas de message d'erreurs et affichage en bas, problablement dû a des messages vides)
 
-- Refaire les placeholders et ajouter un sur la suggestion de nom d'utilisateur
+- Empêcher / Gérer les messages trop longs
+
+- Refaire les placeholders et en ajouter un sur la suggestion de nom d'utilisateur
 
 - Confirmation de fermeture de la fenêtre coté client
 
@@ -37,6 +39,10 @@
 - Pouvoir enregistrer des serveurs : Leur ip, leur port, leur nom
 
 - Commenter, Nettoyer et si possible, répartir le code
+
+- Historique des messages
+
+- Encodage des caractéres en ascii variables selon serveur (Nouvelle constante encodage)
 
 ## Quand tout cela sera fait
 
