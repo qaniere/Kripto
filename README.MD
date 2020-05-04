@@ -16,13 +16,11 @@
 
 - Corriger le bug chez l'hôte en cas de déconnexion du serveur (Pas de message d'erreurs et affichage en bas, problablement dû a des messages vides)
 
-- Empêcher / Gérer les messages trop longs
+- Gérer les messages trop longs => Problèmes de chiffrement aparament, couper ?
 
 - Refaire les placeholders et en ajouter un sur la suggestion de nom d'utilisateur
 
 - Confirmation de fermeture de la fenêtre coté client
-
-- Si le message est trop long, retour à la ligne
 
 - Fermeture du serveur quand l'hôte ferme sa fenêtre
 
