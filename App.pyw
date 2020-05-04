@@ -49,6 +49,81 @@ def formaterPaquet(TypePaquet, NomUser, Contenu):
 
 
 
+def traitementPhrase(chaine):
+    
+    """Cette fonction traite une chaine en la coupant en deux au 
+    bout de 50 caractéres. Elle retourne deux variables, la premiere
+    la chaine de moins de 51 caracteres et le reste. Il convient donc
+    d'executer la fonction autant que nécéssaire"""
+    
+    listeMots = chaine.split(" ")
+    #On transforme la chaine en liste 
+    #Exemple => "Hello World !" ==> ["Hello", "World", "!"]
+
+    Ligne = ""
+    while len(Ligne) < 70:
+    #Tant qu'il y a de la place dans la variable Ligne
+        if Ligne == "":
+            Ligne += listeMots.pop(0)
+        else:
+            Ligne += " " + listeMots.pop(0)
+    #On ajout le premier index de chaque ligne avec la méthode pop,
+    #ce qui le supprime de la liste
+
+    chaine = ""
+    #On vide la variable chaine
+    Ligne = Ligne.split(" ")
+    #On retransorme la chaine en liste pour retire le dernier mot
+
+    listeMots.insert(0, Ligne.pop(-1))
+    #On supprime ce mot et on l'insére dans le reste
+
+    for index in range(len(Ligne)):
+    #On transforme la liste en chaine
+        if chaine == "":
+            chaine += Ligne.pop(0)
+        else:
+            chaine += " " + Ligne.pop(0)
+
+    MotsRestants = ""
+
+    for index in range(len(listeMots)):
+    #On transforme la liste des mots en restant en chaine
+        if MotsRestants == "":
+            MotsRestants += listeMots.pop(0)
+        else:
+            MotsRestants += " " + listeMots.pop(0)
+ 
+    return chaine, MotsRestants
+
+
+
+def couperPhrases(chaine):
+
+    """ Cette fonction sert à appeller la fonction "TraitementPhrase"
+    autant de fois que nécéssaire"""
+    
+    resultat = []
+    NonTraité = chaine
+    #On initialise les variables 
+
+    while len(NonTraité) > 70:
+    #Tant qu'il reste un ligne de plus de 50 caractéres
+
+        Ligne, NonTraité = traitementPhrase(NonTraité)
+        #On récupere un ligne de 50 caractères maximums et un autre
+        #ligne qu'on va retraitre si elle fait plus de 50 caratères
+
+        resultat.append(Ligne)
+        #On ajoute la ligne de moins de 50 caratères à un liste
+        #résulat qu'on retourne
+     
+    resultat.append(NonTraité)
+    #On ajoute le reste de moins de 50
+    return resultat
+
+
+
 def envoyer():
 
 	"""Fonction qui chiffre et envoi les message au serveur. Les messages sont chiffrés en fonction du serveur"""
@@ -103,10 +178,24 @@ def envoyer():
 
 		else:
     	#Si il n'a pas eu d'execeptions
-			filMessages.insert(END, messageInterface)
+
+			if len(messageInterface) > 70:
+    		#Si le message à afficher fait plus de 70 caratères
+
+				listeLignes = couperPhrases(messageInterface)
+				#On recupere plusieurs lignes de moins de 70 caractères dans une liste
+
+				for ligne in listeLignes:
+    			#On insere chaque ligne
+					filMessages.insert(END, ligne)
+			else:
+				filMessages.insert(END, messageInterface)
+
 			filMessages.yview(END)
-			#On insère le message dans listbox et on défile tout en bas cette dernière, vers le message le plus récent
+			#On défile tout en bas cette dernière, vers le message le plus récent
+
 			winsound.PlaySound("Médias/SonEnvoi.wav", winsound.SND_ASYNC)
+
 			saisieMessage.delete(0, 'end')
 			#On vide la zone de saisie du message
 
@@ -146,7 +235,18 @@ def reception():
 		messageRecu = transformationCaratères(messageRecu)
 		#On décrypte le message recu, puis ensuite,  on le transforme en caractères
 
-		filMessages.insert(END, messageRecu)
+		if len(messageRecu) > 70:
+		#Si le message à afficher fait plus de 70 caratères
+			
+			listeLignes = couperPhrases(messageRecu)
+				#On recupere plusieurs lignes de moins de 70 caractères dans une liste
+
+			for ligne in listeLignes:
+    		#On insere chaque ligne
+				filMessages.insert(END, ligne)
+		else:
+			filMessages.insert(END, messageRecu)
+			
 		filMessages.yview(END)
 		#On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
 
