@@ -110,59 +110,60 @@ def reception():
     """ Fonction récursive (Qui s'appelle elle même toutes les 10ms) qui permet de vérifier
     la présence de nouveaux messages"""
 
-    global filMessages, ConnexionSocket, CléPrivée, Module, SonActivé
+    global filMessages, ConnexionSocket, CléPrivée, Module, SonActivé, Connexion
     #On récupere les variables nécéssaires au fonctionemment de la fonction
+    if Connexion == True:
+        try:
+        #Cette partie du code est dans un bloc "try, except" car "ConnexionSocket.setblocking(0)" a été défini sur False
+        #Au lieu d'attendre un message, si rien n'est envoyé cela va générer une exception, ce qui permet un fonctionnement asynchrone.
 
-    try:
-    #Cette partie du code est dans un bloc "try, except" car "ConnexionSocket.setblocking(0)" a été défini sur False
-    #Au lieu d'attendre un message, si rien n'est envoyé cela va générer une exception, ce qui permet un fonctionnement asynchrone.
+            messageRecu = ConnexionSocket.recv(2048)
+            #2048 est la limite d'octets recevables
+            messageRecu = messageRecu.decode("utf-8")
 
-        messageRecu = ConnexionSocket.recv(2048)
-        #2048 est la limite d'octets recevables
-        messageRecu = messageRecu.decode("utf-8")
+            messageRecu = messageRecu.split("/")
+            #On transforme le message recu en liste
+            #Exemple => "234/23124/34142" donnera la liste ["234", "23124", "34142"]
 
-        messageRecu = messageRecu.split("/")
-        #On transforme le message recu en liste
-        #Exemple => "234/23124/34142" donnera la liste ["234", "23124", "34142"]
-
-        messageRecu.remove("")
-        #On supprime le dernier index vide de la liste
+            messageRecu.remove("")
+            #On supprime le dernier index vide de la liste
         
-        for index in range (len(messageRecu)):
-        #Boucle qui sera executé autant de fois qu'il y'a d'index dans la liste messageRecu
+            for index in range (len(messageRecu)):
+            #Boucle qui sera executé autant de fois qu'il y'a d'index dans la liste messageRecu
 
-            messageRecu[index] = int(messageRecu[index])
-            #On transforme l'index de la liste en entier pour pouvoir le déchiffrer
+                messageRecu[index] = int(messageRecu[index])
+                #On transforme l'index de la liste en entier pour pouvoir le déchiffrer
 
-        messageRecu = décryptage(messageRecu, CléPrivée, Module)
-        messageRecu = transformationCaratères(messageRecu)
-        #On décrypte le message recu, puis ensuite,  on le transforme en caractères
+            messageRecu = décryptage(messageRecu, CléPrivée, Module)
+            messageRecu = transformationCaratères(messageRecu)
+            #On décrypte le message recu, puis ensuite,  on le transforme en caractères
 
-        if len(messageRecu) > 70:
-        #Si le message à afficher fait plus de 70 caratères
+            if len(messageRecu) > 70:
+            #Si le message à afficher fait plus de 70 caratères
             
-            listeLignes = couperPhrases(messageRecu)
+                listeLignes = couperPhrases(messageRecu)
                 #On recupere plusieurs lignes de moins de 70 caractères dans une liste
 
-            for ligne in listeLignes:
-            #On insere chaque ligne
-                filMessages.insert(END, ligne)
-        else:
-            filMessages.insert(END, messageRecu)
+                for ligne in listeLignes:
+                #On insere chaque ligne
+                    filMessages.insert(END, ligne)
+
+            else:
+                filMessages.insert(END, messageRecu)
             
-        filMessages.yview(END)
-        #On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
+            filMessages.yview(END)
+            #On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
 
-        if SonActivé == True:
-            winsound.PlaySound("Médias/SonMessage.wav", winsound.SND_ASYNC)
+            if SonActivé == True:
+                winsound.PlaySound("Médias/SonMessage.wav", winsound.SND_ASYNC)
 
-    except BlockingIOError:
-    #Si aucun message n'a été envoyé, on ne fait rien
-        pass
-    finally:	
-    #Bloc qui sera executé aprés le try ou l'except
-        fen.after(10, reception)
-        #La fonction s'appelle après 10ms
+        except BlockingIOError:
+        #Si aucun message n'a été envoyé, on ne fait rien
+         pass
+        finally:	
+        #Bloc qui sera executé aprés le try ou l'except
+            fen.after(10, reception)
+            #La fonction s'appelle après 10ms
 
 
 
@@ -214,13 +215,34 @@ def ActiverSon():
     barreMenu.insert_command(2, label="Couper Son", command=CouperSon)
     #On supprime la commande à l'index 2 du menu pour y ajouter la commande CouperSon à la même position
 
+def RetournerMenu():
+    global filMessages, saisieMessage, bouttonEnvoyer, Connexion
+
+    Confirmation = messagebox.askquestion (f"Vous partez déja {nomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
+    if Confirmation == 'yes':
+        filMessages.pack_forget()
+        saisieMessage.pack_forget()
+        bouttonEnvoyer.pack_forget()
+
+        fen.unbind_all(ALL)
+    
+        barreMenu.delete(1)
+        barreMenu.delete(1)
+        barreMenu.delete(3)
+
+        
+        Connexion = False
+        ConnexionSocket.close()
+
+        AfficherMenu()
+
 
 
 def affichageConversation():
         
     """ Cette fonction sert à générer l'interface de la conversation"""
 
-    global cadreParametres, saisieMessage, nomUser, filMessages
+    global cadreParametres, saisieMessage, nomUser, filMessages, bouttonEnvoyer, Connexion
     #On récuperer les objets et les variables nécéssaire au fonctionnement de la fonction
 
     logo.pack_forget()
@@ -229,7 +251,7 @@ def affichageConversation():
 
     barreMenu.insert_command(1, label="Couper Son", command=CouperSon)
     barreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
-    barreMenu.insert_command(0, label="Menu", command=pasCode)
+    barreMenu.insert_command(0, label="Menu", command=RetournerMenu)
     #On insère les boutons dans le menu au index donnés
 
     filMessages = Listbox(fen, width="70", height="20")
@@ -246,6 +268,7 @@ def affichageConversation():
     fen.bind_all('<Return>', toucheEntre)
     #On associe l'appui sur la toucheEntre à la fonction toucheEntre
 
+    Connexion = True
     reception()
     #On commence à recevoir des messages
     placeholder("AppelManuel")
@@ -519,20 +542,26 @@ policeTitre = tkFont.Font(size=14,weight="bold")
 policeSousTitre = tkFont.Font(size=12)
 
 imageLogo = PhotoImage(file="Médias/Logo.png")
- 
-logo = Label(fen, bg="grey", image=imageLogo)
-logo.pack() 
 
-messageBienvenue = Label(fen, text="Bienvenue dans Kripto. Pour démarrez, dites-nous \nsi vous voulez être hôte ou bien client.", bg="grey", font=policeBienvenue)
-messageBienvenue.pack()
+def AfficherMenu():
 
-cadreBouttons = Frame(fen, bg="grey")
-cadreBouttons.pack(pady=60)
+    global messageBienvenue, cadreBouttons, logo
 
-bouttonHote = Button(cadreBouttons, text="Être hôte", font=policeBoutton, command=hote)
-bouttonHote.pack(side=LEFT, padx=7)
+    logo = Label(fen, bg="grey", image=imageLogo)
+    logo.pack() 
 
-bouttonClient = Button(cadreBouttons, text="Être client", font=policeBoutton, command=client)
-bouttonClient.pack(side=LEFT, padx=7)
+    messageBienvenue = Label(fen, text="Bienvenue dans Kripto. Pour démarrez, dites-nous \nsi vous voulez être hôte ou bien client.", bg="grey", font=policeBienvenue)
+    messageBienvenue.pack()
+
+    cadreBouttons = Frame(fen, bg="grey")
+    cadreBouttons.pack(pady=60)
+
+    bouttonHote = Button(cadreBouttons, text="Être hôte", font=policeBoutton, command=hote)
+    bouttonHote.pack(side=LEFT, padx=7)
+
+    bouttonClient = Button(cadreBouttons, text="Être client", font=policeBoutton, command=client)
+    bouttonClient.pack(side=LEFT, padx=7)
+
+AfficherMenu()
 
 fen.mainloop()

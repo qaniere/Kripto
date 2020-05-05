@@ -86,6 +86,27 @@ def envoi(message, type):
             destinataire.send(bytes(messageEnvoi))
             #On encode le tout en UTF8 et on l'envoi au client
 
+
+
+def Déconnexion(Client):
+
+    """ Fonction qui supprimme des variables du serveur les infos d'un client qui vient de se déconnecter """ 
+
+    annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient de se déconnecter"
+    print(annonce)
+
+    listeClient.remove(Client)
+    listeDesPseudos.remove(nomClient[client])
+    del nomClient[Client]
+    del CléPubliqueClient[Client]
+    del RoleClient[Client]
+    #On supprime les informations du client déconnecté
+    #On utilise del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
+
+    envoi(annonce, "Annonce")
+    #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
+
+
 #On défini les paramêtres du socket 
 
 Serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -181,7 +202,7 @@ else:
                 #On déchiffre le message puis on le retransforme en caractéres
 
                 if message == "":
-                    print("Message vide")
+                    Déconnexion(client)
 
                 else:
                 #Si le message n'est pas vide
@@ -213,16 +234,4 @@ else:
 
             except ConnectionResetError:
             #Si jamais un des clients s'est déconnecté
-
-                annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[client]} vient de se déconnecter"
-                print(annonce)
-
-                listeClient.remove(client)
-                listeDesPseudos.remove(nomClient[client])
-                del nomClient[client]
-                del CléPubliqueClient[client]
-                del RoleClient[client]
-                #On supprime les informations du client déconnecté
-
-                envoi(annonce, "Annonce")
-                #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
+                Déconnexion(client)
