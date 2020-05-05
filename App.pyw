@@ -12,7 +12,7 @@ from tkinter import messagebox
 from random import randint, choices
 
 #Variables d'applications
-global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs
+global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs, SonActivé
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
@@ -23,11 +23,14 @@ Module, CléPublique, CléPrivée = génération(16)
 NombreErreurs = 0
 #On initialise le compte d'erreurs
 
+SonActivé = True
+#Par défault, on considére que le son est activé
+
 def envoyer():
 
     """Fonction qui chiffre et envoi les message au serveur. Les messages sont chiffrés en fonction du serveur"""
 
-    global saisieMessage, nomUser, filMessages, ConnexionSocket, NombreErreurs, CléPubliqueServeur, ModuleServeur
+    global saisieMessage, nomUser, filMessages, ConnexionSocket, NombreErreurs, CléPubliqueServeur, ModuleServeur, SonActivé
     #On récuper toutes les variables et objets nécésssaires au fonctionnement de la fonction
 
     message = saisieMessage.get()
@@ -93,8 +96,9 @@ def envoyer():
             filMessages.yview(END)
             #On défile tout en bas cette dernière, vers le message le plus récent
 
-            winsound.PlaySound("Médias/SonEnvoi.wav", winsound.SND_ASYNC)
-
+            if SonActivé == True:
+                winsound.PlaySound("Médias/SonEnvoi.wav", winsound.SND_ASYNC)
+            
             saisieMessage.delete(0, 'end')
             #On vide la zone de saisie du message
 
@@ -106,7 +110,7 @@ def reception():
     """ Fonction récursive (Qui s'appelle elle même toutes les 10ms) qui permet de vérifier
     la présence de nouveaux messages"""
 
-    global filMessages, ConnexionSocket, CléPrivée, Module
+    global filMessages, ConnexionSocket, CléPrivée, Module, SonActivé
     #On récupere les variables nécéssaires au fonctionemment de la fonction
 
     try:
@@ -149,7 +153,9 @@ def reception():
         filMessages.yview(END)
         #On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
 
-        winsound.PlaySound("Médias/SonMessage.wav", winsound.SND_ASYNC)
+        if SonActivé == True:
+            winsound.PlaySound("Médias/SonMessage.wav", winsound.SND_ASYNC)
+
     except BlockingIOError:
     #Si aucun message n'a été envoyé, on ne fait rien
         pass
@@ -188,6 +194,28 @@ def pasCode():
         tkinter.messagebox.showwarning(title="Aïe...", message="Cette fonction n'a pas encore été codée")
 
 
+def CouperSon():
+    global SonActivé
+
+    SonActivé = False
+
+    barreMenu.delete(2)
+    barreMenu.insert_command(2, label="Activer Son", command=ActiverSon)
+    #On supprime la commande à l'index 2 du menu pour y ajouter la commande ActiverSon à la même position
+
+
+
+def ActiverSon():
+    global SonActivé
+
+    SonActivé = True
+
+    barreMenu.delete(2)
+    barreMenu.insert_command(2, label="Couper Son", command=CouperSon)
+    #On supprime la commande à l'index 2 du menu pour y ajouter la commande CouperSon à la même position
+
+
+
 def affichageConversation():
         
     """ Cette fonction sert à générer l'interface de la conversation"""
@@ -199,6 +227,7 @@ def affichageConversation():
     cadreParametres.pack_forget()
     #On efface les élements de connexion / paramétrage du serveur
 
+    barreMenu.insert_command(1, label="Couper Son", command=CouperSon)
     barreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
     barreMenu.insert_command(0, label="Menu", command=pasCode)
     #On insère les boutons dans le menu au index donnés
@@ -424,8 +453,6 @@ def client():
 
     bouttonStart = Button(cadreParametres, text="Se connecter",  command=seConnecter)
     bouttonStart.pack(pady=20)
-
-
 def infosServeur():
     """ Cette fonction affiches les informations du serveur dans une fenêtre en top level"""
 
@@ -470,6 +497,8 @@ def infosServeur():
 
     fenInfos.mainloop()
 
+
+
 fen = Tk()
 fen.geometry("550x460")
 fen.title("Kripto - Un chat chiffré")
@@ -479,7 +508,6 @@ fen.iconbitmap(bitmap="Médias/icone.ico")
 
 barreMenu = Menu(fen)
 barreMenu.add_command(label="Aide", command=pasCode)
-barreMenu.add_command(label="Couper le son", command=pasCode)
 barreMenu.add_command(label="Paramètres", command=pasCode)
 barreMenu.add_command(label="Contact", command=pasCode)
 fen.configure(menu=barreMenu)
