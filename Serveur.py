@@ -197,7 +197,7 @@ else:
                             Contenu = MessageListe[4]
                             #On récupere les information du message
 
-                            messageFormaté = f"[{HeureMessage}] {Expediteur} : {Contenu}"
+                            messageFormaté = f"[{HeureMessage}] {Expediteur} → {Contenu}"
                             print(messageFormaté)
                             envoi(messageFormaté, "Message")
 

@@ -102,24 +102,57 @@ def couperPhrases(chaine):
 
     """ Cette fonction sert à appeller la fonction "TraitementPhrase"
     autant de fois que nécéssaire"""
-    
+
+    def SeparerCara(chaine):
+        """ Fonction retourne un liste de tout les caractères d'une chaine """
+        return [ch for ch in chaine]
+
+    chaineSéparé = chaine.split("→")
+    #On sépare la chaine pour vérifier le message contient des espaces, sans prendre en compte le header
+    #Header => "[12:04:23] Auteur du message →"
+
     resultat = []
-    NonTraité = chaine
-    #On initialise les variables 
 
-    while len(NonTraité) > 70:
-    #Tant qu'il reste un ligne de plus de 50 caractéres
+    if " " in chaineSéparé:
+    #Si le texte contient des espaces et que c'est pas "fzjkrzkfpozeijfoijfpofjzeoif"
+    
+        NonTraité = chaine
+        #On initialise la variable
 
-        Ligne, NonTraité = traitementPhrase(NonTraité)
-        #On récupere un ligne de 50 caractères maximums et un autre
-        #ligne qu'on va retraitre si elle fait plus de 50 caratères
+        while len(NonTraité) > 70:
+        #Tant qu'il reste un ligne de plus de 50 caractéres
 
-        resultat.append(Ligne)
-        #On ajoute la ligne de moins de 50 caratères à un liste
-        #résulat qu'on retourne
+            Ligne, NonTraité = traitementPhrase(NonTraité)
+            #On récupere un ligne de 50 caractères maximums et un autre
+            #ligne qu'on va retraitre si elle fait plus de 50 caratères
+
+            resultat.append(Ligne)
+            #On ajoute la ligne de moins de 50 caratères à un liste
+            #résulat qu'on retournera
      
-    resultat.append(NonTraité)
-    #On ajoute le reste de moins de 50
+        resultat.append(NonTraité)
+        #On ajoute le reste de moins de 50
+    else:
+        chaine = SeparerCara(chaine)
+        #Transforme le message liste en séparant chaque caractères
+
+        ligne = ""
+        
+        while chaine != []:
+
+            ligne += chaine.pop(0)
+            #On ajoute à la nouvelle ligne le premier index de la liste qu'on supprime de cette dernière
+
+            if len(ligne) == 70:
+            #Un fois que la nouvelle ligne fait la bonne taille
+
+                resultat.append(ligne)
+                ligne = ""
+                #On ajoute la ligne au résultat et on la remet à zéro
+        
+        resultat.append(ligne)
+        #On ajoute la ligne même si elle fait pas 70 caratères une fois sorti du while
+
     return resultat
 
 
@@ -136,7 +169,7 @@ def envoyer():
 
     if len(message) != 0:
             
-        messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} : {message}"
+        messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} → {message}"
         #On garde de coté un message avec un formaté spécialement pour l'interface, mais on ne l'utilise que si l'envoi est réussi.
 
         message = formaterPaquet("Message", nomUser, message)
