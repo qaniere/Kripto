@@ -21,12 +21,20 @@ listeDesPseudos = []
 #On initialise la liste qui contient les objets clients, ainsi que la liste de toute des pseudos de 
 # tout les clients connectés pour éviter les doublons
 
+HoteConnecté = False
+
 nomClient = {}
 RoleClient= {}
 CléPubliqueClient = {}
 ModuleClient = {}
 #On initialise des dictionnaires vides qui serviront à récuperer les informations de chaque objet client.
-#Exemple, Marc est un objet client, quand veut récuperer son nom d'utilisateur, on utilise la syntaxe "nonClient[Marc}"
+#Exemple, Marc est un objet client, quand veut récuperer son nom d'utilisateur, on utilise la syntaxe "nomClient[Marc}"
+
+def arretServeur():
+
+    Serveur.close()
+    exit()
+
 
 
 IP = sys.argv[1]
@@ -92,19 +100,34 @@ def Déconnexion(Client):
 
     """ Fonction qui supprimme des variables du serveur les infos d'un client qui vient de se déconnecter """ 
 
-    annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient de se déconnecter"
-    print(annonce)
+    if RoleClient[Client] == "Client":
+        annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient de se déconnecter"
+        print(annonce)
 
-    listeClient.remove(Client)
-    listeDesPseudos.remove(nomClient[client])
-    del nomClient[Client]
-    del CléPubliqueClient[Client]
-    del RoleClient[Client]
-    #On supprime les informations du client déconnecté
-    #On utilise del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
+        listeClient.remove(Client)
+        listeDesPseudos.remove(nomClient[client])
+        del nomClient[Client]
+        del CléPubliqueClient[Client]
+        del RoleClient[Client]
+        #On supprime les informations du client déconnecté
+        #On utilise del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
 
-    envoi(annonce, "Annonce")
-    #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
+        envoi(annonce, "Annonce")
+        #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
+    else:
+        annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient d'arrêter le serveur."
+        print(annonce)
+
+        listeClient.remove(Client)
+        listeDesPseudos.remove(nomClient[client])
+        del nomClient[Client]
+        del CléPubliqueClient[Client]
+        del RoleClient[Client]
+
+        envoi(annonce, "Annonce")
+
+        arretServeur()
+
 
 
 #On défini les paramêtres du socket 
@@ -155,10 +178,11 @@ else:
                 listeDesPseudos.append(données[0])
                 #On ajoute son pseudo à la liste
 
-                if listeClient == []:
+                if HoteConnecté == False:
                 #Si c'est la première connexion, on précise que c,'est l'hôte
                     RoleClient[objetClient] = "Hôte"
                     print(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
+                    HoteConnecté = True
 
                 else:
                 #Sinon c'est un client

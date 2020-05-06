@@ -181,6 +181,15 @@ def placeholder(Provenance):
         saisieMessage.delete(0, "end")
 
 
+def deconnexion():
+
+    global Connexion
+
+    Connexion = False
+    ConnexionSocket.close()
+
+
+
 
 def toucheEntre(argumentUseless):
     
@@ -216,7 +225,7 @@ def ActiverSon():
     #On supprime la commande à l'index 2 du menu pour y ajouter la commande CouperSon à la même position
 
 def RetournerMenu():
-    global filMessages, saisieMessage, bouttonEnvoyer, Connexion
+    global filMessages, saisieMessage, bouttonEnvoyer
 
     Confirmation = messagebox.askquestion (f"Vous partez déja {nomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
     if Confirmation == 'yes':
@@ -230,9 +239,7 @@ def RetournerMenu():
         barreMenu.delete(1)
         barreMenu.delete(3)
 
-        
-        Connexion = False
-        ConnexionSocket.close()
+        deconnexion()
 
         AfficherMenu()
 
@@ -476,6 +483,9 @@ def client():
 
     bouttonStart = Button(cadreParametres, text="Se connecter",  command=seConnecter)
     bouttonStart.pack(pady=20)
+
+
+
 def infosServeur():
     """ Cette fonction affiches les informations du serveur dans une fenêtre en top level"""
 
