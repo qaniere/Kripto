@@ -6,72 +6,68 @@ from random import *
 
 
 ''''''''''''''''''''''' Message au lecteur ''''''''''''''''''''
-
 Dans ce script, certains paramètres se trouveront toujours
 sous formes de variables au nom court.
-
-- Le module de chiffrement sera appelé par la variable "g"
-- La clef publique sera appelée par la variable "A"
-- La clef privée sera appelée par la variable "a"
-
-- Le message clair sera appelé mar la variable "m"
-- Le message chiffré sera appelé par la variable "n"
-- Le message chiffré et crypté sera appelé par la variable "c"
-
+- Le module de chiffrement sera appelé par la variable "moduleDeChiffrement"
+- La clef publique sera appelée par la variable "clefPublique"
+- La clef privée sera appelée par la variable "clefPrivée"
+- Le message clair sera appelé mar la variable "messageClair"
+- Le message chiffré sera appelé par la variable "messageChiffré"
+- Le message chiffré et crypté sera appelé par la variable "messageCrypté"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
 ### Définition de la fonction de chiffrement ###
 
 
-def transformationChiffres(m):
+def transformationChiffres(messageClair):
 
     """Fonction de chiffrement : transforme le message clair en message chiffré"""
 
-    n = list(m)
-    for i in range(len(n)):
-        n[i] = ord(n[i])
-    return n
+    messageChiffré = list(messageClair)
+    for i in range(len(messageChiffré)):
+        messageChiffré[i] = ord(messageChiffré[i])
+    return messageChiffré
 
 
 ### Définition de la fonction de cryptage ###
 
 
-def cryptage(n, A, g):
+def cryptage(messageChiffré, clefPublique, moduleDeChiffrement):
 
     """Fonction de cryptage : transforme le message chiffré en message indéchiffrable"""
 
-    c = n
-    for x in range(len(c)):
-        c[x] = pow(c[x], A, g)
-    return c
+    messageCrypté = messageChiffré
+    for x in range(len(messageCrypté)):
+        messageCrypté[x] = pow(messageCrypté[x], clefPublique, moduleDeChiffrement)
+    return messageCrypté
 
 
 ### Définition de la fonction de décryptage ###
 
 
-def décryptage(c, a, g):
+def décryptage(messageCrypté, clefPrivée, moduleDeChiffrement):
 
     """Fonction de décryptage : transforme le message indéchiffrable en message chiffré"""
 
-    n = c
-    for y in range(len(n)):
-        n[y] = pow(n[y], a, g)
-    return n
+    messageChiffré = messageCrypté
+    for y in range(len(messageChiffré)):
+        messageChiffré[y] = pow(messageChiffré[y], clefPrivée, moduleDeChiffrement)
+    return messageChiffré
 
 
 ### Définition de la fonction de déchiffrement ###
 
 
-def transformationCaratères(n):
+def transformationCaratères(messageChiffré):
 
     """Fonction de déchiffrement : transforme le message chiffré en message clair"""
 
-    m = n
-    for j in range(len(m)):
-        m[j] = chr(m[j])
-    m = "".join(m)
-    return m
+    messageClair = messageChiffré
+    for j in range(len(messageClair)):
+        messageClair[j] = chr(messageClair[j])
+    messageClair = "".join(messageClair)
+    return messageClair
 
 
 ### Définition de la fonction de génération des clefs ###
@@ -86,21 +82,21 @@ def génération(longueur):
     p = mersenne(longueur)
     q = mersenne(longueur)
 
-    ## Génération d'un grand nombre premier complexe à partir des deux grands nombres premiers précédents qui servira de clef publique A ##
+    ## Génération d'un grand nombre premier complexe à partir des deux grands nombres premiers précédents qui servira de clef publique clefPublique ##
 
-    A = randrange(2**(longueur - 1), 2**(longueur))
-    while pgcd(A, (p - 1) * (q - 1)) != 1:
-        A = randrange(2**(longueur - 1), 2**(longueur))
+    clefPublique = randrange(2**(longueur - 1), 2**(longueur))
+    while pgcd(clefPublique, (p - 1) * (q - 1)) != 1:
+        clefPublique = randrange(2**(longueur - 1), 2**(longueur))
 
-    ## Calcul de la clef privée a à partir d'une fonction et de la clef publique A ##
+    ## Calcul de la clef privée clefPrivée à partir d'une fonction et de la clef publique clefPublique ##
 
-    a = inverse(A, (p - 1) * (q - 1))
+    clefPrivée = inverse(clefPublique, (p - 1) * (q - 1))
 
-    ## Calcul du module de chiffrement (g) ##
+    ## Calcul du module de chiffrement (moduleDeChiffrement) ##
 
-    g = p * q
+    moduleDeChiffrement = p * q
 
-    return (g, A, a)
+    return (moduleDeChiffrement, clefPublique, clefPrivée)
 
 
 ### Définition de la fonction de Miller-Rabin ###
@@ -116,8 +112,8 @@ def Miller_Rabin(premier):
         s = s // 2
         t += 1
     for trials in range(5):
-        a = randrange(2, premier - 1)
-        v = pow(a, s, premier)
+        u = randrange(2, premier - 1)
+        v = pow(u, s, premier)
         if v != 1:
             i = 0
             while v != (premier - 1):
@@ -155,7 +151,7 @@ def primalité(premier):
 def mersenne(longueur):
 
     """Renvoie un nombre premier aléatoire de taille correspondant à la variable longueur en bits"""
-    
+
     while True:
         premier = randrange(2**(longueur - 1), 2**(longueur))
         if primalité(premier):
@@ -165,99 +161,36 @@ def mersenne(longueur):
 ### Définition de la fonction de calcul de la clef publique ###
 
 
-def pgcd(A, phi_de_g):
+def pgcd(clefPublique, phiDuModuleDeChiffrement):
 
-    "Fonction de calcul du PGCD (Plus Grand Commun Diviseur) de A et phi de g : Ce PGCD servira de clef publique"
+    "Fonction de calcul du PGCD (Plus Grand Commun Diviseur) de clefPublique et phi de moduleDeChiffrement : Ce PGCD servira de clef publique"
 
-    while A != 0:
-        A, phi_de_g = phi_de_g % A, A
-    return phi_de_g
+    while clefPublique != 0:
+        clefPublique, phiDuModuleDeChiffrement = phiDuModuleDeChiffrement % clefPublique, clefPublique
+    return phiDuModuleDeChiffrement
 
 
 ### Définition de la fonction de calcul de la clef privée  ###
 
 
-def inverse(A, phi_de_g):
-    
-    """Fonction inverse : Cacule l'inverse de A modulo phi_de_g avec l'algorithme d'euclide étendu"""
+def inverse(clefPublique, phiDuModuleDeChiffrement):
 
-    if pgcd(A, phi_de_g) != 1:
-        return None  # Si A et phi_de_g ne sont pas premier
+    """Fonction inverse : Cacule l'inverse de clefPublique modulo phiDuModuleDeChiffrement avec l'algorithme d'euclide étendu"""
+
+    if pgcd(clefPublique, phiDuModuleDeChiffrement) != 1:
+        return None  # Si clefPublique et phiDuModuleDeChiffrement ne sont pas premier
 
     ## Calcul de l'algorithme d'euclide étendu ##
 
-    u1, u2, u3, v1, v2, v3 = 0, 1, phi_de_g, 1, 0, A
+    u1, u2, u3, v1, v2, v3 = 0, 1, phiDuModuleDeChiffrement, 1, 0, clefPublique
     while v3 != 0:
         q = u3 // v3  # // division euclidienne
         v1, v2, v3, u1, u2, u3 = (u1 - q * v1), (u2 - q * v2), (u3 - q * v3), v1, v2, v3
 
-    return u1 % phi_de_g
+    return u1 % phiDuModuleDeChiffrement
 
 
 ### Génération des clefs et du module de chiffrement ###
 
 
-g, A, a = génération(16)
-
-
-### Impression des clefs et du module de chiffrement ###
-
-"""
-print("Module de chiffrement (g) : " + str(g) + "\n        Clef publique (A) : (" + str(g) + ", " + str(A) + ")\n          Clef privée (a) : (" + str(g) + ", " + str(a) + ")\n")
-
-
-### Entrée du message à envoyer ###
-
-
-m = input("Tapez votre message :\n\n    ")
-
-## Vérification de la longueur du message ##
-
-while len(m) >= 255:
-    m = input("\nVotre message doit faire moins de 255 caractères.\n\nTapez votre message :\n\n    ")
-
-
-### Chiffrement du message ###
-
-
-n = chiffrement(m)
-
-
-### Cryptage du message ###
-
-
-c = cryptage(n, A, g)
-
-
-###  Affichage du message chiffré et crypté (donc indéchiffrable) grâce à la clef publique, qui sert à la simulation de l'envoi du message ###
-
-
-print("\nLe message chiffré par grâce à la clef publique est :", c, "\n")
-
-
-### Entrée manuelle de la clef privée nécessaire au décryptage du message pour simuler le travail de l'ordinateur ###
-
-
-clefTapée = int(
-    input("Tapez votre clef privée pour lire votre message :\n\n>>> "))
-
-
-### Décryptage du message ###
-
-
-n = décryptage(c, clefTapée, g)
-
-
-### Déchiffrement du message ###
-
-
-m = déchiffrement(n)
-
-
-### Affichage du message déchiffré ###
-
-
-print("\nLe message dechiffré est :\n\n", m)
-
-input("\n\nVous êtes arrivés à la fin du programme\n\n")
-"""
+moduleDeChiffrement, clefPublique, clefPrivée = génération(16)
