@@ -177,7 +177,7 @@ else:
                 ModuleClient[objetClient] = int(données[2])
                 #On récupere les informations du client dans les dictionnaires adéquats
 
-                nombreErreurs[client] = 0
+                nombreErreurs[objetClient] = 0
                 #On initialise le nombre d'erreurs
 
                 listeDesPseudos.append(données[0])
