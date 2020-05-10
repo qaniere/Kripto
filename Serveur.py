@@ -27,6 +27,7 @@ nomClient = {}
 RoleClient= {}
 CléPubliqueClient = {}
 ModuleClient = {}
+nombreErreurs = {}
 #On initialise des dictionnaires vides qui serviront à récuperer les informations de chaque objet client.
 #Exemple, Marc est un objet client, quand veut récuperer son nom d'utilisateur, on utilise la syntaxe "nomClient[Marc}"
 
@@ -123,6 +124,7 @@ def Déconnexion(Client):
         del nomClient[Client]
         del CléPubliqueClient[Client]
         del RoleClient[Client]
+        del nombreErreurs[Client]
 
         envoi(annonce, "Annonce")
 
@@ -175,6 +177,9 @@ else:
                 ModuleClient[objetClient] = int(données[2])
                 #On récupere les informations du client dans les dictionnaires adéquats
 
+                nombreErreurs[client] = 0
+                #On initialise le nombre d'erreurs
+
                 listeDesPseudos.append(données[0])
                 #On ajoute son pseudo à la liste
 
@@ -226,10 +231,19 @@ else:
                 #On déchiffre le message puis on le retransforme en caractéres
 
                 if message == "":
-                    Déconnexion(client)
+                #Le message recu vide, la connexion à été temporairement perdue
+                #Au bout d'un nombre défini d'exceptions, on déconnecte le client
+
+                    if nombreErreurs[client] < 5:
+                        nombreErreurs += 1
+                    else:
+                        Déconnexion(client)
 
                 else:
                 #Si le message n'est pas vide
+
+                    nombreErreurs[client] = 0
+                    #On remet à zéro le nombre d'erreurs
 
                     MessageListe = message.split("|")
                     Type = MessageListe[0]
