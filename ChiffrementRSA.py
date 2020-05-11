@@ -27,6 +27,7 @@ def transformationChiffres(messageClair):
     messageChiffré = list(messageClair)
     for i in range(len(messageChiffré)):
         messageChiffré[i] = ord(messageChiffré[i])
+        # ord(x) est la fonction qui pour tout charactère Unicode (sous type str) x renvoie sa valeur Unicode
     return messageChiffré
 
 
@@ -40,6 +41,7 @@ def cryptage(messageChiffré, clefPublique, moduleDeChiffrement):
     messageCrypté = messageChiffré
     for x in range(len(messageCrypté)):
         messageCrypté[x] = pow(messageCrypté[x], clefPublique, moduleDeChiffrement)
+        # pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
     return messageCrypté
 
 
@@ -53,6 +55,7 @@ def décryptage(messageCrypté, clefPrivée, moduleDeChiffrement):
     messageChiffré = messageCrypté
     for y in range(len(messageChiffré)):
         messageChiffré[y] = pow(messageChiffré[y], clefPrivée, moduleDeChiffrement)
+        # pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
     return messageChiffré
 
 
@@ -66,6 +69,7 @@ def transformationCaratères(messageChiffré):
     messageClair = messageChiffré
     for j in range(len(messageClair)):
         messageClair[j] = chr(messageClair[j])
+        # chr(x) est la fonction qui pour toute valeur Unicode x nous renvoie son charactère Unicode (sous type str)
     messageClair = "".join(messageClair)
     return messageClair
 
