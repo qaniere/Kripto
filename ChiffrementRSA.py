@@ -5,7 +5,7 @@ from random import *
 """Dans ce programme on simulera la création d'une paire de clef publique/privée, l'envoi d'un message ainsi que son chiffrement, cryptage, décryptage puis finalement déchiffrement."""
 
 
-''''''''''''''''''''''' Message au lecteur ''''''''''''''''''''
+''''''''''''''''''''''''''''''' Message au lecteur ''''''''''''''''''''''''''''''
 Dans ce script, certains paramètres se trouveront toujours
 sous formes de variables au nom court.
 - Le module de chiffrement sera appelé par la variable "moduleDeChiffrement"
@@ -14,7 +14,7 @@ sous formes de variables au nom court.
 - Le message clair sera appelé mar la variable "messageClair"
 - Le message chiffré sera appelé par la variable "messageChiffré"
 - Le message chiffré et crypté sera appelé par la variable "messageCrypté"
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
 ### Définition de la fonction de chiffrement ###
@@ -28,6 +28,7 @@ def transformationChiffres(messageClair):
     for i in range(len(messageChiffré)):
         messageChiffré[i] = ord(messageChiffré[i])
         # ord(x) est la fonction qui pour tout charactère Unicode (sous type str) x renvoie sa valeur Unicode
+        # Cette fonction transforme donc le message en une suite de charactère chiffrés sous forme Unicode
     return messageChiffré
 
 
@@ -42,6 +43,7 @@ def cryptage(messageChiffré, clefPublique, moduleDeChiffrement):
     for x in range(len(messageCrypté)):
         messageCrypté[x] = pow(messageCrypté[x], clefPublique, moduleDeChiffrement)
         # pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
+        # C'est effectuant cette puissance sur chaque membre de la liste composant le message chiffré que l'on crypte chaque caractère du message
     return messageCrypté
 
 
@@ -56,6 +58,7 @@ def décryptage(messageCrypté, clefPrivée, moduleDeChiffrement):
     for y in range(len(messageChiffré)):
         messageChiffré[y] = pow(messageChiffré[y], clefPrivée, moduleDeChiffrement)
         # pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
+        # C'est effectuant cette puissance sur chaque membre de la liste composant le message crypté que l'on décrypte chaque caractère du message
     return messageChiffré
 
 
@@ -70,6 +73,7 @@ def transformationCaratères(messageChiffré):
     for j in range(len(messageClair)):
         messageClair[j] = chr(messageClair[j])
         # chr(x) est la fonction qui pour toute valeur Unicode x nous renvoie son charactère Unicode (sous type str)
+        # Cette fonction transforme donc la suite de charactère chiffrés sous forme Unicode en message
     messageClair = "".join(messageClair)
     return messageClair
 
