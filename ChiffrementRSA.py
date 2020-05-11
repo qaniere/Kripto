@@ -2,7 +2,7 @@
 from random import *
 
 
-"""Dans ce programme on simulera la création d'une paire de clef publique/privée, l'envoi d'un message ainsi que son chiffrement, cryptage, décryptage puis finalement déchiffrement."""
+"""Dans ce programme on décrira les fonctions permetant la création d'une paire de clef publique/privée, le chiffrement d'un message, son cryptage, son décryptage et enfin son déchiffrement."""
 
 
 ''''''''''''''''''''''''''''''' Message au lecteur ''''''''''''''''''''''''''''''
