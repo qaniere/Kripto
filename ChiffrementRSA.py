@@ -174,7 +174,7 @@ def pgcd(clefPublique, phiDuModuleDeChiffrement):
     "Fonction de calcul du PGCD (Plus Grand Commun Diviseur) de clefPublique et phi de moduleDeChiffrement : Ce PGCD servira de clef publique"
 
     while clefPublique != 0:
-        clefPublique, phiDuModuleDeChiffrement = phiDuModuleDeChiffrement % clefPublique, clefPublique
+        clefPublique, phiDuModuleDeChiffrement = phiDuModuleDeChiffrement % clefPublique, clefPublique # % reste de la division euclidienne
     return phiDuModuleDeChiffrement
 
 
@@ -192,7 +192,7 @@ def inverse(clefPublique, phiDuModuleDeChiffrement):
 
     u1, u2, u3, v1, v2, v3 = 0, 1, phiDuModuleDeChiffrement, 1, 0, clefPublique
     while v3 != 0:
-        q = u3 // v3  # // division euclidienne
+        q = u3 // v3  # // quotient de la division euclidienne
         v1, v2, v3, u1, u2, u3 = (u1 - q * v1), (u2 - q * v2), (u3 - q * v3), v1, v2, v3
 
     return u1 % phiDuModuleDeChiffrement
