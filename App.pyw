@@ -41,7 +41,7 @@ def envoyer():
         messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} → {message}"
         #On garde de coté un message avec un formaté spécialement pour l'interface, mais on ne l'utilise que si l'envoi est réussi.
 
-        message = formaterPaquet("Message", nomUser, message)
+        message = formaterPaquet("Message", message)
         #On formate le paquet
 
         message = transformationChiffres(message)

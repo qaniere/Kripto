@@ -133,7 +133,6 @@ def Déconnexion(Client):
 
 
 #On défini les paramêtres du socket 
-
 Serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
@@ -162,7 +161,7 @@ else:
             données = objetClient.recv(2048)
             données = données.decode("utf-8")
             #On recoit et on convertir les données du client	
-
+        
             données = données.split("|")
             #On transforme ces données en liste
 
@@ -235,7 +234,7 @@ else:
                 #Au bout d'un nombre défini d'exceptions, on déconnecte le client
 
                     if nombreErreurs[client] < 5:
-                        nombreErreurs += 1
+                        nombreErreurs[client] += 1
                     else:
                         Déconnexion(client)
 
@@ -250,13 +249,11 @@ else:
                     #On récupere le message sous forme de liste afin de déterminer son type
 
                     if Type == "Message":
-                            LongueurMessage =  MessageListe[1]
-                            HeureMessage = MessageListe[2]
-                            Expediteur = MessageListe[3]
-                            Contenu = MessageListe[4]
+                            HeureMessage = MessageListe[1]
+                            Contenu = MessageListe[2]
                             #On récupere les information du message
 
-                            messageFormaté = f"[{HeureMessage}] {Expediteur} → {Contenu}"
+                            messageFormaté = f"[{HeureMessage}] {nomClient[client]} → {Contenu}"
                             print(messageFormaté)
                             envoi(messageFormaté, "Message")
 

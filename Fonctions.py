@@ -4,29 +4,25 @@ import time
 
 """ Certains fonctions sont définies ici pour alléger le code de l'application """
 
-def formaterPaquet(TypePaquet, NomUser, Contenu):
+def formaterPaquet(TypePaquet, Contenu):
         
     """
     Fonction qui permer de formater les messages selon des régles spécifiques pour optimiser le traitement coté 
     serveur.
 
-        - Message : TypeDePaquet|Longueur|HeureEnvoi|AuteurDuMessage|ContenuDuMessage
+        - Message : TypeDePaquet|HeureEnvoi|ContenuDuMessage
+        - Commande : TypeDePaquet|HeureExecution|Commande
 
     """
 
     if TypePaquet == "Message":
     
-        Paquet = f"Message|&|{time.strftime('%H:%M:%S')}|{NomUser}|{Contenu}"
+        Paquet = f"Message|{time.strftime('%H:%M:%S')}|{Contenu}"
         #La longueur du paquet est indéterminé à ce stade, alors on met un caractére facilement remplaçable à la place.
 
-        longueurPaquet = len(Paquet) - 1 
-        #Le -1 est le "&" qu'on enlevera
-        longueurPaquet += len(str(longueurPaquet))
-        #On ajoute à la longueur du paquet la longueur du paquet
-        #Exemple : Le paquet fait 10 caractére, on ajouter deux caractéres pour le signifier donc la longueur sera de 12.
-
-        Paquet = Paquet.replace("&", str(longueurPaquet))
-
+    elif TypePaquet == "Commande":
+        Paquet = None
+        #TODO => Implémenter les commandes
     return Paquet
 
 
