@@ -70,6 +70,7 @@ def envoi(message, type):
                 ChaineMessage += str(index) + "/"
                 #On ajoute à la variable vide chaque index qu'on converti en texte et on insére un / pour pouvoir les redécouper
             
+            ChaineMessage = f"{len(ChaineMessage)}-{ChaineMessage}"
             messageEnvoi = ChaineMessage.encode('utf-8')
             destinataire.send(bytes(messageEnvoi))
             #On encode le tout en UTF8 et on l'envoi au client
@@ -90,6 +91,8 @@ def envoi(message, type):
             #On récupere tour à tour chaque index de la liste messageEnvoi
                 ChaineMessage += str(index) + "/"
                 #On ajoute à la variable vide chaque index qu'on converti en texte et on insére un / pour pouvoir les redécouper
+            
+            ChaineMessage = f"{len(ChaineMessage)}-{ChaineMessage}"
             
             messageEnvoi = ChaineMessage.encode('utf-8')
             destinataire.send(bytes(messageEnvoi))
@@ -157,7 +160,7 @@ else:
             #On accepte chaque connexion et on récupere les infos du client dans "objetClient"
             #Et son IP et son port dans IPClient
             
-            données = objetClient.recv(2048)
+            données = objetClient.recv(32768)
             données = données.decode("utf-8")
             #On recoit et on convertir les données du client	
         
@@ -231,7 +234,7 @@ else:
                     suite = suite.decode("utf-8")
 
                     message[1] += suite
-                    #On ajout la suite du message recu
+                    #On ajoute la suite du message recu
 
                 #A ce stage le message est complet
 

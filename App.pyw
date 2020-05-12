@@ -119,45 +119,65 @@ def reception():
         #Cette partie du code est dans un bloc "try, except" car "ConnexionSocket.setblocking(0)" a été défini sur False
         #Au lieu d'attendre un message, si rien n'est envoyé cela va générer une exception, ce qui permet un fonctionnement asynchrone.
 
-            messageRecu = ConnexionSocket.recv(2048)
+            messageRecu = ConnexionSocket.recv(32768)
             #2048 est la limite d'octets recevables
             messageRecu = messageRecu.decode("utf-8")
 
-            messageRecu = messageRecu.split("/")
-            #On transforme le message recu en liste
-            #Exemple => "234/23124/34142" donnera la liste ["234", "23124", "34142"]
+            if messageRecu != "":
 
-            messageRecu.remove("")
-            #On supprime le dernier index vide de la liste
+                messageRecu = messageRecu.split("-")
+                #Le message comporte un petit entête 
+                #Exemple = 564-6646464/65656/4564564654, 564 est içi la longueur totale du message. Cela peut arriver que les très long messages (Fichiers) 
+                #fassent plus de 2048 la taille taille du buffer
+
+                LongeurMessage = int(messageRecu[0])
+
+                while len(messageRecu[1]) < LongeurMessage:
+                #Tant que le message recu est plus petit que la longueur totale du message
+
+                    suite = ConnexionSocket.recv(32768)
+                    suite = suite.decode("utf-8")
+
+                    messageRecu[1] += suite
+                    #On ajoute la suite du message recu
+
+                messageRecu = messageRecu[1].split("/")
+                #On transforme le message recu en liste
+                #Exemple => "234/23124/34142" donnera la liste ["234", "23124", "34142"]
+
+                messageRecu.remove("")
+                #On supprime le dernier index vide de la liste
         
-            for index in range (len(messageRecu)):
-            #Boucle qui sera executé autant de fois qu'il y'a d'index dans la liste messageRecu
+                for index in range (len(messageRecu)):
+                #Boucle qui sera executé autant de fois qu'il y'a d'index dans la liste messageRecu
 
-                messageRecu[index] = int(messageRecu[index])
-                #On transforme l'index de la liste en entier pour pouvoir le déchiffrer
+                    messageRecu[index] = int(messageRecu[index])
+                    #On transforme l'index de la liste en entier pour pouvoir le déchiffrer
 
-            messageRecu = décryptage(messageRecu, CléPrivée, Module)
-            messageRecu = transformationCaratères(messageRecu)
-            #On décrypte le message recu, puis ensuite,  on le transforme en caractères
+                messageRecu = décryptage(messageRecu, CléPrivée, Module)
+                messageRecu = transformationCaratères(messageRecu)
+                #On décrypte le message recu, puis ensuite,  on le transforme en caractères
 
-            if len(messageRecu) > 70:
-            #Si le message à afficher fait plus de 70 caratères
+                if len(messageRecu) > 70:
+                #Si le message à afficher fait plus de 70 caratères
             
-                listeLignes = couperPhrases(messageRecu)
-                #On recupere plusieurs lignes de moins de 70 caractères dans une liste
+                    listeLignes = couperPhrases(messageRecu)
+                    #On recupere plusieurs lignes de moins de 70 caractères dans une liste
 
-                for ligne in listeLignes:
-                #On insere chaque ligne
-                    filMessages.insert(END, ligne)
+                    for ligne in listeLignes:
+                    #On insere chaque ligne
+                        filMessages.insert(END, ligne)
 
+                else:
+                    filMessages.insert(END, messageRecu)
+            
+                filMessages.yview(END)
+                #On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
+
+                if SonActivé == True:
+                    winsound.PlaySound("Médias/SonMessage.wav", winsound.SND_ASYNC)
             else:
-                filMessages.insert(END, messageRecu)
-            
-            filMessages.yview(END)
-            #On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
-
-            if SonActivé == True:
-                winsound.PlaySound("Médias/SonMessage.wav", winsound.SND_ASYNC)
+                input("message vide")
 
         except BlockingIOError:
         #Si aucun message n'a été envoyé, on ne fait rien
