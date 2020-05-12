@@ -59,7 +59,7 @@ def envoi(message, type):
             messageEnvoi = transformationChiffres(message)
             messageEnvoi = cryptage(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
             #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
-            #Avec la clé publique et le module de chaque client
+            #Avec la clé publiq ue et le module de chaque client
 
             #On récupere alors un liste d'entiers
             
@@ -157,7 +157,6 @@ else:
             #On accepte chaque connexion et on récupere les infos du client dans "objetClient"
             #Et son IP et son port dans IPClient
             
-
             données = objetClient.recv(2048)
             données = données.decode("utf-8")
             #On recoit et on convertir les données du client	
@@ -213,11 +212,30 @@ else:
             try:
             #Si un message est envoyé, on le récupere, sinon l'instruction génére une exception
 
-                message = client.recv(2048)
+                message = client.recv(32768) #L'argument dans la fonction recv définit combien de caractères on reçoit
                 message = message.decode("utf-8")
                 #On recoit le message et on le décode
 
-                message = message.split("/")
+                message = message.split("-")
+                #Le message comporte un petit entête 
+                #Exemple = 564-6646464/65656/4564564654, 564 est içi la longueur totale du message. Cela peut arriver que les très long messages (Fichiers) fassent plus
+                #de 2048 la taille taille du buffer
+
+
+                LongeurMessage = int(message[0])
+
+                while len(message[1]) < LongeurMessage:
+                #Tant que le message recu est plus petit que la longueur totale du message
+
+                    suite = client.recv(32768)
+                    suite = suite.decode("utf-8")
+
+                    message[1] += suite
+                    #On ajout la suite du message recu
+
+                #A ce stage le message est complet
+
+                message = message[1].split("/")
                 message.remove("")
                 #On le transforme en liste et on enleve le dernier index vide
 

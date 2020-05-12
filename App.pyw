@@ -48,7 +48,7 @@ def envoyer():
         message = cryptage(message, CléPubliqueServeur, ModuleServeur)
         #On transforme le message en liste de chiffres, correspondant à leur identifiant Ascii, puis on chiffre le message
 
-        #On récupere alors un liste d'entiers
+        #On récupere alors une liste d'entiers
 
         ChaineMessage = ""
 
@@ -56,12 +56,14 @@ def envoyer():
         #On récupere tour à tour chaque index de la liste message
             ChaineMessage += str(index) + "/"
             #On ajoute à la variable vide chaque index qu'on converti en texte et on insére un / pour pouvoir les redécouper
-            
-        message = ChaineMessage.encode('utf-8')
+        
+        messageFinal = f"{len(ChaineMessage)}-{ChaineMessage}"
+        #On rajoute un en tête avec la longueur totale du message
+        messageFinal = messageFinal.encode('utf-8')
         #On encode le tout en UTF8
 
         try:
-            ConnexionSocket.send(bytes(message))
+            ConnexionSocket.send(bytes(messageFinal))
             #On essaie d'envoyer le message au serveur.
 
         except ConnectionResetError:
@@ -76,7 +78,7 @@ def envoyer():
                 messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
                 #On stocke le message dans un variable pour diminuer la taille de la ligne d'en dessous
                 tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
-                exit()
+                exit() #TODO => Remplacer par retour au menu
 
         else:
         #Si il n'a pas eu d'execeptions
@@ -159,7 +161,13 @@ def reception():
 
         except BlockingIOError:
         #Si aucun message n'a été envoyé, on ne fait rien
-         pass
+            pass
+
+        except ConnectionAbortedError:
+        #Le serveur a crashé
+
+            tkinter.messagebox.showerror(title="Aïe...", message="Le serveur a crashé...")
+            exit()
         finally:	
         #Bloc qui sera executé aprés le try ou l'except
             fen.after(10, reception)
