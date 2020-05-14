@@ -183,7 +183,7 @@ def reception():
         #Si aucun message n'a été envoyé, on ne fait rien
             pass
 
-        except ConnectionAbortedError:
+        except (ConnectionAbortedError, ConnectionResetError):
         #Le serveur a crashé
 
             tkinter.messagebox.showerror(title="Aïe...", message="Le serveur a crashé...")
