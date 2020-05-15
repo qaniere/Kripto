@@ -35,31 +35,30 @@ def transformationChiffres(messageClair):
 ### Définition de la fonction de cryptage ###
 
 
-def cryptage(messageChiffré, clefPublique, moduleDeChiffrement):
+def chiffrement(Message, clefPublique, moduleDeChiffrement):
 
-    """Fonction de cryptage : transforme le message chiffré en message indéchiffrable"""
+    """Fonction de chiffrement qui transforme un liste d'entiers corr"""
 
-    messageCrypté = messageChiffré
-    for x in range(len(messageCrypté)):
-        messageCrypté[x] = pow(messageCrypté[x], clefPublique, moduleDeChiffrement)
-        # pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
-        # C'est effectuant cette puissance sur chaque membre de la liste composant le message chiffré que l'on crypte chaque caractère du message
-    return messageCrypté
+    for index in range(len(Message)):
+    
+        Message[index] = pow(Message[index], clefPublique, moduleDeChiffrement)
+        #La fonction pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
+        #Le message est désormais chiffré et ne peut être déchiffré uniquement avec la clé privée
 
-
-### Définition de la fonction de décryptage ###
+    return Message
 
 
-def décryptage(messageCrypté, clefPrivée, moduleDeChiffrement):
+
+def déchiffrement(message, clefPrivée, moduleDeChiffrement):
 
     """Fonction de décryptage : transforme le message indéchiffrable en message chiffré"""
 
-    messageChiffré = messageCrypté
-    for y in range(len(messageChiffré)):
-        messageChiffré[y] = pow(messageChiffré[y], clefPrivée, moduleDeChiffrement)
+    for index in range(len(message)):
+
+        message[index] = pow(message[index], clefPrivée, moduleDeChiffrement)
         # pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
         # C'est effectuant cette puissance sur chaque membre de la liste composant le message crypté que l'on décrypte chaque caractère du message
-    return messageChiffré
+    return message
 
 
 ### Définition de la fonction de déchiffrement ###

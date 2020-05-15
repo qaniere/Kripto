@@ -34,13 +34,15 @@ nombreErreurs = {}
 def arretServeur():
 
     Serveur.close()
+    # Fermeture de la connexion
+
     exit()
 
 
 
 IP = sys.argv[1]
 Port = int(sys.argv[2])
-#On récuperer les arguments de lancement du script sous forme de liste
+#On récupere les arguments de lancement du script sous forme de liste
 #Par exemple => "script.py", un seul argument, "script.py argument2, argument3" 3 arguments
 
 def envoi(message, type):
@@ -57,18 +59,16 @@ def envoi(message, type):
         #Si le destinaire n'est pas l'expéditeur
 
             messageEnvoi = transformationChiffres(message)
-            messageEnvoi = cryptage(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+            messageEnvoi = chiffrement(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
             #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
             #Avec la clé publiq ue et le module de chaque client
 
             #On récupere alors un liste d'entiers
             
-            ChaineMessage = ""
-
-            for index in messageEnvoi:
-            #On récupere tour à tour chaque index de la liste messageEnvoi
-                ChaineMessage += str(index) + "/"
-                #On ajoute à la variable vide chaque index qu'on converti en texte et on insére un / pour pouvoir les redécouper
+            ChaineMessage = "/"
+            #Cette valeur sera notre séparateur dans la méthode join
+            ChaineMessage = ChaineMessage.join(map(str, messageEnvoi))
+            #On utilise la fonction map pour convertir au format str tout les index de la liste
             
             ChaineMessage = f"{len(ChaineMessage)}-{ChaineMessage}"
             messageEnvoi = ChaineMessage.encode('utf-8')
@@ -79,18 +79,15 @@ def envoi(message, type):
         #Si on veut envoyer une annonce, on utilise cette boucle car tout le monde est concerné
             
             messageEnvoi = transformationChiffres(message)
-            messageEnvoi = cryptage(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+            messageEnvoi = chiffrement(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
             #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
             #Avec la clé publique et le module de chaque client
-            
-            ChaineMessage = ""
-
             #On récupere alors un liste d'entiers
 
-            for index in messageEnvoi:
-            #On récupere tour à tour chaque index de la liste messageEnvoi
-                ChaineMessage += str(index) + "/"
-                #On ajoute à la variable vide chaque index qu'on converti en texte et on insére un / pour pouvoir les redécouper
+            ChaineMessage = "/"
+            #Cette valeur sera notre séparateur dans la méthode join
+            ChaineMessage = ChaineMessage.join(map(str, messageEnvoi))
+            #On utilise la fonction map pour convertir au format str tout les index de la liste
             
             ChaineMessage = f"{len(ChaineMessage)}-{ChaineMessage}"
             
@@ -239,14 +236,13 @@ else:
                 #A ce stage le message est complet
 
                 message = message[1].split("/")
-                message.remove("")
-                #On le transforme en liste et on enleve le dernier index vide
+                #On le transforme en liste en détectant les indices avec un séparateur
 
                 for index in range (len(message)):
                 #Pour chaque index de la liste, on le transforme en entier
                     message[index] = int(message[index])
 
-                message = décryptage(message, CléPrivée, Module)
+                message = déchiffrement(message, CléPrivée, Module)
                 message = transformationCaratères(message)
                 #On déchiffre le message puis on le retransforme en caractéres
 

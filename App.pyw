@@ -45,17 +45,14 @@ def envoyer():
         #On formate le paquet
 
         message = transformationChiffres(message)
-        message = cryptage(message, CléPubliqueServeur, ModuleServeur)
+        message = chiffrement(message, CléPubliqueServeur, ModuleServeur)
         #On transforme le message en liste de chiffres, correspondant à leur identifiant Ascii, puis on chiffre le message
-
         #On récupere alors une liste d'entiers
 
-        ChaineMessage = ""
-
-        for index in message:
-        #On récupere tour à tour chaque index de la liste message
-            ChaineMessage += str(index) + "/"
-            #On ajoute à la variable vide chaque index qu'on converti en texte et on insére un / pour pouvoir les redécouper
+        ChaineMessage = "/"
+        #Cette valeur sera notre séparateur dans la méthode join
+        ChaineMessage = ChaineMessage.join(map(str, message))
+        #On utilise la fonction map pour convertir au format str tout les index de la liste
         
         messageFinal = f"{len(ChaineMessage)}-{ChaineMessage}"
         #On rajoute un en tête avec la longueur totale du message
@@ -66,7 +63,7 @@ def envoyer():
             ConnexionSocket.send(bytes(messageFinal))
             #On essaie d'envoyer le message au serveur.
 
-        except ConnectionResetError:
+        except (ConnectionResetError, ConnectionAbortedError):
         #Si le serveur ne répond pas
     
             if NombreErreurs < 3:
@@ -109,7 +106,7 @@ def envoyer():
 
 def reception():
         
-    """ Fonction récursive (Qui s'appelle elle même toutes les 10ms) qui permet de vérifier
+    """ Fonction qui s'appelle elle même toutes les 10ms qui permet de vérifier
     la présence de nouveaux messages"""
 
     global filMessages, ConnexionSocket, CléPrivée, Module, SonActivé, Connexion
@@ -154,9 +151,9 @@ def reception():
                     messageRecu[index] = int(messageRecu[index])
                     #On transforme l'index de la liste en entier pour pouvoir le déchiffrer
 
-                messageRecu = décryptage(messageRecu, CléPrivée, Module)
+                messageRecu = déchiffrement(messageRecu, CléPrivée, Module)
                 messageRecu = transformationCaratères(messageRecu)
-                #On décrypte le message recu, puis ensuite,  on le transforme en caractères
+                #On déchiffre le message recu, puis ensuite,  on le transforme en caractères
 
                 if len(messageRecu) > 70:
                 #Si le message à afficher fait plus de 70 caratères
@@ -257,19 +254,25 @@ def RetournerMenu():
 
     Confirmation = messagebox.askquestion (f"Vous partez déja {nomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
     if Confirmation == 'yes':
+
         filMessages.pack_forget()
         saisieMessage.pack_forget()
         bouttonEnvoyer.pack_forget()
+        #On efface l'interface de conversation
 
         fen.unbind_all(ALL)
+        #On supprime tout les raccourcis
     
         barreMenu.delete(1)
         barreMenu.delete(1)
         barreMenu.delete(3)
+        #On efface certaines commandes du menu : "Menu, Couper Son et Infos Serveur"
 
         deconnexion()
+        #Lancement de la procédure de déconnexion
 
         AfficherMenu()
+        #Affichage du menu
 
 
 
