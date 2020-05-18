@@ -12,44 +12,59 @@
 
 *En cours de rédaction*
 
-## Liste de choses essentielles à faire
+## Liste de fonctionnalités à implémenter 
 
-- Corriger le bug chez l'hôte en cas de déconnexion du serveur (Pas de message d'erreurs et affichage en bas, problablement dû a des messages vides)
+- Refaire les placeholders (Pas buggés) et en ajouter un sur la suggestion de nom d'utilisateur
 
-- Gérer les messages trop longs => Problèmes de chiffrement aparament, couper ?
+- Confirmation de fermeture de la fenêtre
 
-- Refaire les placeholders et en ajouter un sur la suggestion de nom d'utilisateur
+- Onglets logs chiffré, l'user choisi un ficher à déchiffré (Qui seront nommées date et heure de début de la conv). A la fermeture du programme / au clic sur un boutton, le fichier sera rechiffré.
 
-- Confirmation de fermeture de la fenêtre coté client
+- Gestion des paramétres : 
 
-- Fermeture du serveur quand l'hôte ferme sa fenêtre
+    - [ ] Personaliser le son des messages (Envoi et réception) parmi une sélection 
+    - [ ] Choisir un son (Envoi et réception) perso, voir niveau conversion (Faut que ça marche en local)
+    - [ ] Choisir un nom d'utilisateur par défaut
+    - [ ] Modifier la couleur de la fenêtre
+    - [ ] Coordonées de serveur par défaut 
+    - [ ] Gestion des logs : Activation / Désativation, choix du mot de passe de chiffrement
+    
+- Fusioner clé publique et module de chiffrement au niveau de la structure des données, avec un tupple ?
 
-- Gestion des paramétres : Son et remplissage automatique des champs
+- Pouvoir revenir en arrière lors du choix "Hôte/Client"
 
-- Empêcher l'envoi de messsage vide ("      ")
+- Ajouter des commandes :
+  
+    - [ ] /stop : Commande pour stopper le serveur (Confirmation demandée)
+    - [ ] /lock - /unlock : Commande pour empêcher l'arrivé de nouveaux utilisateurs
+    - [ ] /ban : Commande pour bannir un utilisateur 
+    - [ ] /kick : Commande pour jeter l'utilisateur dehors 
+    - [ ] /op : Commande qui permet de changer le rôle (Hôte à client, client à hôte)
 
-- Ajouter des commandes : /stop pour stopper le serveur, /ban pour bannir un utilisateur, /op pour le promouvoir
+- Pouvoir enregistrer des serveurs : Leur ip, leur port, leur nom (Sorte d'annuaire)
 
-- Pouvoir retourner facilement au menu
+- Implémenter le Pierre Feuille Ciseaux :
 
-- Fusioner clé publique et module de chiffrement au niveau de la structure des données
+    - [ ] /play pour défier quelqu'un 
+    - [ ] /play ok ou /play non pour accepter / refuser la partie
+    - [ ] Afficher dans le chat "{user} vient de défier {user2} !"
+    - [ ] implémenter le jeu en lui même
+    - [ ] Afficher un message de victoire
+    
+- Envoyer des fichiers :
 
-- Pouvoir enregistrer des serveurs : Leur ip, leur port, leur nom
-
-- Commenter, Nettoyer et si possible, répartir le code
-
-- Historique des messages
-
-- Encodage des caractéres en ascii variables selon serveur (Nouvelle constante encodage)
+    - [ ] Chiffrer les fichiers très vite (Threads, ou alors zip avec MDP)
+    - [ ] Télécharger fichier coté serveur
+    - [ ] Serveur qui propose fichier => "PhotoChat.jpg est dispo, (1.3mo), faite /fichier 1 pour télécharger
+    - [ ] Téléchargement du fichier (Mettre une liste d'attente pour pas pénaliser ?)
+    - [ ] Suppresion des fichiers à la fin du serveur
+    
 
 ## Quand tout cela sera fait
 
-Il faudra alors rédiger de l'aide et de la documentation, à la fois en toplevel dans l'application et aussi faire une page HTML, si jamais le programme ne marche pas. Ensuite, remplir ce README.MD. On pourra alors envisager d'implémenter des fonctions bonus.
+- Rédiger l'aide en TopLevel
+- Rédiger le rapport
 
-## Fonctions bonus :
+## Fonction bonus :
 
-- Envoyer des fichiers. Il faudrait que chaque client valide le téléchargement du fichier
-- Librarie sonore pour Linux et osX
-- Petit jeu => PierreFeuilleCiseaux, Pong ect..
-- Interface avec bulles de discussion dans Canvas avec Scrollbar
-- Appels vocaux ?
+- Interface avec canvas
