@@ -1,5 +1,8 @@
 # coding: utf8
 import time
+import tkinter
+from tkinter import *
+from tkinter import messagebox
 
 
 """ Certains fonctions sont définies ici pour alléger le code de l'application """
@@ -133,6 +136,29 @@ def couperPhrases(chaine):
 
     return resultat
 
+def placeholder(zone, nouveauTexte, premiereFois):
+
+    if premiereFois == True:
+        #Si c'est le message de base, on le sauvegarde et ensuite on l'insére
+
+        texteDeBase[zone] = nouveauTexte
+        zone.insert("0", nouveauTexte)
+
+    else:
+        texteActuel = zone.get()
+        #On récupere le texte de la zone de saisie
+
+        if texteActuel == texteDeBase[zone]:
+        #Si le texte présent actuelement dans la zone de saisie est le texte défini lors de la création du placeholder
+            zone.delete("0", END)
+
+            zone.unbind("<Button-1>")
+            #On supprime le bind de la zone d'entrée afin que l'utilisateur puisse saisir le texte initial du placeholder
+            #si il le souhaite
+
 def pasCode():
         """ Fonction qui affiche un message come quoi j'ai eu la flemme de coder la fonction pour le moment"""
         tkinter.messagebox.showwarning(title="Aïe...", message="Cette fonction n'a pas encore été codée")
+
+texteDeBase = {}
+#Initialision du dico néccessaire pour la fonction placeholder

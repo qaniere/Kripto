@@ -191,21 +191,6 @@ def reception():
             #La fonction s'appelle après 10ms
 
 
-
-
-def placeholder(Provenance):
-    
-    """ Fonction qui reproduit l'atribut "placeholder" des input HTML. Un suggestions est affiché, quand l'utilisateur clique
-    dessus elle disparait"""
-
-    if Provenance == "AppelManuel":
-    #Si la fonction a été appellé par une instruction 
-        saisieMessage.insert(0, "Saisissez votre message ici")
-    else:
-    #La fonction a été appellé par un bind, on supprime alors le placeholder
-        saisieMessage.delete(0, "end")
-
-
 def deconnexion():
 
     global Connexion
@@ -213,20 +198,6 @@ def deconnexion():
     Connexion = False
     ConnexionSocket.close()
 
-
-
-
-def toucheEntre(argumentUseless):
-    
-    """ Cette fonction sert simplement à contourner un défaut de conception de Tkinter : Les fonctions appellées avec bind le sont
-    toujours avec argument qui contient la position de la souris, ce qui pose problème quand la fonction cible ne prend aucun 
-    argument"""
-
-    envoyer()
-
-def pasCode():
-        """ Fonction qui affiche un message come quoi j'ai eu la flemme de coder la fonction pour le moment"""
-        tkinter.messagebox.showwarning(title="Aïe...", message="Cette fonction n'a pas encore été codée")
 
 
 def CouperSon():
@@ -301,16 +272,19 @@ def affichageConversation():
     bouttonEnvoyer = Button(fen, text="Envoyer", command=envoyer)
     bouttonEnvoyer.pack(pady=15)
 
-    saisieMessage.bind("<Button-1>", placeholder)
+    saisieMessage.bind("<Button-1>", lambda a: placeholder(saisieMessage, "", False))
     #On associe le clic gauche sur la zone de saisie du message à la fonction placeholder
-    fen.bind_all('<Return>', toucheEntre)
-    #On associe l'appui sur la toucheEntre à la fonction toucheEntre
+    #On utilise une lambda pour appeler une fonction avec des arguments
+
+    fen.bind_all('<Return>', lambda c: envoyer())
+    #On associe l'appui a a fonction envoyer avec une fonction lambda afin de pouvoir envoyer aucun argument
 
     Connexion = True
     reception()
     #On commence à recevoir des messages
-    placeholder("AppelManuel")
 
+    placeholder(saisieMessage, "Saisisez votre message ici", True)
+    #On affiche un placeholder dans le zone de saisie des messages
 
 
 def connexion():
@@ -460,15 +434,20 @@ def hote():
     entrePort.insert("end", portRecommande)
     entrePort.pack(anchor=CENTER)
 
-    suggestionNom = choices(listeNoms)
-    #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
-
     votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
     votreNom.pack(anchor=CENTER, pady=7)
 
     entreNom = Entry(cadreParametres)
-    entreNom.insert("end", suggestionNom)
     entreNom.pack(anchor=CENTER)
+
+    suggestionNom = choices(listeNoms)
+    #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
+
+    placeholder(entreNom, suggestionNom[0], True)
+    #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
+
+    entreNom.bind("<Button-1>", lambda b: placeholder(entreNom, "", False))
+    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
 
     bouttonStart = Button(cadreParametres, text="Démarrer", command=démarrerServeur)
     bouttonStart.pack(pady=20)
@@ -480,7 +459,7 @@ def client():
     """ Cette fonction permet à un client de se connecter au serveur""" 
 
     global entreIP, entrePort, entreNom, cadreParametres, listeNoms
-    #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
+    #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
 
     messageBienvenue.pack_forget()
     cadreBouttons.pack_forget()
@@ -502,15 +481,22 @@ def client():
     entrePort = Entry(cadreParametres)
     entrePort.pack(anchor=CENTER)
 
-    suggestionNom = choices(listeNoms)
-    #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
+   
 
     votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
     votreNom.pack(anchor=CENTER, pady=7)
 
     entreNom = Entry(cadreParametres)
-    entreNom.insert("end", suggestionNom)
     entreNom.pack(anchor=CENTER)
+
+    suggestionNom = choices(listeNoms)
+    #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
+
+    placeholder(entreNom, suggestionNom[0], True)
+    #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
+
+    entreNom.bind("<Button-1>", lambda b: placeholder(entreNom, "", False))
+    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
 
     bouttonStart = Button(cadreParametres, text="Se connecter",  command=seConnecter)
     bouttonStart.pack(pady=20)
