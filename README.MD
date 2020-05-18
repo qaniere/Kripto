@@ -14,8 +14,6 @@
 
 ## Liste de fonctionnalités à implémenter 
 
-- Refaire les placeholders (Pas buggés) et en ajouter un sur la suggestion de nom d'utilisateur
-
 - Confirmation de fermeture de la fenêtre
 
 - Onglets logs chiffré, l'user choisi un ficher à déchiffré (Qui seront nommées date et heure de début de la conv). A la fermeture du programme / au clic sur un boutton, le fichier sera rechiffré.
@@ -32,6 +30,10 @@
 - Fusioner clé publique et module de chiffrement au niveau de la structure des données, avec un tupple ?
 
 - Pouvoir revenir en arrière lors du choix "Hôte/Client"
+
+- Nombre d'utilisateur connectés maximums
+
+- Afficher nombres d'utilisateurs connectés (Liste ?)
 
 - Ajouter des commandes :
   
