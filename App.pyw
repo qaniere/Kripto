@@ -141,9 +141,6 @@ def reception():
                 messageRecu = messageRecu[1].split("/")
                 #On transforme le message recu en liste
                 #Exemple => "234/23124/34142" donnera la liste ["234", "23124", "34142"]
-
-                messageRecu.remove("")
-                #On supprime le dernier index vide de la liste
         
                 for index in range (len(messageRecu)):
                 #Boucle qui sera executé autant de fois qu'il y'a d'index dans la liste messageRecu
