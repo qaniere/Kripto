@@ -58,19 +58,11 @@ def envoi(message, type):
         if destinataire != client:
         #Si le destinaire n'est pas l'expéditeur
 
-            messageEnvoi = transformationChiffres(message)
-            messageEnvoi = chiffrement(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+            messageEnvoi = chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
             #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
             #Avec la clé publiq ue et le module de chaque client
-
-            #On récupere alors un liste d'entiers
             
-            ChaineMessage = "/"
-            #Cette valeur sera notre séparateur dans la méthode join
-            ChaineMessage = ChaineMessage.join(map(str, messageEnvoi))
-            #On utilise la fonction map pour convertir au format str tout les index de la liste
-            
-            ChaineMessage = f"{len(ChaineMessage)}-{ChaineMessage}"
+            ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
             messageEnvoi = ChaineMessage.encode('utf-8')
             destinataire.send(bytes(messageEnvoi))
             #On encode le tout en UTF8 et on l'envoi au client
@@ -78,16 +70,10 @@ def envoi(message, type):
         elif type == "Annonce":
         #Si on veut envoyer une annonce, on utilise cette boucle car tout le monde est concerné
             
-            messageEnvoi = transformationChiffres(message)
-            messageEnvoi = chiffrement(messageEnvoi, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+            ChaineMessage = chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
             #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
             #Avec la clé publique et le module de chaque client
             #On récupere alors un liste d'entiers
-
-            ChaineMessage = "/"
-            #Cette valeur sera notre séparateur dans la méthode join
-            ChaineMessage = ChaineMessage.join(map(str, messageEnvoi))
-            #On utilise la fonction map pour convertir au format str tout les index de la liste
             
             ChaineMessage = f"{len(ChaineMessage)}-{ChaineMessage}"
             
@@ -111,13 +97,12 @@ def Déconnexion(Client):
         del CléPubliqueClient[Client]
         del RoleClient[Client]
         #On supprime les informations du client déconnecté
-        #On utilise del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
+        #On utilise le mot clé del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
 
         envoi(annonce, "Annonce")
         #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
     else:
         annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient d'arrêter le serveur."
-        print(annonce)
 
         listeClient.remove(Client)
         listeDesPseudos.remove(nomClient[client])
@@ -125,6 +110,7 @@ def Déconnexion(Client):
         del CléPubliqueClient[Client]
         del RoleClient[Client]
         del nombreErreurs[Client]
+        #On vide tout les données de l'hôte
 
         envoi(annonce, "Annonce")
 
@@ -233,18 +219,11 @@ else:
                     message[1] += suite
                     #On ajoute la suite du message recu
 
-                #A ce stage le message est complet
+                #A ce stade le message est complet
 
-                message = message[1].split("/")
-                #On le transforme en liste en détectant les indices avec un séparateur
-
-                for index in range (len(message)):
-                #Pour chaque index de la liste, on le transforme en entier
-                    message[index] = int(message[index])
-
-                message = déchiffrement(message, CléPrivée, Module)
-                message = transformationCaratères(message)
-                #On déchiffre le message puis on le retransforme en caractéres
+                message = déchiffrement(message[1], CléPrivée, Module)
+                #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
+                #0 étant la longueur de ce message
 
                 if message == "":
                 #Le message recu vide, la connexion à été temporairement perdue
@@ -278,7 +257,7 @@ else:
                     #Si le message recu ne respecte aucune forme de message, il est invalide
                     #Cela peut être du a un client pas à jour
 
-                        print(f"Message invalide recu ! => {message} - Expéditeur => {IPClient} ")
+                        print(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
 
             except BlockingIOError:
             #Si aucun message n'a été envoyé

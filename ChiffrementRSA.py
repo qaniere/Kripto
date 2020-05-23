@@ -33,31 +33,23 @@ def déchiffrement(message, clefPrivée, moduleDeChiffrement):
 
     """Fonction de décryptage : transforme le message indéchiffrable en message chiffré"""
 
-    for index in range(len(message)):
+    messageDéchiffré = ""
 
-        message[index] = pow(message[index], clefPrivée, moduleDeChiffrement)
-        # pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
-        # C'est effectuant cette puissance sur chaque membre de la liste composant le message crypté que l'on décrypte chaque caractère du message
-    return message
+    message = message.split("/")
+    message = list(map(int, message))
+    #On transforme la chaine d'entrée en liste d'entiers
 
+    for indexEntier in range(len(message)):
+    #Pour chaque index de la liste messages
+    
+        numeroCaractère = pow(message[indexEntier], clefPrivée, moduleDeChiffrement)
+        #On déchiffre le message, en récupérant a puissance b modulo c
+        #C'est effectuant cette puissance sur chaque membre de la liste composant le message crypté que l'on décrypte chaque caractère du message
+        messageDéchiffré += chr(numeroCaractère)
+        #On transforme le numéro ascii en caractère
 
-### Définition de la fonction de déchiffrement ###
-
-
-def transformationCaratères(messageChiffré):
-
-    """Fonction de déchiffrement : transforme le message chiffré en message clair"""
-
-    messageClair = messageChiffré
-    for j in range(len(messageClair)):
-        messageClair[j] = chr(messageClair[j])
-        # chr(x) est la fonction qui pour toute valeur Unicode x nous renvoie son charactère Unicode (sous type str)
-        # Cette fonction transforme donc la suite de charactère chiffrés sous forme Unicode en message
-    messageClair = "".join(messageClair)
-    return messageClair
-
-
-### Définition de la fonction de génération des clefs ###
+    #Le message est alors déchiffré
+    return messageDéchiffré
 
 
 def génération(longueur):
@@ -86,8 +78,6 @@ def génération(longueur):
     return (moduleDeChiffrement, clefPublique, clefPrivée)
 
 
-### Définition de la fonction de Miller-Rabin ###
-
 
 def Miller_Rabin(premier):
 
@@ -112,7 +102,6 @@ def Miller_Rabin(premier):
     return True
 
 
-### Définition de la fonction de primalité ###
 
 
 def primalité(premier):
@@ -132,7 +121,6 @@ def primalité(premier):
     return Miller_Rabin(premier)
 
 
-### Définition de la fonction de génération d'un grand nombre premier ###
 
 
 def mersenne(longueur):
@@ -145,8 +133,6 @@ def mersenne(longueur):
             return premier
 
 
-### Définition de la fonction de calcul de la clef publique ###
-
 
 def pgcd(clefPublique, phiDuModuleDeChiffrement):
 
@@ -157,7 +143,6 @@ def pgcd(clefPublique, phiDuModuleDeChiffrement):
     return phiDuModuleDeChiffrement
 
 
-### Définition de la fonction de calcul de la clef privée  ###
 
 
 def inverse(clefPublique, phiDuModuleDeChiffrement):
