@@ -44,17 +44,11 @@ def envoyer():
         message = formaterPaquet("Message", message)
         #On formate le paquet
 
-        message = transformationChiffres(message)
         message = chiffrement(message, CléPubliqueServeur, ModuleServeur)
         #On transforme le message en liste de chiffres, correspondant à leur identifiant Ascii, puis on chiffre le message
         #On récupere alors une liste d'entiers
-
-        ChaineMessage = "/"
-        #Cette valeur sera notre séparateur dans la méthode join
-        ChaineMessage = ChaineMessage.join(map(str, message))
-        #On utilise la fonction map pour convertir au format str tout les index de la liste
         
-        messageFinal = f"{len(ChaineMessage)}-{ChaineMessage}"
+        messageFinal = f"{len(message)}-{message}"
         #On rajoute un en tête avec la longueur totale du message
         messageFinal = messageFinal.encode('utf-8')
         #On encode le tout en UTF8
@@ -111,6 +105,7 @@ def reception():
 
     global filMessages, ConnexionSocket, CléPrivée, Module, SonActivé, Connexion
     #On récupere les variables nécéssaires au fonctionemment de la fonction
+
     if Connexion == True:
         try:
         #Cette partie du code est dans un bloc "try, except" car "ConnexionSocket.setblocking(0)" a été défini sur False
@@ -138,19 +133,9 @@ def reception():
                     messageRecu[1] += suite
                     #On ajoute la suite du message recu
 
-                messageRecu = messageRecu[1].split("/")
-                #On transforme le message recu en liste
-                #Exemple => "234/23124/34142" donnera la liste ["234", "23124", "34142"]
-        
-                for index in range (len(messageRecu)):
-                #Boucle qui sera executé autant de fois qu'il y'a d'index dans la liste messageRecu
-
-                    messageRecu[index] = int(messageRecu[index])
-                    #On transforme l'index de la liste en entier pour pouvoir le déchiffrer
-
-                messageRecu = déchiffrement(messageRecu, CléPrivée, Module)
-                messageRecu = transformationCaratères(messageRecu)
-                #On déchiffre le message recu, puis ensuite,  on le transforme en caractères
+                messageRecu = déchiffrement(messageRecu[1], CléPrivée, Module)
+                #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
+                #0 étant la longueur de ce message
 
                 if len(messageRecu) > 70:
                 #Si le message à afficher fait plus de 70 caratères

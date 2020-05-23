@@ -2,50 +2,30 @@
 from random import *
 
 
-"""Dans ce programme on décrira les fonctions permetant la création d'une paire de clef publique/privée, le chiffrement d'un message, son cryptage, son décryptage et enfin son déchiffrement."""
+def chiffrement(message, clefPublique, moduleDeChiffrement):
 
+    """ Fonction qui chiffre le message selon l'algorithme RSA et le formate en une seule chaine de caractère.
+    Cette fonction doit prendre comme argument :
+        - Le message à chiffre
+        - La Clé publique de l'expéditeur
+        - Le module de chiffrement de l'expéditeur """
 
-''''''''''''''''''''''''''''''' Message au lecteur ''''''''''''''''''''''''''''''
-Dans ce script, certains paramètres se trouveront toujours
-sous formes de variables au nom court.
-- Le module de chiffrement sera appelé par la variable "moduleDeChiffrement"
-- La clef publique sera appelée par la variable "clefPublique"
-- La clef privée sera appelée par la variable "clefPrivée"
-- Le message clair sera appelé mar la variable "messageClair"
-- Le message chiffré sera appelé par la variable "messageChiffré"
-- Le message chiffré et crypté sera appelé par la variable "messageCrypté"
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    messageFinal = []
+    #On intialise la liste qui stockera le résultat au fur et à mesure
 
+    for indexCaractère in range (len(message)):
 
-### Définition de la fonction de chiffrement ###
+        numeroCaractère = ord(message[indexCaractère])
+        #On récupere le numéro du caractère de chaque message dans la table ASCII avec ord()
 
+        messageFinal.append(pow(numeroCaractère, clefPublique, moduleDeChiffrement))
+        #la fonction pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
 
-def transformationChiffres(messageClair):
-
-    """Fonction de chiffrement : transforme le message clair en message chiffré"""
-
-    messageChiffré = list(messageClair)
-    for i in range(len(messageChiffré)):
-        messageChiffré[i] = ord(messageChiffré[i])
-        # ord(x) est la fonction qui pour tout charactère Unicode (sous type str) x renvoie sa valeur Unicode
-        # Cette fonction transforme donc le message en une suite de charactère chiffrés sous forme Unicode
-    return messageChiffré
-
-
-### Définition de la fonction de cryptage ###
-
-
-def chiffrement(Message, clefPublique, moduleDeChiffrement):
-
-    """Fonction de chiffrement qui transforme un liste d'entiers corr"""
-
-    for index in range(len(Message)):
+    messageFinal = "/".join(map(str, messageFinal))
+    #On formate le message chiffré pour l'envoyer plus facilement
     
-        Message[index] = pow(Message[index], clefPublique, moduleDeChiffrement)
-        #La fonction pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
-        #Le message est désormais chiffré et ne peut être déchiffré uniquement avec la clé privée
-
-    return Message
+    #Le message est désormais chiffré et formaté et ne peut être déchiffré uniquement avec la clé privée
+    return messageFinal
 
 
 
@@ -53,31 +33,23 @@ def déchiffrement(message, clefPrivée, moduleDeChiffrement):
 
     """Fonction de décryptage : transforme le message indéchiffrable en message chiffré"""
 
-    for index in range(len(message)):
+    messageDéchiffré = ""
 
-        message[index] = pow(message[index], clefPrivée, moduleDeChiffrement)
-        # pow(a, b, c) est la fonction qui renvoie a puissance b modulo c
-        # C'est effectuant cette puissance sur chaque membre de la liste composant le message crypté que l'on décrypte chaque caractère du message
-    return message
+    message = message.split("/")
+    message = list(map(int, message))
+    #On transforme la chaine d'entrée en liste d'entiers
 
+    for indexEntier in range(len(message)):
+    #Pour chaque index de la liste messages
+    
+        numeroCaractère = pow(message[indexEntier], clefPrivée, moduleDeChiffrement)
+        #On déchiffre le message, en récupérant a puissance b modulo c
+        #C'est effectuant cette puissance sur chaque membre de la liste composant le message crypté que l'on décrypte chaque caractère du message
+        messageDéchiffré += chr(numeroCaractère)
+        #On transforme le numéro ascii en caractère
 
-### Définition de la fonction de déchiffrement ###
-
-
-def transformationCaratères(messageChiffré):
-
-    """Fonction de déchiffrement : transforme le message chiffré en message clair"""
-
-    messageClair = messageChiffré
-    for j in range(len(messageClair)):
-        messageClair[j] = chr(messageClair[j])
-        # chr(x) est la fonction qui pour toute valeur Unicode x nous renvoie son charactère Unicode (sous type str)
-        # Cette fonction transforme donc la suite de charactère chiffrés sous forme Unicode en message
-    messageClair = "".join(messageClair)
-    return messageClair
-
-
-### Définition de la fonction de génération des clefs ###
+    #Le message est alors déchiffré
+    return messageDéchiffré
 
 
 def génération(longueur):
@@ -106,8 +78,6 @@ def génération(longueur):
     return (moduleDeChiffrement, clefPublique, clefPrivée)
 
 
-### Définition de la fonction de Miller-Rabin ###
-
 
 def Miller_Rabin(premier):
 
@@ -132,7 +102,6 @@ def Miller_Rabin(premier):
     return True
 
 
-### Définition de la fonction de primalité ###
 
 
 def primalité(premier):
@@ -152,7 +121,6 @@ def primalité(premier):
     return Miller_Rabin(premier)
 
 
-### Définition de la fonction de génération d'un grand nombre premier ###
 
 
 def mersenne(longueur):
@@ -165,8 +133,6 @@ def mersenne(longueur):
             return premier
 
 
-### Définition de la fonction de calcul de la clef publique ###
-
 
 def pgcd(clefPublique, phiDuModuleDeChiffrement):
 
@@ -177,7 +143,6 @@ def pgcd(clefPublique, phiDuModuleDeChiffrement):
     return phiDuModuleDeChiffrement
 
 
-### Définition de la fonction de calcul de la clef privée  ###
 
 
 def inverse(clefPublique, phiDuModuleDeChiffrement):
