@@ -14,7 +14,11 @@
 
 ## Liste de fonctionnalités à implémenter 
 
+- Réparer et nettoyer le chiffrement vignère
+
 - Confirmation de fermeture de la fenêtre
+
+- Empêcher les noms d'utilisateur très long (16 caractères max)
 
 - Onglets logs chiffré, l'user choisi un ficher à déchiffré (Qui seront nommées date et heure de début de la conv). A la fermeture du programme / au clic sur un boutton, le fichier sera rechiffré.
 
