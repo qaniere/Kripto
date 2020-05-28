@@ -18,8 +18,6 @@
 
 - Ajouter un délai pour éviter le spam
 
-- Gérer OverFlow et ValueError 
-
 - Confirmation de fermeture de la fenêtre
 
 - Empêcher les noms d'utilisateur très long (16 caractères max)
