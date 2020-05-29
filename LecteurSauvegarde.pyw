@@ -61,9 +61,16 @@ def terminer():
         #On insére dans l'interface chaque fichier de sauvegarde existant
 
 
+try:
+    ListeSauvegardes = os.listdir("Messages Sauvegardés")
+    #On liste chaque fichier du répertoire Messages Sauvegardés
+except OSError:
+#Si le dossier de sauvegarde n'existe pas
 
-ListeSauvegardes = os.listdir("Messages Sauvegardés")
-#On liste chaque fichier du répertoire Messages Sauvegardés
+    fen.withdraw()
+    tkinter.messagebox.showerror(title="Aïe...", message="Vous n'avez pas de sauvegardes")
+    #On cache la fenêtre et on affiche un message d'erreur
+    exit()
 
 Interface = Listbox(fen, width="70", height="20")
 Interface.pack(pady=15)
