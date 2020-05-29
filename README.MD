@@ -14,8 +14,6 @@
 
 ## Liste de fonctionnalités à implémenter 
 
-- Ajouter un léger délai pour éviter le spam
-
 - Confirmation de fermeture de la fenêtre
 
 - Empêcher les noms d'utilisateur très long (16 caractères max)

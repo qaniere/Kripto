@@ -14,7 +14,7 @@ from tkinter import messagebox
 from random import randint, choices
 
 #Variables d'applications
-global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs, SonActivé, MotDePasse, FichierSauvegarde
+global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs, SonActivé, MotDePasse, FichierSauvegarde, EnvoiOK
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
@@ -29,20 +29,24 @@ Module, CléPublique, CléPrivée = génération(16)
 NombreErreurs = 0
 #On initialise le compte d'erreurs
 
+EnvoiOK = True
 SonActivé = True
-#Par défault, on considére que le son est activé
+#Par défault, on considére que le son est activé et que l'utilisateur peut envoyer des messages
 
 def envoyer():
 
     """Fonction qui chiffre et envoi les message au serveur. Les messages sont chiffrés en fonction du serveur"""
 
-    global saisieMessage, nomUser, filMessages, ConnexionSocket, NombreErreurs, CléPubliqueServeur, ModuleServeur, SonActivé
+    global saisieMessage, nomUser, filMessages, ConnexionSocket, NombreErreurs, CléPubliqueServeur, ModuleServeur, SonActivé, EnvoiOK
     #On récuper toutes les variables et objets nécésssaires au fonctionnement de la fonction
 
     message = saisieMessage.get()
     #On récupere le message dans l'entrée où il a été saisi
 
-    if len(message) != 0:
+    if len(message) != 0 and EnvoiOK:
+
+        EnvoiOK = False
+        #On rend impossible l'envoi de nouveaux messages
             
         messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} → {message}"
         #On garde de coté un message avec un formaté spécialement pour l'interface, mais on ne l'utilise que si l'envoi est réussi.
@@ -105,6 +109,14 @@ def envoyer():
             saisieMessage.delete(0, 'end')
             #On vide la zone de saisie du message
 
+            def RéactivationEnvoi():
+
+                global EnvoiOK
+
+                EnvoiOK = True
+
+            fen.after(500, RéactivationEnvoi)
+            #Au bout de 500ms en asynchrone, on appelle la fonction qui rendra possible l'envoi de messages
 
 
 
@@ -279,7 +291,7 @@ def affichageConversation():
     reception()
     #On commence à recevoir des messages
 
-    placeholder(saisieMessage, "Saisisez votre message ici", True)
+    placeholder(saisieMessage, "Saisissez votre message ici", True)
     #On affiche un placeholder dans le zone de saisie des messages
 
 
