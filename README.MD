@@ -14,15 +14,13 @@
 
 ## Liste de fonctionnalités à implémenter 
 
-- Réparer et nettoyer le chiffrement vignère
-
-- Ajouter un délai pour éviter le spam
+- Ajouter un léger délai pour éviter le spam
 
 - Confirmation de fermeture de la fenêtre
 
 - Empêcher les noms d'utilisateur très long (16 caractères max)
 
-- Onglets logs chiffré, l'user choisi un ficher à déchiffré (Qui seront nommées date et heure de début de la conv). A la fermeture du programme / au clic sur un boutton, le fichier sera rechiffré.
+- Empêcher les messages de plus de 1000 caratères
 
 - Gestion des paramétres : 
 
@@ -31,9 +29,7 @@
     - [ ] Choisir un nom d'utilisateur par défaut
     - [ ] Modifier la couleur de la fenêtre
     - [ ] Coordonées de serveur par défaut 
-    - [ ] Gestion des logs : Activation / Désativation, choix du mot de passe de chiffrement
-    
-- Fusioner clé publique et module de chiffrement au niveau de la structure des données, avec un tupple ?
+    - [ ] Gestion des logs : Activation / Désativation
 
 - Pouvoir revenir en arrière lors du choix "Hôte/Client"
 
