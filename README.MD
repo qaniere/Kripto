@@ -14,8 +14,6 @@
 
 ## Liste de fonctionnalités à implémenter 
 
-- Confirmation de fermeture de la fenêtre
-
 - Empêcher les noms d'utilisateur très long (16 caractères max)
 
 - Empêcher les messages de plus de 1000 caratères
@@ -66,7 +64,3 @@
 
 - Rédiger l'aide en TopLevel
 - Rédiger le rapport
-
-## Fonction bonus :
-
-- Interface avec canvas

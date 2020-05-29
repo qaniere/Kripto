@@ -11,10 +11,11 @@ import tkinter.simpledialog
 from ChiffrementRSA import *
 import tkinter.font as tkFont
 from tkinter import messagebox
+from LecteurSauvegarde import *
 from random import randint, choices
 
-#Variables d'applications
 global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs, SonActivé, MotDePasse, FichierSauvegarde, EnvoiOK
+#Variables d'applications
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
@@ -591,7 +592,7 @@ fen.iconbitmap(bitmap="Médias/icone.ico")
 
 barreMenu = Menu(fen)
 barreMenu.add_command(label="Aide", command=pasCode)
-barreMenu.add_command(label="Sauvegardes", command=LancementLecteurSauvegarde)
+barreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde)
 barreMenu.add_command(label="Paramètres", command=pasCode)
 barreMenu.add_command(label="Contact", command=pasCode)
 fen.configure(menu=barreMenu)

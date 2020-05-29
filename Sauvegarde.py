@@ -1,8 +1,8 @@
 # coding: utf8
+import os
 import time
 import codecs
 import hashlib
-from os import makedirs
 
 
 #TODO - J'ai supprimé le message au lecteur car jugé inutile par monsieur Germant
@@ -182,7 +182,7 @@ def InitialisationSauvegarde(motDePasse):
 
     try :
     #On essie de créé un dossier pour stocker les fichiers de sauvegardes
-        makedirs("Messages sauvegardés")
+        os.makedirs("Messages sauvegardés")
     except FileExistsError :
     #Si le fichier existe déja
         pass

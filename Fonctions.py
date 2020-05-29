@@ -162,11 +162,5 @@ def pasCode():
         tkinter.messagebox.showwarning(title="Aïe...", message="Cette fonction n'a pas encore été codée")
 
 
-def LancementLecteurSauvegarde():
-
-    """ Fonction qui lance le lecteur de sauvegarde dans un proccèssus parallèle """
-
-    subprocess.Popen("python LecteurSauvegarde.pyw ")
-
 texteDeBase = {}
 #Initialision du dico néccessaire pour la fonction placeholder
