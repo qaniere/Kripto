@@ -1,6 +1,7 @@
 # coding: utf8
 import time
 import tkinter
+import subprocess
 from tkinter import *
 from tkinter import messagebox
 
@@ -159,6 +160,13 @@ def placeholder(zone, nouveauTexte, premiereFois):
 def pasCode():
         """ Fonction qui affiche un message come quoi j'ai eu la flemme de coder la fonction pour le moment"""
         tkinter.messagebox.showwarning(title="Aïe...", message="Cette fonction n'a pas encore été codée")
+
+
+def LancementLecteurSauvegarde():
+
+    """ Fonction qui lance le lecteur de sauvegarde dans un proccèssus parallèle """
+
+    subprocess.Popen("python LecteurSauvegarde.pyw ")
 
 texteDeBase = {}
 #Initialision du dico néccessaire pour la fonction placeholder

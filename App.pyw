@@ -579,6 +579,7 @@ fen.iconbitmap(bitmap="Médias/icone.ico")
 
 barreMenu = Menu(fen)
 barreMenu.add_command(label="Aide", command=pasCode)
+barreMenu.add_command(label="Sauvegardes", command=LancementLecteurSauvegarde)
 barreMenu.add_command(label="Paramètres", command=pasCode)
 barreMenu.add_command(label="Contact", command=pasCode)
 fen.configure(menu=barreMenu)

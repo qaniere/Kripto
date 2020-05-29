@@ -239,7 +239,7 @@ def lectureSauvegarde(NomFichier, MDP):
 
     ListeLignes = []
 
-    with codecs.open(FichierSauvegarde, "rb") as fichier :
+    with codecs.open(NomFichier, "rb") as fichier :
     #On ouvrer le fichier en mode lecture binaire avec le module codec
 
         for ligne in fichier :
