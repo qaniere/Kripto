@@ -1,6 +1,7 @@
 # coding: utf8
-from ChiffrementRSA import transformationChiffres, transformationCaratères
 from hashlib import sha1
+from os import makedirs
+import codecs
 
 
 """Dans ce programme on décrira les fonctions permetant la création d'une sauvegarde cryptée des messages"""
@@ -10,13 +11,54 @@ from hashlib import sha1
 
 Ce programme contient différentes fonctions, décrites ci-dessous :
 
+    - Une fonction de chiffrement, nécessaire aux fonctions de cryptage et de décryptage (fonctionnelle)
+    - Une fonction de déchiffrement, nécessaire aux fonctions de cryptage et de décryptage (fonctionnelle)
     - Une fonction de cryptage pour préparer sauvegarde (fonctionnelle)
     - Une fonction de décryptage de sauvegarde (fonctionnelle)
     - Une fonction de cryptage de mot de passe, qui aide les fonctions de cryptage et de décryptage de sauvegarde (fonctionnelle)
     - Une fonction de sauvegarde (fonctionnelle)
-    - Une fonction de chargement de sauvegarde (non fonctionnelle)
+    - Une fonction de chargement de sauvegarde (fonctionnelle)
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+### Définition de la fonction de chiffrement ###
+
+
+def transformationChiffres(messageClair):
+
+    """Fonction de chiffrement : transforme le message clair en message chiffré"""
+
+    messageChiffré = list(messageClair)
+    for i in range(len(messageChiffré)):
+        messageChiffré[i] = ord(messageChiffré[i])
+        # ord(x) est la fonction qui pour tout charactère Unicode (sous type str) x renvoie sa valeur Unicode
+        # Cette fonction transforme donc le message en une suite de charactère chiffrés sous forme Unicode
+    return messageChiffré
+
+
+### Définition de la fonction de déchiffrement ###
+
+
+def transformationCaratères(messageChiffré):
+
+    """Fonction de déchiffrement : transforme le message chiffré en message clair"""
+
+    messageClair = messageChiffré
+    for j in range(len(messageClair)):
+
+        ## Boucle de sécurité si jamais le cryptage donnerait à convertir des nombres ne rentrant pas dans la table de caractères Unicode ##
+        
+        if messageClair[j] > 1114111 :
+            messageClair[j] = messageClair[j] - 1114111
+        elif messageClair[j] < 0 :
+            messageClair[j] = messageClair[j] + 1114111
+
+        messageClair[j] = chr(messageClair[j])
+        # chr(x) est la fonction qui pour toute valeur Unicode x nous renvoie son charactère Unicode (sous type str)
+        # Cette fonction transforme donc la suite de charactère chiffrés sous forme Unicode en message
+    messageClair = "".join(messageClair)
+    return messageClair
 
 
 ### Définition de la fonction de cryptage ###
@@ -62,7 +104,7 @@ def cryptageSauvegarde(messageASauvegarder) :
 
     messageASauvegarderCrypté = transformationCaratères(messageASauvegarderChiffré)
 
-    print("\n    Message crypté à la Vigenère : "+str(messageASauvegarderCrypté))
+    print("\n    Message crypté à la Vigenère : "+str(messageASauvegarderCrypté)+"\n\n")
 
     return messageASauvegarderCrypté
 
@@ -143,7 +185,13 @@ def sauvegarde(messageASauvegarderCrypté) :
 
     nomDeLaSauvegarde = str(input("Quel nom voulez-vous donner à votre sauvegarde ?\n>>> "))
 
-    nomDuFichierDeLaSauvegarde = str(str(nomDeLaSauvegarde)+".mcr")
+    try :
+        makedirs("Messages sauvegardés")
+    except FileExistsError :
+        # directory already exists
+        pass
+
+    nomDuFichierDeLaSauvegarde = str("Messages sauvegardés/"+str(nomDeLaSauvegarde)+".mcr")
 
     fichier = open(nomDuFichierDeLaSauvegarde, "a", encoding = "utf-8")
     fichier.write(messageASauvegarderCrypté)
@@ -153,27 +201,44 @@ def sauvegarde(messageASauvegarderCrypté) :
 ### Définition de la fonction de lecture de sauvegarde ###
 
 
-#Non fonctionnel :
 def chargerSauvegarde() :
 
     """Fonction de chargement de sauvegarde : Charger les messages sauvegardés cryptés"""
 
-    nomDeLaSauvegarde = str(input("Quelle sauvegarde voulez-vous charger ?\n>>> "))
+    nomDeLaSauvegarde = str(input("\nQuelle sauvegarde voulez-vous charger ?\n>>> "))
 
-    nomDuFichierDeLaSauvegarde = str(str(nomDeLaSauvegarde)+".mcr")
+    nomDuFichierDeLaSauvegarde = str("Messages sauvegardés/"+str(nomDeLaSauvegarde)+".mcr")
 
-    fichier = open(nomDuFichierDeLaSauvegarde, "r")
-    sauvegardeChargée = fichier.read().decode("utf-8")
-    fichier.close()
+    sauvegardeEnCoursDeChargement = []
 
-    return sauvegardeChargée
+    try :
+        with codecs.open(nomDuFichierDeLaSauvegarde, encoding="utf-8") as fichier :
+            for line in fichier :
+                sauvegardeEnCoursDeChargement.append(line)
+        fichier.close()
+
+        sauvegardeChargée = str("".join(sauvegardeEnCoursDeChargement))
+
+        return sauvegardeChargée
+
+    except :
+
+        print("Erreur fatale : assurez vous que ce soit le bon nom de fichier (sans l'extension mcr), et qu'il soit dans le bon dossier.")
 
 
-# Partie fonctionnelle du code :
-sauvegarde(cryptageSauvegarde(input("Entrez le message à crypter\n>>> ")))
+### Partie de sauvegarde ###
 
-# Partie à rendre fonctionnelle du code :
+
+#sauvegarde(cryptageSauvegarde(input("Entrez le message à crypter\n>>> ")))
+
+#print("\nVotre message a bien été enregistré !")
+
+
+### Partie de chargement de sauvegarde ###
+
+
 print("\nVotre message était : "+str(décryptageSauvegarde(chargerSauvegarde())))
+
 
 # Pause pour pouvoir observer le code :
 input("\n\nFIN\n\n")
