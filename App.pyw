@@ -3,19 +3,25 @@ import time
 import socket
 import tkinter
 import winsound
-import subprocess	
+import subprocess 
 from tkinter import *
 from Fonctions import *
+from Sauvegarde import *
+import tkinter.simpledialog
 from ChiffrementRSA import *
 import tkinter.font as tkFont
 from tkinter import messagebox
 from random import randint, choices
 
 #Variables d'applications
-global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs, SonActivé
+global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs, SonActivé, MotDePasse, FichierSauvegarde
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
+
+FichierSauvegarde = None
+MotDePasse = None
+#Initilisation du mot de passe de la sauvegarde et le fichier de sauvegarde
 
 Module, CléPublique, CléPrivée = génération(16)
 #On génére une clé publique et une clé publique et on garde en mémoire le module de chiffrement
@@ -83,8 +89,12 @@ def envoyer():
                 for ligne in listeLignes:
                 #On insere chaque ligne
                     filMessages.insert(END, ligne)
+                    NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
+                    #On sauvegarde la ligne
             else:
                 filMessages.insert(END, messageInterface)
+                NouvelleLigne(FichierSauvegarde, MotDePasse, messageInterface)
+                #On sauvegarde le message
 
             filMessages.yview(END)
             #On défile tout en bas cette dernière, vers le message le plus récent
@@ -146,9 +156,13 @@ def reception():
                     for ligne in listeLignes:
                     #On insere chaque ligne
                         filMessages.insert(END, ligne)
+                        NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
+                        #On sauvegarde la ligne
 
                 else:
                     filMessages.insert(END, messageRecu)
+                    NouvelleLigne(FichierSauvegarde, MotDePasse, messageRecu)
+                    #On sauvegarde le nouveau message
             
                 filMessages.yview(END)
                 #On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
@@ -348,7 +362,7 @@ def démarrerServeur():
         
     """ Cette fonction sert à démarrez le serveur quand on est hôte"""
 
-    global entreIP, entrePort, IP, Port, Role
+    global entreIP, entrePort, IP, Port, Role, FichierSauvegarde, MotDePasse
     #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
 
     Role = "Hote"
@@ -360,6 +374,19 @@ def démarrerServeur():
 
     if connexion() == True:
     #Si la connexion est une réussite, on affiche les conversations
+
+        MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
+        ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
+        #On demande le mot et sa confirmation
+
+        while ConfirmationMotDePasse != MotDePasse:
+        #Tant que la confirmination n'est validée
+
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
+        
+        FichierSauvegarde = InitialisationSauvegarde(MotDePasse)
+        #On initialise le fichier de sauvegarde
+        
         affichageConversation()
 
 
@@ -368,7 +395,7 @@ def seConnecter():
         
     """ Fonction qui affiche l'interface de discusion si la connexion est une réussite"""
 
-    global entreIP, entrePort, IP, Port, Role
+    global entreIP, entrePort, IP, Port, Role, FichierSauvegarde, MotDePasse
     #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
     
     Role = "Client"
@@ -376,6 +403,18 @@ def seConnecter():
     IP = entreIP.get()
 
     if connexion() == True: 
+
+        MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
+        ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
+        #On demande le mot et sa confirmation
+
+        while ConfirmationMotDePasse != MotDePasse:
+        #Tant que la confirmination n'est validée
+
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
+        
+        FichierSauvegarde = InitialisationSauvegarde(MotDePasse)
+        #On initialise le fichier de sauvegarde
         affichageConversation()
 
 
@@ -572,5 +611,4 @@ def AfficherMenu():
     bouttonClient.pack(side=LEFT, padx=7)
 
 AfficherMenu()
-
 fen.mainloop()
