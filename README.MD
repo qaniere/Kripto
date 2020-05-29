@@ -14,14 +14,11 @@
 
 ## Liste de fonctionnalités à implémenter 
 
-- Empêcher les noms d'utilisateur très long (16 caractères max)
-
-- Empêcher les messages de plus de 1000 caratères
 
 - Gestion des paramétres : 
 
     - [ ] Personaliser le son des messages (Envoi et réception) parmi une sélection 
-    - [ ] Choisir un son (Envoi et réception) perso, voir niveau conversion (Faut que ça marche en local)
+    - [ ] Choisir un son (Envoi et réception) perso
     - [ ] Choisir un nom d'utilisateur par défaut
     - [ ] Modifier la couleur de la fenêtre
     - [ ] Coordonées de serveur par défaut 

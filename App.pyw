@@ -44,6 +44,13 @@ def envoyer():
     message = saisieMessage.get()
     #On récupere le message dans l'entrée où il a été saisi
 
+    if len(message) > 1000:
+
+        tkinter.messagebox.showerror(title="Attention au spam !", message="Afin d'éviter de surcharger le serveur, les messages de plus de 1000 caractères sont interdits")
+        return
+        #On stoppe l'éxeuction de la fonction
+
+    
     if len(message) != 0 and EnvoiOK:
 
         EnvoiOK = False
@@ -375,8 +382,14 @@ def démarrerServeur():
         
     """ Cette fonction sert à démarrez le serveur quand on est hôte"""
 
-    global entreIP, entrePort, IP, Port, Role, FichierSauvegarde, MotDePasse
-    #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
+    global entreIP, entrePort, IP, Port, Role, FichierSauvegarde, MotDePasse, entreNom
+    #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
+
+    if len(entreNom.get()) > 16:
+
+        tkinter.messagebox.showerror(title="Aie...", message="Votre nom d'utilisateur doit faire moins de 16 caractères")
+        return 
+        #On stoppe l'exécution de la fonction
 
     Role = "Hote"
     IP = entreIP.get()
