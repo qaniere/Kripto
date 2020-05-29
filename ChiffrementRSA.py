@@ -103,7 +103,6 @@ def Miller_Rabin(premier):
 
 
 
-
 def primalité(premier):
 
     """Fonction de primalité : retourne True si premier est le nombre premier selon plusieurs algorithmes"""
@@ -119,7 +118,6 @@ def primalité(premier):
         if (premier % prime == 0):
             return False
     return Miller_Rabin(premier)
-
 
 
 
@@ -144,7 +142,6 @@ def pgcd(clefPublique, phiDuModuleDeChiffrement):
 
 
 
-
 def inverse(clefPublique, phiDuModuleDeChiffrement):
 
     """Fonction inverse : Cacule l'inverse de clefPublique modulo phiDuModuleDeChiffrement avec l'algorithme d'euclide étendu"""
@@ -160,3 +157,21 @@ def inverse(clefPublique, phiDuModuleDeChiffrement):
         v1, v2, v3, u1, u2, u3 = (u1 - q * v1), (u2 - q * v2), (u3 - q * v3), v1, v2, v3
 
     return u1 % phiDuModuleDeChiffrement
+
+
+
+if __name__ == "__main__":
+#Si on execute le fichier en lui même, ces lignes ne seront pas lues en cas d'import
+
+    """ Démonstration du module de chiffrement"""
+
+    module, CléPublique, CléPrivée = génération(16)
+
+    print(f"Votre Clé Publique => {CléPublique}\nVotre Clé Privée => {CléPrivée}\nVotre module de chiffrement => {module}\n")
+    
+    MessageClair = input("Quel message désirez vous chiffrer ?\n>>> ")
+    MessageChiffré = chiffrement(MessageClair, CléPublique, module)
+
+    print(f"\n{MessageClair} chiffré avec l'algorithme RSA donne {MessageChiffré}")
+
+    #Inutile de faire la démonstration du déchiffrement

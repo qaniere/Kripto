@@ -214,6 +214,8 @@ def InitialisationSauvegarde(motDePasse):
 
 def NouvelleLigne(NomFichier, MotDePasse, chaine):
 
+    """ Fichier qui ajoute une ligne chiffrée au fichier demandé """
+
     ChaineChiffré = ChiffrementVignère(MotDePasse, chaine)
 
     fichier = open(NomFichier, "ab")
@@ -230,6 +232,10 @@ def NouvelleLigne(NomFichier, MotDePasse, chaine):
 
 
 def lectureSauvegarde(NomFichier, MDP):
+
+
+    """ Fonction qui lit, déchiffre et retourne sous forme de liste 
+    chaque ligne du fichier demandé """
 
     ListeLignes = []
 
@@ -260,14 +266,31 @@ def lectureSauvegarde(NomFichier, MDP):
 
 #TODO Regarde la démo
 
-MDP = "Jambon"
-#Je ferais une saisie avec confirmation plus tard
 
-FichierSauvegarde = InitialisationSauvegarde(MDP)
-#On initialisae le fichier de sauvegarde au début de la conversations
+if __name__ == "__main__":
+#Si on execute le fichier en lui même, ces lignes ne seront pas lues en cas d'import
 
-NouvelleLigne(FichierSauvegarde, MDP, "Salut c'est moi patrique !")
-#A chaque nouveau message, on ajoute une ligne
+    """ Démonstration du module de sauvegarde chiffré """
 
-print(lectureSauvegarde(FichierSauvegarde, MDP))
-#Fonction qui retourne chaque lignes déchiffrés du fichier
+    mdp = input("Veuillez saisir un mot de passe pour chiffrer votre sauvegarde\n>>> ")
+
+    confirmationMDP = input("\nVeuillez saisir une seconde fois votre mot de passe\n>>> ")
+
+    while confirmationMDP != mdp:
+
+        confirmationMDP = input("\n Le mot de passe n'est confirmé. Veuillez saisir la confirmation du mot de passe\n>>> ")
+
+    FichierSauvegarde = InitialisationSauvegarde(mdp)
+    #On initialisae le fichier de sauvegarde au début de la conversations
+
+    print(f"Un fichier de sauvegarde \"{FichierSauvegarde} à bien été crée")
+
+    NouvelleLigne(FichierSauvegarde, mdp, "Bonjour, je suis la nouvelle ligne")
+    #A chaque nouveau message, on ajoute une ligne
+
+    NouvelleLigne(FichierSauvegarde, mdp, "Salut ligne 2, moi c'est ligne 3 !")
+
+    print()
+    print(f"Voici les lignes contenus dans {FichierSauvegarde}")
+    print(lectureSauvegarde(FichierSauvegarde, mdp))
+    #Fonction qui retourne chaque lignes déchiffrés du fichier
