@@ -4,15 +4,15 @@ import time
 import socket
 import tkinter
 from tkinter import *
-from ChiffrementRSA import *
 from tkinter import messagebox
+from Modules import ChiffrementRSA
 
 fen = Tk()
 fen.withdraw()
 #On crée une fenêtre qu'on affiche pas pour éviter qu'une fenêtre se génère lors de message d'erreurs
 
 global Module, CléPublique, CléPrivée
-Module, CléPublique, CléPrivée = génération(16)
+Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
 #On génère notre jeu de clés Privée et Publique, ainsi que notre module qu'on rend accesible à tout le programme avec Global
 
 
@@ -58,7 +58,7 @@ def envoi(message, type):
         if destinataire != client:
         #Si le destinaire n'est pas l'expéditeur
 
-            messageEnvoi = chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+            messageEnvoi = ChiffrementRSA.chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
             #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
             #Avec la clé publiq ue et le module de chaque client
 
@@ -70,7 +70,7 @@ def envoi(message, type):
         elif type == "Annonce":
         #Si on veut envoyer une annonce, on utilise cette boucle car tout le monde est concerné
 
-            ChaineMessage = chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
+            ChaineMessage = ChiffrementRSA.chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
             #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
             #Avec la clé publique et le module de chaque client
             #On récupere alors un liste d'entiers
@@ -221,7 +221,7 @@ else:
 
                 #A ce stade le message est complet
 
-                message = déchiffrement(message[1], CléPrivée, Module)
+                message = ChiffrementRSA.déchiffrement(message[1], CléPrivée, Module)
                 #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
                 #0 étant la longueur de ce message
 

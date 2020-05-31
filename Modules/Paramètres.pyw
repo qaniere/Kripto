@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
-from Sauvegarde import *
+from Modules import Sauvegarde
 from tkinter import messagebox
 
 ListeParamètres = ["NomUserDéfaut", "Sauvegarde"]

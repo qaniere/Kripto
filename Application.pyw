@@ -5,20 +5,14 @@ import tkinter
 import winsound
 import subprocess 
 from tkinter import *
-from Fonctions import *
-from Sauvegarde import *
-from Paramètres import *
 import tkinter.simpledialog
-from ChiffrementRSA import *
 import tkinter.font as tkFont
 from tkinter import messagebox
-from LecteurSauvegarde import *
 from random import randint, choices
+from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde
 
-LectureParamètres()
+Paramètres.LectureParamètres()
 # On lit les paramètres
-
-print(DicoParamètres)
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
@@ -27,7 +21,7 @@ FichierSauvegarde = None
 MotDePasse = None
 #Initilisation du mot de passe de la sauvegarde et le fichier de sauvegarde
 
-Module, CléPublique, CléPrivée = génération(16)
+Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
 #On génére une clé publique et une clé publique et on garde en mémoire le module de chiffrement
 
 NombreErreurs = 0
@@ -62,10 +56,10 @@ def envoyer():
         messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} → {message}"
         #On garde de coté un message avec un formaté spécialement pour l'interface, mais on ne l'utilise que si l'envoi est réussi.
 
-        message = formaterPaquet("Message", message)
+        message = Fonctions.formaterPaquet("Message", message)
         #On formate le paquet
 
-        message = chiffrement(message, CléPubliqueServeur, ModuleServeur)
+        message = ChiffrementRSA.chiffrement(message, CléPubliqueServeur, ModuleServeur)
         #On transforme le message en liste de chiffres, correspondant à leur identifiant Ascii, puis on chiffre le message
         #On récupere alors une liste d'entiers
         
@@ -104,12 +98,16 @@ def envoyer():
                 for ligne in listeLignes:
                 #On insere chaque ligne
                     filMessages.insert(END, ligne)
-                    NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
-                    #On sauvegarde la ligne
+
+                    if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+                        Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
+                        #On sauvegarde la ligne
             else:
                 filMessages.insert(END, messageInterface)
-                NouvelleLigne(FichierSauvegarde, MotDePasse, messageInterface)
-                #On sauvegarde le message
+
+                if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+                    Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, messageInterface)
+                    #On sauvegarde le message
 
             filMessages.yview(END)
             #On défile tout en bas cette dernière, vers le message le plus récent
@@ -166,7 +164,7 @@ def reception():
                     messageRecu[1] += suite
                     #On ajoute la suite du message recu
 
-                messageRecu = déchiffrement(messageRecu[1], CléPrivée, Module)
+                messageRecu = ChiffrementRSA.déchiffrement(messageRecu[1], CléPrivée, Module)
                 #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
                 #0 étant la longueur de ce message
 
@@ -179,13 +177,17 @@ def reception():
                     for ligne in listeLignes:
                     #On insere chaque ligne
                         filMessages.insert(END, ligne)
-                        NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
-                        #On sauvegarde la ligne
+
+                        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+                            NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
+                            #On sauvegarde la ligne
 
                 else:
                     filMessages.insert(END, messageRecu)
-                    NouvelleLigne(FichierSauvegarde, MotDePasse, messageRecu)
-                    #On sauvegarde le nouveau message
+
+                    if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+                        Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, messageRecu)
+                        #On sauvegarde le nouveau message
             
                 filMessages.yview(END)
                 #On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
@@ -291,7 +293,7 @@ def affichageConversation():
     bouttonEnvoyer = Button(fen, text="Envoyer", command=envoyer)
     bouttonEnvoyer.pack(pady=15)
 
-    saisieMessage.bind("<Button-1>", lambda a: placeholder(saisieMessage, "", False))
+    saisieMessage.bind("<Button-1>", lambda a: Fonctions.placeholder(saisieMessage, "", False))
     #On associe le clic gauche sur la zone de saisie du message à la fonction placeholder
     #On utilise une lambda pour appeler une fonction avec des arguments
 
@@ -302,7 +304,7 @@ def affichageConversation():
     reception()
     #On commence à recevoir des messages
 
-    placeholder(saisieMessage, "Saisissez votre message ici", True)
+    Fonctions.placeholder(saisieMessage, "Saisissez votre message ici", True)
     #On affiche un placeholder dans le zone de saisie des messages
 
 
@@ -404,7 +406,7 @@ def démarrerServeur():
     if connexion() == True:
     #Si la connexion est une réussite, on affiche les conversations
 
-        if DicoParamètres["Sauvegarde"] == "Activée":
+        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
 
             MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
             ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
@@ -415,7 +417,7 @@ def démarrerServeur():
 
                 ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
             
-            FichierSauvegarde = InitialisationSauvegarde(MotDePasse)
+            FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
             #On initialise le fichier de sauvegarde
         
         affichageConversation()
@@ -435,7 +437,7 @@ def seConnecter():
 
     if connexion() == True: 
 
-        if DicoParamètres["Sauvegarde"] == "Activée":
+        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
 
             MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
             ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
@@ -446,7 +448,7 @@ def seConnecter():
 
                 ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
             
-            FichierSauvegarde = InitialisationSauvegarde(MotDePasse)
+            FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
             #On initialise le fichier de sauvegarde
         affichageConversation()
 
@@ -494,16 +496,16 @@ def hote():
     entreNom = Entry(cadreParametres)
     entreNom.pack(anchor=CENTER)
     
-    if DicoParamètres["NomUserDéfaut"] != "Inconnu":
+    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
     # Si l'utilisateur a définit un nom d'utilisateur par défaut
-        placeholder(entreNom, DicoParamètres["NomUserDéfaut"], True)
+        Fonctions.placeholder(entreNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
     else:
         suggestionNom = choices(listeNoms)
         #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
-        placeholder(entreNom, suggestionNom[0], True)
+        Fonctions.placeholder(entreNom, suggestionNom[0], True)
         #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
 
-    entreNom.bind("<Button-1>", lambda b: placeholder(entreNom, "", False))
+    entreNom.bind("<Button-1>", lambda b: Fonctions.placeholder(entreNom, "", False))
     #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
 
     bouttonStart = Button(cadreParametres, text="Démarrer", command=démarrerServeur)
@@ -544,17 +546,17 @@ def client():
     entreNom = Entry(cadreParametres)
     entreNom.pack(anchor=CENTER)
 
-    if DicoParamètres["NomUserDéfaut"] != "Inconnu":
+    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
     # Si l'utilisateur a définit un nom d'utilisateur par défaut
 
-        placeholder(entreNom, DicoParamètres["NomUserDéfaut"], True)
+        Fonctions.placeholder(entreNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
     else:
         suggestionNom = choices(listeNoms)
         #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
-        placeholder(entreNom, suggestionNom[0], True)
+        Fonctions.placeholder(entreNom, suggestionNom[0], True)
         #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
 
-    entreNom.bind("<Button-1>", lambda b: placeholder(entreNom, "", False))
+    entreNom.bind("<Button-1>", lambda b: Fonctions.placeholder(entreNom, "", False))
     #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
 
     bouttonStart = Button(cadreParametres, text="Se connecter",  command=seConnecter)
@@ -616,10 +618,10 @@ fen.resizable(width=False, height=False)
 fen.iconbitmap(bitmap="Médias/icone.ico")
 
 barreMenu = Menu(fen)
-barreMenu.add_command(label="Aide", command=pasCode)
-barreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde)
-barreMenu.add_command(label="Paramètres", command=InterfaceParamètres)
-barreMenu.add_command(label="Contact", command=pasCode)
+barreMenu.add_command(label="Aide", command=Fonctions.pasCode)
+barreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde.LecteurSauvegarde)
+barreMenu.add_command(label="Paramètres", command=Paramètres.InterfaceParamètres)
+barreMenu.add_command(label="Contact", command=Fonctions.pasCode)
 fen.configure(menu=barreMenu)
 #On configure la barre de menu
 

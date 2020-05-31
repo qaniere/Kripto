@@ -1,8 +1,8 @@
 # coding: utf8
 import os
 from tkinter import *
-from Sauvegarde import *
 import tkinter.simpledialog
+from Modules import Sauvegarde
 
 
 def LecteurSauvegarde():
@@ -39,7 +39,7 @@ def LecteurSauvegarde():
         Interface.delete(0,"end")
         # On supprime tout les fichiers dans l'interface
 
-        Disscusion = lectureSauvegarde(Fichier, MotDePasse)
+        Disscusion = Sauvegarde.lectureSauvegarde(Fichier, MotDePasse)
         # On lis la sauvegarde et on récupere sous forme de liste tout les messages
 
         for message in Disscusion:
