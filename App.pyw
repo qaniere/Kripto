@@ -18,6 +18,8 @@ from random import randint, choices
 LectureParamètres()
 # On lit les paramètres
 
+print(DicoParamètres)
+
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
 
@@ -402,17 +404,19 @@ def démarrerServeur():
     if connexion() == True:
     #Si la connexion est une réussite, on affiche les conversations
 
-        MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
-        ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
-        #On demande le mot et sa confirmation
+        if DicoParamètres["Sauvegarde"] == "Activée":
 
-        while ConfirmationMotDePasse != MotDePasse:
-        #Tant que la confirmination n'est validée
+            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
+            #On demande le mot et sa confirmation
 
-            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
-        
-        FichierSauvegarde = InitialisationSauvegarde(MotDePasse)
-        #On initialise le fichier de sauvegarde
+            while ConfirmationMotDePasse != MotDePasse:
+            #Tant que la confirmination n'est validée
+
+                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
+            
+            FichierSauvegarde = InitialisationSauvegarde(MotDePasse)
+            #On initialise le fichier de sauvegarde
         
         affichageConversation()
 
@@ -431,17 +435,19 @@ def seConnecter():
 
     if connexion() == True: 
 
-        MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
-        ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
-        #On demande le mot et sa confirmation
+        if DicoParamètres["Sauvegarde"] == "Activée":
 
-        while ConfirmationMotDePasse != MotDePasse:
-        #Tant que la confirmination n'est validée
+            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
+            #On demande le mot et sa confirmation
 
-            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
-        
-        FichierSauvegarde = InitialisationSauvegarde(MotDePasse)
-        #On initialise le fichier de sauvegarde
+            while ConfirmationMotDePasse != MotDePasse:
+            #Tant que la confirmination n'est validée
+
+                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
+            
+            FichierSauvegarde = InitialisationSauvegarde(MotDePasse)
+            #On initialise le fichier de sauvegarde
         affichageConversation()
 
 
@@ -490,14 +496,10 @@ def hote():
     
     if DicoParamètres["NomUserDéfaut"] != "Inconnu":
     # Si l'utilisateur a définit un nom d'utilisateur par défaut
-
         placeholder(entreNom, DicoParamètres["NomUserDéfaut"], True)
-
     else:
-
         suggestionNom = choices(listeNoms)
         #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
-
         placeholder(entreNom, suggestionNom[0], True)
         #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
 
@@ -536,19 +538,21 @@ def client():
     entrePort = Entry(cadreParametres)
     entrePort.pack(anchor=CENTER)
 
-   
-
     votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
     votreNom.pack(anchor=CENTER, pady=7)
 
     entreNom = Entry(cadreParametres)
     entreNom.pack(anchor=CENTER)
 
-    suggestionNom = choices(listeNoms)
-    #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
+    if DicoParamètres["NomUserDéfaut"] != "Inconnu":
+    # Si l'utilisateur a définit un nom d'utilisateur par défaut
 
-    placeholder(entreNom, suggestionNom[0], True)
-    #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
+        placeholder(entreNom, DicoParamètres["NomUserDéfaut"], True)
+    else:
+        suggestionNom = choices(listeNoms)
+        #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
+        placeholder(entreNom, suggestionNom[0], True)
+        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
 
     entreNom.bind("<Button-1>", lambda b: placeholder(entreNom, "", False))
     #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments

@@ -2,9 +2,10 @@ import os
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
+from Sauvegarde import *
 from tkinter import messagebox
 
-ListeParamètres = ["NomUserDéfaut"]
+ListeParamètres = ["NomUserDéfaut", "Sauvegarde"]
 DicoParamètres = {}
 
 
@@ -13,7 +14,9 @@ def EnregistrerParamètres():
     """ Fonction qui récupére les paramètres dans l'interface et les enregistre dans 
     un fichier """
 
-    global NomUser
+    global DicoParamètres, fen, NomUser, ValeurCase
+
+    # Récupération du nom d'utilisateur
     
     ValeurNomUser = NomUser.get()
 
@@ -22,17 +25,32 @@ def EnregistrerParamètres():
     else:
         DicoParamètres["NomUserDéfaut"] = "Inconnu"
 
-    FichierParamètres = open("Paramètres", "w")
+    #####
 
-    for Paramètres in ListeParamètres:
+    # Récupération de l'activation de la sauvegarde
+
+    if ValeurCase.get() == True:
+
+        DicoParamètres["Sauvegarde"] = "Activée"
+    
+    else: 
+        DicoParamètres["Sauvegarde"] = "Non"
+    
+
+    FichierParamètres = open("Paramètres", "w", encoding="utf-8")
+
+    for Paramètre in ListeParamètres:
     # On récupere chaque paramètres
 
-        FichierParamètres.write(DicoParamètres[Paramètres] + "/-;-/")
+        FichierParamètres.write(DicoParamètres[Paramètre] + "/-;-/")
+        # On utilise un séparateur peu commun pour éviter tout problème
 
     FichierParamètres.close()
 
+    fen.withdraw()
     tk.messagebox.showinfo(title="Succès !", message="Vos paramètres ont étés enregistrés avec succès !")
-
+    fen.destroy()
+    # On cache la fenêtre, ensuite on affiche un message de succès puis on supprime la fenêtre afin d'avoir un meilleure rendu visuel
 
 def LectureParamètres():
 
@@ -41,7 +59,7 @@ def LectureParamètres():
     if os.path.exists("Paramètres"):
     # Si le fichier de paramètre existe déja
 
-        FichierParamètres = open("Paramètres", "r")
+        FichierParamètres = open("Paramètres", "r", encoding="utf-8")
         Contenu = FichierParamètres.read()
 
         ValeursParamètres = Contenu.split("/-;-/")
@@ -64,7 +82,7 @@ def InterfaceParamètres():
 
     """ Fonction qui affiche les paramètres """
 
-    global NomUser
+    global NomUser, ValeurCase, fen
 
     fen = tk.Tk()
     fen.geometry("550x460")
@@ -89,6 +107,8 @@ def InterfaceParamètres():
 
     """ Widgets de l'onglet général """
 
+    # Partie nom d'utilisateur par défaut
+
     Label(CadreGénéral, text="Votre nom d'utilisateur par défaut :", bg="grey").grid(pady=15, padx=15, row=0, column=0)
     # On ne stocke pas le label dans une variable car on n'aura pas besoin le réutiliser
     
@@ -97,13 +117,44 @@ def InterfaceParamètres():
 
     if DicoParamètres["NomUserDéfaut"] != "Inconnu":
         NomUser.insert(0, DicoParamètres["NomUserDéfaut"])
+    #####
+
+    #Partie activation de la sauvegarde
+
+    def changementValeur():
+
+        """ Cette fonction permet de changer la valeur de la variable Tkinter "ValeurCase. 
+        On n'utilise pas le paramètres var sur le Checkbutton car ce dernier ce fonction pas
+        quand le fichier est appellée comme module"""
+
+        global ValeurCase
+
+        if ValeurCase.get() == True:
+            ValeurCase.set(False)  
+        else:
+            ValeurCase.set(True)
+
+    
+    ValeurCase = tk.BooleanVar() 
+
+    BouttonActivationSauv = Checkbutton(CadreGénéral, bg="grey", activebackground="grey", command= changementValeur)
+    BouttonActivationSauv.grid(pady=15, padx=10, row=1, column=0)
+
+    if DicoParamètres["Sauvegarde"] == "Activée":
+        BouttonActivationSauv.select()
+        ValeurCase.set(True)
+    else:
+        ValeurCase.set(False)
+
+    Label(CadreGénéral, text="Activation de la sauvegarde", bg="grey").grid(row=1, column=1)
+    #####
 
     Enregistrer = Button(CadreGénéral, text="Enregistrer", command=EnregistrerParamètres)
-    Enregistrer.grid(pady=15, padx=15, row=1, column=1)
+    Enregistrer.grid(pady=15, padx=15, row=2, column=1)
 
     """ Widgets de l'onglet son """
 
-
+    
     notebook.grid(row=0, column=0, sticky="n")
     # On ajout les boutton pour changer d'onglets
     

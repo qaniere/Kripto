@@ -17,18 +17,17 @@
 
 - Gestion des paramétres : 
 
-    - [ ] Personaliser le son des messages (Envoi et réception) parmi une sélection 
-    - [ ] Choisir un son (Envoi et réception) perso
-    - [ ] Choisir un nom d'utilisateur par défaut
-    - [ ] Modifier la couleur de la fenêtre
-    - [ ] Coordonées de serveur par défaut 
-    - [ ] Gestion des logs : Activation / Désativation
+    - Personaliser le son des messages (Envoi et réception) parmi une sélection 
+    - Gérer les paramètres du serveur 
+        - Nombre de participants maximums
+        - Mot de passe (Asynchrone)
+    - Empêcher l'écriture du séparateur
 
 - Pouvoir revenir en arrière lors du choix "Hôte/Client"
 
 - Nombre d'utilisateur connectés maximums
 
-- Afficher nombres d'utilisateurs connectés (Liste ?)
+- Afficher nombres d'utilisateurs connectés
 
 - Ajouter des commandes :
   
@@ -37,8 +36,6 @@
     - [ ] /ban : Commande pour bannir un utilisateur 
     - [ ] /kick : Commande pour jeter l'utilisateur dehors 
     - [ ] /op : Commande qui permet de changer le rôle (Hôte à client, client à hôte)
-
-- Pouvoir enregistrer des serveurs : Leur ip, leur port, leur nom (Sorte d'annuaire)
 
 - Implémenter le Pierre Feuille Ciseaux :
 
@@ -50,14 +47,12 @@
     
 - Envoyer des fichiers :
 
-    - [ ] Chiffrer les fichiers très vite (Threads, ou alors zip avec MDP)
+    - [ ] Chiffrer les fichiers très vite (Threads)
     - [ ] Télécharger fichier coté serveur
     - [ ] Serveur qui propose fichier => "PhotoChat.jpg est dispo, (1.3mo), faite /fichier 1 pour télécharger
     - [ ] Téléchargement du fichier (Mettre une liste d'attente pour pas pénaliser ?)
     - [ ] Suppresion des fichiers à la fin du serveur
-    
 
-## Quand tout cela sera fait
+ - Enlever toutes les fast string pour des raisons de compatibilité
 
-- Rédiger l'aide en TopLevel
-- Rédiger le rapport
+ - Rédiger l'aide en TopLevel
