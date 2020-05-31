@@ -7,6 +7,7 @@ import subprocess
 from tkinter import *
 from Fonctions import *
 from Sauvegarde import *
+from Paramètres import *
 import tkinter.simpledialog
 from ChiffrementRSA import *
 import tkinter.font as tkFont
@@ -14,8 +15,8 @@ from tkinter import messagebox
 from LecteurSauvegarde import *
 from random import randint, choices
 
-global listeNoms, Module,CléPublique, CléPrivée, NombreErreurs, SonActivé, MotDePasse, FichierSauvegarde, EnvoiOK
-#Variables d'applications
+LectureParamètres()
+# On lit les paramètres
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
@@ -486,12 +487,19 @@ def hote():
 
     entreNom = Entry(cadreParametres)
     entreNom.pack(anchor=CENTER)
+    
+    if DicoParamètres["NomUserDéfaut"] != "Inconnu":
+    # Si l'utilisateur a définit un nom d'utilisateur par défaut
 
-    suggestionNom = choices(listeNoms)
-    #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
+        placeholder(entreNom, DicoParamètres["NomUserDéfaut"], True)
 
-    placeholder(entreNom, suggestionNom[0], True)
-    #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
+    else:
+
+        suggestionNom = choices(listeNoms)
+        #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
+
+        placeholder(entreNom, suggestionNom[0], True)
+        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
 
     entreNom.bind("<Button-1>", lambda b: placeholder(entreNom, "", False))
     #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
@@ -606,7 +614,7 @@ fen.iconbitmap(bitmap="Médias/icone.ico")
 barreMenu = Menu(fen)
 barreMenu.add_command(label="Aide", command=pasCode)
 barreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde)
-barreMenu.add_command(label="Paramètres", command=pasCode)
+barreMenu.add_command(label="Paramètres", command=InterfaceParamètres)
 barreMenu.add_command(label="Contact", command=pasCode)
 fen.configure(menu=barreMenu)
 #On configure la barre de menu
