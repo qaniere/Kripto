@@ -18,8 +18,8 @@ Module, CléPublique, CléPrivée = génération(16)
 
 listeClient = []
 listeDesPseudos = []
-#On initialise la liste qui contient les objets clients, ainsi que la liste de toute des pseudos de 
-# tout les clients connectés pour éviter les doublons
+#On initialise la liste qui contient les objets clients, ainsi que la liste de tous les pseudos de
+# tous les clients connectés pour éviter les doublons
 
 HoteConnecté = False
 
@@ -46,7 +46,7 @@ Port = int(sys.argv[2])
 #Par exemple => "script.py", un seul argument, "script.py argument2, argument3" 3 arguments
 
 def envoi(message, type):
-        
+
     """ Cette fonction sert à envoyer des messages au clients connectés"""
 
     global listeClient
@@ -54,14 +54,14 @@ def envoi(message, type):
 
     for destinataire in listeClient:
     #On désigne les destinaires du message, à savoir tout les clients connectés
-    
+
         if destinataire != client:
         #Si le destinaire n'est pas l'expéditeur
 
             messageEnvoi = chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
             #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
             #Avec la clé publiq ue et le module de chaque client
-            
+
             ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
             messageEnvoi = ChaineMessage.encode('utf-8')
             destinataire.send(bytes(messageEnvoi))
@@ -69,14 +69,14 @@ def envoi(message, type):
 
         elif type == "Annonce":
         #Si on veut envoyer une annonce, on utilise cette boucle car tout le monde est concerné
-            
+
             ChaineMessage = chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
             #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
             #Avec la clé publique et le module de chaque client
             #On récupere alors un liste d'entiers
-            
+
             ChaineMessage = f"{len(ChaineMessage)}-{ChaineMessage}"
-            
+
             messageEnvoi = ChaineMessage.encode('utf-8')
             destinataire.send(bytes(messageEnvoi))
             #On encode le tout en UTF8 et on l'envoi au client
@@ -85,7 +85,7 @@ def envoi(message, type):
 
 def Déconnexion(Client):
 
-    """ Fonction qui supprimme des variables du serveur les infos d'un client qui vient de se déconnecter """ 
+    """ Fonction qui supprimme des variables du serveur les infos d'un client qui vient de se déconnecter """
 
     if RoleClient[Client] == "Client":
         annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient de se déconnecter"
@@ -118,7 +118,7 @@ def Déconnexion(Client):
 
 
 
-#On défini les paramêtres du socket 
+#On défini les paramêtres du socket
 Serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
@@ -142,20 +142,20 @@ else:
             objetClient, IPClient = Serveur.accept()
             #On accepte chaque connexion et on récupere les infos du client dans "objetClient"
             #Et son IP et son port dans IPClient
-            
+
             données = objetClient.recv(32768)
             données = données.decode("utf-8")
-            #On recoit et on convertir les données du client	
-        
+            #On recoit et on convertir les données du client
+
             données = données.split("|")
             #On transforme ces données en liste
 
             if données[0] not in listeDesPseudos:
             #Si un autre utilisateur est déja connecté avec le même nom d'utilisateur
-                    
+
                 objetClient.send(bytes(f"{str(CléPublique)}|{str(Module)}", "utf-8"))
                 #On envoi au client les informations de chiffremment du serveur
-                
+
                 nomClient[objetClient] = données[0]
                 CléPubliqueClient[objetClient] = int(données[1])
                 ModuleClient[objetClient] = int(données[2])
@@ -181,20 +181,20 @@ else:
                     print(annonce)
                     envoi(annonce, "Annonce")
 
-                listeClient.append(objetClient) 
+                listeClient.append(objetClient)
                 #On stocke l'objet client
             else:
                 objetClient.send(bytes("False", "utf-8"))
                 #Sinon on envoi au client l'interdeiction de se connecter
-            
+
         except IOError:
         #Si personne n'essaie de se connecter, on ne fait rien et on ralenti le programme pour préserver les ressources de la machine
             time.sleep(0.1)
-    
+
         for client in listeClient:
         #On récupere chaque client dans la liste des clients connectés
-        
-            
+
+
             try:
             #Si un message est envoyé, on le récupere, sinon l'instruction génére une exception
 
@@ -203,7 +203,7 @@ else:
                 #On recoit le message et on le décode
 
                 message = message.split("-")
-                #Le message comporte un petit entête 
+                #Le message comporte un petit entête
                 #Exemple = 564-6646464/65656/4564564654, 564 est içi la longueur totale du message. Cela peut arriver que les très long messages (Fichiers) fassent plus
                 #de 2048 la taille taille du buffer
 
