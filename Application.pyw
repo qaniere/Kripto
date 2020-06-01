@@ -112,7 +112,12 @@ def envoyer():
             #On défile tout en bas cette dernière, vers le message le plus récent
 
             if SonActivé == True:
-                winsound.PlaySound("Médias/SonEnvoi.wav", winsound.SND_ASYNC)
+
+                if Paramètres.DicoParamètres["SonEnvoi"] != "Inconnu":
+                    winsound.PlaySound("Sons/" + Paramètres.DicoParamètres["SonEnvoi"], winsound.SND_ASYNC)
+                
+                else:
+                    winsound.PlaySound("Sons/pop.wav", winsound.SND_ASYNC)
             
             saisieMessage.delete(0, 'end')
             #On vide la zone de saisie du message

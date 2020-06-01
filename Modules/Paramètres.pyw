@@ -5,7 +5,7 @@ from tkinter import ttk
 from Modules import Sauvegarde
 from tkinter import messagebox
 
-ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré"]
+ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi"]
 DicoParamètres = {}
 
 
@@ -14,7 +14,7 @@ def EnregistrerParamètres():
     """ Fonction qui récupére les paramètres dans l'interface et les enregistre dans 
     un fichier """
 
-    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort
+    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort, Sélection
 
     # Récupération du nom d'utilisateur
     
@@ -48,6 +48,15 @@ def EnregistrerParamètres():
 
     else:
         DicoParamètres["PortPréféré"] = ValeurPort
+
+    if Sélection == None:
+
+        DicoParamètres["SonEnvoi"] = "Inconnu"
+
+    else:
+
+        DicoParamètres["SonEnvoi"] = Sélection
+
     
 
     FichierParamètres = open("Paramètres", "w", encoding="utf-8")
@@ -95,7 +104,7 @@ def InterfaceParamètres():
 
     """ Fonction qui affiche les paramètres """
 
-    global fen, NomUser, ValeurCase, EntréPort
+    global fen, NomUser, ValeurCase, EntréPort, Sélection
 
     fen = tk.Tk()
     fen.geometry("550x460")
@@ -109,14 +118,14 @@ def InterfaceParamètres():
     style.configure("top.TNotebook")
     # On configure notre fenêtre comme étant un "notebook", le widget qui permet de faire des onglets
     
-    notebook = ttk.Notebook(fen)
+    notebook = ttk.Notebook(fen, width=550, height=460)
     
     CadreGénéral = tk.Frame(notebook, bg="grey", width=550, height=460)
-    CadreSauvegarde = tk.Frame(notebook, bg="grey", width=550, height=460)
+    CadreSon = tk.Frame(notebook, bg="grey", width=550, height=460)
     # On définit les cadres, qui seront en fait les onglets
     
     notebook.add(CadreGénéral, text="Général")
-    notebook.add(CadreSauvegarde, text="Son")
+    notebook.add(CadreSon, text="Son")
 
     """ Widgets de l'onglet général """
 
@@ -180,6 +189,63 @@ def InterfaceParamètres():
 
     """ Widgets de l'onglet son """
 
+    Sélection = None
+    
+    def CallbackClicSon():
+
+        global Sélection
+
+        """ Fonction appellé au clic sur un son, qui permet de récuperer le son sélectioné """
+
+        if ListeFichierSon.curselection() != ():
+        # Le premier clic n'est pas pris en compte par tkinter
+
+            Sélection  = ListeFichierSon.get(ListeFichierSon.curselection())
+
+            Titre.configure(text="Son d'envoi actuel : " + Sélection)
+
+
+    if DicoParamètres["SonEnvoi"] == "Inconnu":
+        son = "pop.waw"
+    else:
+        son = DicoParamètres["SonEnvoi"] 
+
+    Titre = Label(CadreSon, text="Son d'envoi actuel : " + son, bg="grey")
+    Titre.pack(pady=10)
+
+    Label(CadreSon, text="Double-cliquez sur un son pour le sélectioner", bg="grey").pack(pady=5)
+
+    ListeFichierSon = Listbox(CadreSon, width="60", height="17")
+    ListeFichierSon.pack()
+
+    ListeFichierSon.bind("<Button-1>", lambda x: CallbackClicSon())
+
+    ListeFichiers = os.listdir("Sons")
+
+    # On récupere dans une liste chaque fichier du dossier Sons
+
+    for fichier in ListeFichiers:
+
+        if fichier.split(".")[1] == "wav":
+        # On coupe le nom du fichier pour vérifier l'extension
+        # son.wav devient ["son", "wav"]
+    
+            ListeFichierSon.insert(END, fichier)
+
+
+
+    cadreBouttons = Frame(CadreSon, bg="grey")
+    cadreBouttons.pack(pady=40)
+
+    ChoisirRéception = Button(cadreBouttons, text="Choisir le son de réception", width="21")
+    ChoisirRéception.pack(side=LEFT, padx=7)
+
+    NouveauSon = Button(cadreBouttons, text="Uploader un nouveau son", width="21")
+    NouveauSon.pack(side=LEFT, padx=7)
+
+    Enregistrer = Button(cadreBouttons, text="Enregistrer", width="21", command=EnregistrerParamètres)
+    Enregistrer.pack(side=LEFT, padx=7)
+    ####
     
     notebook.grid(row=0, column=0, sticky="n")
     # On ajout les boutton pour changer d'onglets
