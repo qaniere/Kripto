@@ -3,13 +3,12 @@ import time
 import socket
 import tkinter
 import winsound
-import subprocess 
 from tkinter import *
 import tkinter.simpledialog
 import tkinter.font as tkFont
 from tkinter import messagebox
 from random import randint, choices
-from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde
+from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde, Serveur
 
 Paramètres.LectureParamètres()
 # On lit les paramètres
@@ -92,7 +91,7 @@ def envoyer():
             if len(messageInterface) > 70:
             #Si le message à afficher fait plus de 70 caratères
 
-                listeLignes = couperPhrases(messageInterface)
+                listeLignes = Fonctions.couperPhrases(messageInterface)
                 #On recupere plusieurs lignes de moins de 70 caractères dans une liste
 
                 for ligne in listeLignes:
@@ -400,8 +399,8 @@ def démarrerServeur():
     IP = entreIP.get()
     Port = int(entrePort.get())
 
-    subprocess.Popen(f"python Serveur.py {IP} {Port}")
-    #On lance le serveur dans un processus parallèle.
+    fen.after(10, Serveur.Démarrer(IP, Port))
+    #On lance de manière asynchrone le démarrage du serveur
 
     if connexion() == True:
     #Si la connexion est une réussite, on affiche les conversations
