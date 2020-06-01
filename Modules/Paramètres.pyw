@@ -5,7 +5,7 @@ from tkinter import ttk
 from Modules import Sauvegarde
 from tkinter import messagebox
 
-ListeParamètres = ["NomUserDéfaut", "Sauvegarde"]
+ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré"]
 DicoParamètres = {}
 
 
@@ -14,7 +14,7 @@ def EnregistrerParamètres():
     """ Fonction qui récupére les paramètres dans l'interface et les enregistre dans 
     un fichier """
 
-    global DicoParamètres, fen, NomUser, ValeurCase
+    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort
 
     # Récupération du nom d'utilisateur
     
@@ -35,6 +35,19 @@ def EnregistrerParamètres():
     
     else: 
         DicoParamètres["Sauvegarde"] = "Non"
+
+    ####
+
+    # Récupération du port préféré
+
+    ValeurPort = EntréPort.get()
+
+    if ValeurPort == "":
+
+        DicoParamètres["PortPréféré"] = "Inconnu"
+
+    else:
+        DicoParamètres["PortPréféré"] = ValeurPort
     
 
     FichierParamètres = open("Paramètres", "w", encoding="utf-8")
@@ -82,7 +95,7 @@ def InterfaceParamètres():
 
     """ Fonction qui affiche les paramètres """
 
-    global NomUser, ValeurCase, fen
+    global fen, NomUser, ValeurCase, EntréPort
 
     fen = tk.Tk()
     fen.geometry("550x460")
@@ -149,8 +162,21 @@ def InterfaceParamètres():
     Label(CadreGénéral, text="Activation de la sauvegarde", bg="grey").grid(row=1, column=1)
     #####
 
+    # Partie Port préféré
+
+    Label(CadreGénéral, text="Votre port d'hôte préféré : ", bg="grey").grid(pady=15, padx=15, row=2, column=0)
+    
+    EntréPort = Entry(CadreGénéral)
+    EntréPort.grid(row=2, column=1)
+
+    if DicoParamètres["PortPréféré"] != "Inconnu":
+        EntréPort.insert(0, DicoParamètres["PortPréféré"])
+
+    #####
+
+
     Enregistrer = Button(CadreGénéral, text="Enregistrer", command=EnregistrerParamètres)
-    Enregistrer.grid(pady=15, padx=15, row=2, column=1)
+    Enregistrer.grid(pady=15, padx=15, row=3, column=1)
 
     """ Widgets de l'onglet son """
 
@@ -163,5 +189,7 @@ def InterfaceParamètres():
 if __name__ == "__main__":
 # Si le fichier est executé et non importé comme un module
 
-    LectureParamètres()
-    InterfaceParamètres()
+    # LectureParamètres()
+    # InterfaceParamètres()
+    # Zone à décommenter durant le développement sur les paramétres
+    pass

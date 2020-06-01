@@ -482,12 +482,20 @@ def hote():
     votrePort = Label(cadreParametres, text="Port", bg="Grey")
     votrePort.pack(anchor=CENTER, pady=7)
 
-    portRecommande = randint(49152, 65535)
-    #On recommande un port dans la plage de ceux les moins utilisés
 
     entrePort = Entry(cadreParametres)
-    entrePort.insert("end", portRecommande)
     entrePort.pack(anchor=CENTER)
+
+    if Paramètres.DicoParamètres["PortPréféré"] != "Inconnu":
+    # Si l'utilisateur a définit un port par défaut
+        Fonctions.placeholder(entrePort, Paramètres.DicoParamètres["PortPréféré"], True)
+
+    else:
+        portRecommande = randint(49152, 65535)
+        #On recommande un port dans la plage de ceux les moins utilisés
+        Fonctions.placeholder(entrePort, portRecommande, True)
+        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
+    
 
     votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
     votreNom.pack(anchor=CENTER, pady=7)
