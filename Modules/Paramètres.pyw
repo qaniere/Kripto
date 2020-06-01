@@ -1,9 +1,13 @@
 import os
+import winsound
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
+from shutil import copy2
 from Modules import Sauvegarde
+from tkinter import filedialog
 from tkinter import messagebox
+
 
 ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi"]
 DicoParamètres = {}
@@ -190,7 +194,31 @@ def InterfaceParamètres():
     """ Widgets de l'onglet son """
 
     Sélection = None
-    
+
+    def Upload():
+        
+        fichier = filedialog.askopenfilename(title = "Choisisez le son")
+        copy2(fichier, "Sons/")
+        # On demande à l'utilisateur de sélectioner le son qu'il veut uploader 
+        # et on copie le son dans le répertoiré dédié
+
+        if fichier.split(".")[1] != "wav":
+            tk.messagebox.showerror(title="Mauvais format", message="Le son doit être au format wav")
+        else:
+
+            ListeFichierSon.delete(0,"end")
+            # On efface tout les sons affichés
+            ListeFichiers = os.listdir("Sons")
+            # On récupere dans une liste chaque fichier du dossier Sons
+
+            for fichier in ListeFichiers:
+                if fichier.split(".")[1] == "wav":
+                # On coupe le nom du fichier pour vérifier l'extension
+                # son.wav devient ["son", "wav"]
+
+                    ListeFichierSon.insert(END, fichier)
+
+
     def CallbackClicSon():
 
         global Sélection
@@ -201,7 +229,7 @@ def InterfaceParamètres():
         # Le premier clic n'est pas pris en compte par tkinter
 
             Sélection  = ListeFichierSon.get(ListeFichierSon.curselection())
-
+            winsound.PlaySound("Sons/" + Sélection, winsound.SND_ASYNC)
             Titre.configure(text="Son d'envoi actuel : " + Sélection)
 
 
@@ -221,7 +249,6 @@ def InterfaceParamètres():
     ListeFichierSon.bind("<Button-1>", lambda x: CallbackClicSon())
 
     ListeFichiers = os.listdir("Sons")
-
     # On récupere dans une liste chaque fichier du dossier Sons
 
     for fichier in ListeFichiers:
@@ -240,7 +267,7 @@ def InterfaceParamètres():
     ChoisirRéception = Button(cadreBouttons, text="Choisir le son de réception", width="21")
     ChoisirRéception.pack(side=LEFT, padx=7)
 
-    NouveauSon = Button(cadreBouttons, text="Uploader un nouveau son", width="21")
+    NouveauSon = Button(cadreBouttons, text="Uploader un nouveau son", width="21", command=Upload)
     NouveauSon.pack(side=LEFT, padx=7)
 
     Enregistrer = Button(cadreBouttons, text="Enregistrer", width="21", command=EnregistrerParamètres)
