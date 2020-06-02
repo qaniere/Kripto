@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from shutil import copy2
+import tkinter.font as tkFont
 from Modules import Sauvegarde
 from tkinter import filedialog
 from tkinter import messagebox
@@ -52,7 +53,9 @@ def EnregistrerParamètres():
 
     else:
         DicoParamètres["PortPréféré"] = ValeurPort
+    ####
 
+    # Récupération du son d'envoi
     if Sélection == None:
 
         DicoParamètres["SonEnvoi"] = "Inconnu"
@@ -60,8 +63,7 @@ def EnregistrerParamètres():
     else:
 
         DicoParamètres["SonEnvoi"] = Sélection
-
-    
+    ####    
 
     FichierParamètres = open("Paramètres", "w", encoding="utf-8")
 
@@ -125,21 +127,30 @@ def InterfaceParamètres():
     notebook = ttk.Notebook(fen, width=550, height=460)
     
     CadreGénéral = tk.Frame(notebook, bg="grey", width=550, height=460)
-    CadreSon = tk.Frame(notebook, bg="grey", width=550, height=460)
+    CadreSonEnvoi = tk.Frame(notebook, bg="grey", width=550, height=460)
     # On définit les cadres, qui seront en fait les onglets
     
-    notebook.add(CadreGénéral, text="Général")
-    notebook.add(CadreSon, text="Son")
+    notebook.add(CadreGénéral, text=" Général ")
+    notebook.add(CadreSonEnvoi, text=" Son d'envoi ")
 
     """ Widgets de l'onglet général """
 
+    PoliceTitre = tkFont.Font(family="Verdanna",size=16)
+    Label(CadreGénéral, text="Paramètres généraux", bg="grey", font=PoliceTitre).pack(pady=15)
+
+    PoliceSousTitre = tkFont.Font()
+    Label(CadreGénéral, font=PoliceSousTitre, text="Notez bien que vous devrez rédémarrer Kripto,\n ou au moins la conversation en cours pour que\nles changements s'appliquent.", bg="grey").pack()
+
     # Partie nom d'utilisateur par défaut
 
-    Label(CadreGénéral, text="Votre nom d'utilisateur par défaut :", bg="grey").grid(pady=15, padx=15, row=0, column=0)
+    ConteneurNomUser = Frame(CadreGénéral, bg="grey")
+    ConteneurNomUser.pack(pady=10)
+
+    Label(ConteneurNomUser, text="Votre nom d'utilisateur par défaut :", bg="grey").pack(pady=15, padx=15, side="left")
     # On ne stocke pas le label dans une variable car on n'aura pas besoin le réutiliser
     
-    NomUser = Entry(CadreGénéral)
-    NomUser.grid(row=0, column=1)
+    NomUser = Entry(ConteneurNomUser)
+    NomUser.pack(side="left")
 
     if DicoParamètres["NomUserDéfaut"] != "Inconnu":
         NomUser.insert(0, DicoParamètres["NomUserDéfaut"])
@@ -163,8 +174,11 @@ def InterfaceParamètres():
     
     ValeurCase = tk.BooleanVar() 
 
-    BouttonActivationSauv = Checkbutton(CadreGénéral, bg="grey", activebackground="grey", command= changementValeur)
-    BouttonActivationSauv.grid(pady=15, padx=10, row=1, column=0)
+    ConteneurSauvegarde = Frame(CadreGénéral, bg="grey")
+    ConteneurSauvegarde.pack()
+
+    BouttonActivationSauv = Checkbutton(ConteneurSauvegarde, bg="grey", activebackground="grey", command= changementValeur)
+    BouttonActivationSauv.pack(pady=15, padx=10, side="left")
 
     if DicoParamètres["Sauvegarde"] == "Activée":
         BouttonActivationSauv.select()
@@ -172,15 +186,18 @@ def InterfaceParamètres():
     else:
         ValeurCase.set(False)
 
-    Label(CadreGénéral, text="Activation de la sauvegarde", bg="grey").grid(row=1, column=1)
+    Label(ConteneurSauvegarde, text="Activation de la sauvegarde", bg="grey").pack(side="left")
     #####
 
     # Partie Port préféré
 
-    Label(CadreGénéral, text="Votre port d'hôte préféré : ", bg="grey").grid(pady=15, padx=15, row=2, column=0)
+    ConteneurPort = Frame(CadreGénéral, bg="grey")
+    ConteneurPort.pack()
+
+    Label(ConteneurPort, text="Votre port d'hôte préféré : ", bg="grey").pack(pady=15, padx=15, side="left")
     
-    EntréPort = Entry(CadreGénéral)
-    EntréPort.grid(row=2, column=1)
+    EntréPort = Entry(ConteneurPort)
+    EntréPort.pack(side="left")
 
     if DicoParamètres["PortPréféré"] != "Inconnu":
         EntréPort.insert(0, DicoParamètres["PortPréféré"])
@@ -189,22 +206,22 @@ def InterfaceParamètres():
 
 
     Enregistrer = Button(CadreGénéral, text="Enregistrer", command=EnregistrerParamètres)
-    Enregistrer.grid(pady=15, padx=15, row=3, column=1)
+    Enregistrer.pack(side="bottom", pady=50)
 
-    """ Widgets de l'onglet son """
+    """ Widgets de l'onglet son d'envoi """
 
     Sélection = None
 
-    def Upload():
+    def UploadSonEnvoi():
         
         fichier = filedialog.askopenfilename(title = "Choisisez le son")
-        copy2(fichier, "Sons/")
         # On demande à l'utilisateur de sélectioner le son qu'il veut uploader 
-        # et on copie le son dans le répertoiré dédié
 
         if fichier.split(".")[1] != "wav":
             tk.messagebox.showerror(title="Mauvais format", message="Le son doit être au format wav")
         else:
+            copy2(fichier, "Sons/")
+            # et on copie le son dans le répertoiré dédié
 
             ListeFichierSon.delete(0,"end")
             # On efface tout les sons affichés
@@ -216,19 +233,19 @@ def InterfaceParamètres():
                 # On coupe le nom du fichier pour vérifier l'extension
                 # son.wav devient ["son", "wav"]
 
-                    ListeFichierSon.insert(END, fichier)
+                    ListeFichierSonEnvoi.insert(END, fichier)
 
 
-    def CallbackClicSon():
+    def CallbackClicSonEnvoi():
 
         global Sélection
 
         """ Fonction appellé au clic sur un son, qui permet de récuperer le son sélectioné """
 
-        if ListeFichierSon.curselection() != ():
+        if ListeFichierSonEnvoi.curselection() != ():
         # Le premier clic n'est pas pris en compte par tkinter
 
-            Sélection  = ListeFichierSon.get(ListeFichierSon.curselection())
+            Sélection  = ListeFichierSonEnvoi.get(ListeFichierSonEnvoi.curselection())
             winsound.PlaySound("Sons/" + Sélection, winsound.SND_ASYNC)
             Titre.configure(text="Son d'envoi actuel : " + Sélection)
 
@@ -238,15 +255,16 @@ def InterfaceParamètres():
     else:
         son = DicoParamètres["SonEnvoi"] 
 
-    Titre = Label(CadreSon, text="Son d'envoi actuel : " + son, bg="grey")
-    Titre.pack(pady=10)
+    PoliceTitreSon = tkFont.Font(family="Verdanna", size=14)
+    TitreSonEnvoi = Label(CadreSonEnvoi, text="Son d'envoi actuel : " + son, bg="grey", font=PoliceTitreSon)
+    TitreSonEnvoi.pack(pady=10)
 
-    Label(CadreSon, text="Double-cliquez sur un son pour le sélectioner", bg="grey").pack(pady=5)
+    Label(CadreSonEnvoi, text="Double-cliquez sur un son pour le sélectioner", bg="grey").pack(pady=5)
 
-    ListeFichierSon = Listbox(CadreSon, width="60", height="17")
-    ListeFichierSon.pack()
+    ListeFichierSonEnvoi = Listbox(CadreSonEnvoi, width="60", height="17")
+    ListeFichierSonEnvoi.pack()
 
-    ListeFichierSon.bind("<Button-1>", lambda x: CallbackClicSon())
+    ListeFichierSonEnvoi.bind("<Button-1>", lambda x: CallbackClicSonEnvoi())
 
     ListeFichiers = os.listdir("Sons")
     # On récupere dans une liste chaque fichier du dossier Sons
@@ -257,25 +275,22 @@ def InterfaceParamètres():
         # On coupe le nom du fichier pour vérifier l'extension
         # son.wav devient ["son", "wav"]
     
-            ListeFichierSon.insert(END, fichier)
+            ListeFichierSonEnvoi.insert(END, fichier)
 
 
 
-    cadreBouttons = Frame(CadreSon, bg="grey")
+    cadreBouttons = Frame(CadreSonEnvoi, bg="grey")
     cadreBouttons.pack(pady=40)
 
-    ChoisirRéception = Button(cadreBouttons, text="Choisir le son de réception", width="21")
-    ChoisirRéception.pack(side=LEFT, padx=7)
-
-    NouveauSon = Button(cadreBouttons, text="Uploader un nouveau son", width="21", command=Upload)
+    NouveauSon = Button(cadreBouttons, text="Uploader un nouveau son", width="20", command=UploadSonEnvoi)
     NouveauSon.pack(side=LEFT, padx=7)
 
-    Enregistrer = Button(cadreBouttons, text="Enregistrer", width="21", command=EnregistrerParamètres)
+    Enregistrer = Button(cadreBouttons, text="Enregistrer", width="20", command=EnregistrerParamètres)
     Enregistrer.pack(side=LEFT, padx=7)
     ####
     
     notebook.grid(row=0, column=0, sticky="n")
-    # On ajout les boutton pour changer d'onglets
+    # On place les onglets dans la fenêtre
     
     fen.mainloop()
 
