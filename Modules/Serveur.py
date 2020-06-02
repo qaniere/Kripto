@@ -80,7 +80,7 @@ def Démarrer(IP, Port):
             print(annonce)
 
             listeClient.remove(Client)
-            listeDesPseudos.remove(nomClient[client])
+            listeDesPseudos.remove(nomClient[Client])
             del nomClient[Client]
             del CléPubliqueClient[Client]
             del RoleClient[Client]
@@ -93,7 +93,7 @@ def Démarrer(IP, Port):
             annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient d'arrêter le serveur."
 
             listeClient.remove(Client)
-            listeDesPseudos.remove(nomClient[client])
+            listeDesPseudos.remove(nomClient[Client])
             del nomClient[Client]
             del CléPubliqueClient[Client]
             del RoleClient[Client]
