@@ -10,7 +10,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 
 
-ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi"]
+ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi", "SonRéception"]
 DicoParamètres = {}
 
 
@@ -19,7 +19,7 @@ def EnregistrerParamètres():
     """ Fonction qui récupére les paramètres dans l'interface et les enregistre dans 
     un fichier """
 
-    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort, Sélection
+    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception
 
     # Récupération du nom d'utilisateur
     
@@ -64,6 +64,16 @@ def EnregistrerParamètres():
 
         DicoParamètres["SonEnvoi"] = Sélection
     ####    
+
+    # Récupération du son de réception
+    if SélectionRéception == None:
+
+        DicoParamètres["SonRéception"] = "Inconnu"
+
+    else:
+
+        DicoParamètres["SonRéception"] = SélectionRéception
+
 
     FichierParamètres = open("Paramètres", "w", encoding="utf-8")
 
@@ -110,7 +120,7 @@ def InterfaceParamètres():
 
     """ Fonction qui affiche les paramètres """
 
-    global fen, NomUser, ValeurCase, EntréPort, Sélection
+    global fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception
 
     fen = tk.Tk()
     fen.geometry("550x460")
@@ -128,10 +138,12 @@ def InterfaceParamètres():
     
     CadreGénéral = tk.Frame(notebook, bg="grey", width=550, height=460)
     CadreSonEnvoi = tk.Frame(notebook, bg="grey", width=550, height=460)
+    CadreSonRéception = tk.Frame(notebook, bg="grey", width=550, height=460)
     # On définit les cadres, qui seront en fait les onglets
     
     notebook.add(CadreGénéral, text=" Général ")
     notebook.add(CadreSonEnvoi, text=" Son d'envoi ")
+    notebook.add(CadreSonRéception, text=" Son de réception ")
 
     """ Widgets de l'onglet général """
 
@@ -223,7 +235,7 @@ def InterfaceParamètres():
             copy2(fichier, "Sons/")
             # et on copie le son dans le répertoiré dédié
 
-            ListeFichierSon.delete(0,"end")
+            ListeFichierSonEnvoi.delete(0,"end")
             # On efface tout les sons affichés
             ListeFichiers = os.listdir("Sons")
             # On récupere dans une liste chaque fichier du dossier Sons
@@ -247,11 +259,11 @@ def InterfaceParamètres():
 
             Sélection  = ListeFichierSonEnvoi.get(ListeFichierSonEnvoi.curselection())
             winsound.PlaySound("Sons/" + Sélection, winsound.SND_ASYNC)
-            Titre.configure(text="Son d'envoi actuel : " + Sélection)
+            TitreSonEnvoi.configure(text="Son d'envoi actuel : " + Sélection)
 
 
     if DicoParamètres["SonEnvoi"] == "Inconnu":
-        son = "pop.waw"
+        son = "Pop.waw"
     else:
         son = DicoParamètres["SonEnvoi"] 
 
@@ -286,6 +298,85 @@ def InterfaceParamètres():
     NouveauSon.pack(side=LEFT, padx=7)
 
     Enregistrer = Button(cadreBouttons, text="Enregistrer", width="20", command=EnregistrerParamètres)
+    Enregistrer.pack(side=LEFT, padx=7)
+    ####
+    
+    """ Widgets de l'onglet son de réception """
+
+    SélectionRéception = None
+
+    def UploadSonRéception():
+        
+        fichier = filedialog.askopenfilename(title = "Choisisez le son")
+        # On demande à l'utilisateur de sélectioner le son qu'il veut uploader 
+
+        if fichier.split(".")[1] != "wav":
+            tk.messagebox.showerror(title="Mauvais format", message="Le son doit être au format wav")
+        else:
+            copy2(fichier, "Sons/")
+            # et on copie le son dans le répertoiré dédié
+
+            ListeFichierSonRéception.delete(0,"end")
+            # On efface tout les sons affichés
+            ListeFichiers = os.listdir("Sons")
+            # On récupere dans une liste chaque fichier du dossier Sons
+
+            for fichier in ListeFichiers:
+                if fichier.split(".")[1] == "wav":
+                # On coupe le nom du fichier pour vérifier l'extension
+                # son.wav devient ["son", "wav"]
+
+                    ListeFichierSonRéception.insert(END, fichier)
+
+
+    def CallbackClicSonRéception():
+
+        global SélectionRéception
+
+        """ Fonction appellé au clic sur un son, qui permet de récuperer le son sélectioné """
+
+        if ListeFichierSonRéception.curselection() != ():
+        # Le premier clic n'est pas pris en compte par tkinter
+
+            SélectionRéception  = ListeFichierSonRéception.get(ListeFichierSonRéception.curselection())
+            winsound.PlaySound("Sons/" + SélectionRéception, winsound.SND_ASYNC)
+            TitreSonRéception.configure(text="Son de réception actuel : " + SélectionRéception)
+
+
+    if DicoParamètres["SonRéception"] == "Inconnu":
+        SonRéception = "Dong.waw"
+    else:
+        SonRéception = DicoParamètres["SonRéception"] 
+
+    PoliceTitreSon = tkFont.Font(family="Verdanna", size=14)
+    TitreSonRéception = Label(CadreSonRéception, text="Son de réception actuel : " + SonRéception, bg="grey", font=PoliceTitreSon)
+    TitreSonRéception.pack(pady=10)
+
+    Label(CadreSonRéception, text="Double-cliquez sur un son pour le sélectioner", bg="grey").pack(pady=5)
+
+    ListeFichierSonRéception = Listbox(CadreSonRéception, width="60", height="17")
+    ListeFichierSonRéception.pack()
+
+    ListeFichierSonRéception.bind("<Button-1>", lambda x: CallbackClicSonRéception())
+
+    ListeFichiers = os.listdir("Sons")
+    # On récupere dans une liste chaque fichier du dossier Sons
+
+    for fichier in ListeFichiers:
+
+        if fichier.split(".")[1] == "wav":
+        # On coupe le nom du fichier pour vérifier l'extension
+        # son.wav devient ["son", "wav"]
+    
+            ListeFichierSonRéception.insert(END, fichier)
+
+    cadreBouttons2 = Frame(CadreSonRéception, bg="grey")
+    cadreBouttons2.pack(pady=40)
+
+    NouveauSon = Button(cadreBouttons2, text="Uploader un nouveau son", width="20", command=UploadSonRéception)
+    NouveauSon.pack(side=LEFT, padx=7)
+
+    Enregistrer = Button(cadreBouttons2, text="Enregistrer", width="20", command=EnregistrerParamètres)
     Enregistrer.pack(side=LEFT, padx=7)
     ####
     
