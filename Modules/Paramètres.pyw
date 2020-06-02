@@ -5,7 +5,6 @@ from tkinter import *
 from tkinter import ttk
 from shutil import copy2
 import tkinter.font as tkFont
-from Modules import Sauvegarde
 from tkinter import filedialog
 from tkinter import messagebox
 
@@ -56,24 +55,16 @@ def EnregistrerParamètres():
     ####
 
     # Récupération du son d'envoi
-    if Sélection == None:
-
-        DicoParamètres["SonEnvoi"] = "Inconnu"
-
-    else:
+    if Sélection != None:
 
         DicoParamètres["SonEnvoi"] = Sélection
+         
     ####    
 
     # Récupération du son de réception
-    if SélectionRéception == None:
-
-        DicoParamètres["SonRéception"] = "Inconnu"
-
-    else:
+    if SélectionRéception != None:
 
         DicoParamètres["SonRéception"] = SélectionRéception
-
 
     FichierParamètres = open("Paramètres", "w", encoding="utf-8")
 
