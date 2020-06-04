@@ -3,6 +3,7 @@ import time
 import socket
 import tkinter
 import winsound
+import threading
 from tkinter import *
 import tkinter.simpledialog
 import tkinter.font as tkFont
@@ -141,7 +142,7 @@ def reception():
     global filMessages, ConnexionSocket, CléPrivée, Module, SonActivé, Connexion
     #On récupere les variables nécéssaires au fonctionemment de la fonction
 
-    if Connexion == True:
+    while Connexion == True:
         try:
         #Cette partie du code est dans un bloc "try, except" car "ConnexionSocket.setblocking(0)" a été défini sur False
         #Au lieu d'attendre un message, si rien n'est envoyé cela va générer une exception, ce qui permet un fonctionnement asynchrone.
@@ -205,18 +206,15 @@ def reception():
                 input("message vide")
 
         except BlockingIOError:
-        #Si aucun message n'a été envoyé, on ne fait rien
-            pass
+        #Si aucun message n'a été envoyé, on ne fait rien et on attend pour préserver les ressources la machine
+            time.sleep(0.1)
 
         except (ConnectionAbortedError, ConnectionResetError):
         #Le serveur a crashé
 
             tkinter.messagebox.showerror(title="Aïe...", message="Le serveur a crashé...")
             exit()
-        finally:	
-        #Bloc qui sera executé aprés le try ou l'except
-            fen.after(10, reception)
-            #La fonction s'appelle après 10ms
+
 
 
 def deconnexion():
@@ -308,7 +306,9 @@ def affichageConversation():
     #On associe l'appui a a fonction envoyer avec une fonction lambda afin de pouvoir envoyer aucun argument
 
     Connexion = True
-    reception()
+    thread = threading.Thread(target=reception)
+    thread.daemon = True #Ce flag signifie que quand il ne reste que ce thread, le programme s'arrête.
+    thread.start()
     #On commence à recevoir des messages
 
     Fonctions.placeholder(saisieMessage, "Saisissez votre message ici", True)

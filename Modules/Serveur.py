@@ -256,8 +256,10 @@ def Démarrer(IP, Port):
                                 print(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
 
                     except BlockingIOError:
-                    #Si aucun message n'a été envoyé
-                        pass
+                    # Si aucun message n'a été envoyé, on temporise pour éviter de trop consommer des ressources
+                    # Exemple, sans temporisation, 38% du proco, on passe à peine 1% avec une délai ressenti
+                
+                        time.sleep(0.1)
 
                     except ConnectionResetError:
                     #Si jamais un des clients s'est déconnecté
