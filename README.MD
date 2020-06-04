@@ -14,10 +14,10 @@
 
 ## Liste de fonctionnalités à implémenter 
 
+- Gérér le serveur en fond
 
 - Gestion des paramétres : 
 
-    - Personaliser le son des messages (Envoi et réception) parmi une sélection 
     - Gérer les paramètres du serveur 
         - Nombre de participants maximums
         - Mot de passe (Asynchrone)
@@ -35,7 +35,9 @@
     - [ ] /lock - /unlock : Commande pour empêcher l'arrivé de nouveaux utilisateurs
     - [ ] /ban : Commande pour bannir un utilisateur 
     - [ ] /kick : Commande pour jeter l'utilisateur dehors 
-    - [ ] /op : Commande qui permet de changer le rôle (Hôte à client, client à hôte)
+    - [ ] /op : Commande qui permet de changer le rôle (Hôte à client, client à hôte)*
+
+- Transformer la fonction réception en thread
 
 - Implémenter le Pierre Feuille Ciseaux :
 

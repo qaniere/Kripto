@@ -199,9 +199,8 @@ def reception():
                 if SonActivé == True:
                     if Paramètres.DicoParamètres["SonRéception"] != "Inconnu":
                         winsound.PlaySound("Sons/" + Paramètres.DicoParamètres["SonRéception"], winsound.SND_ASYNC)
-                
-                else:
-                    winsound.PlaySound("Sons/Dong.wav", winsound.SND_ASYNC)
+                    else:
+                        winsound.PlaySound("Sons/Dong.wav", winsound.SND_ASYNC)
             else:
                 input("message vide")
 
