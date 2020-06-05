@@ -265,7 +265,7 @@ def Démarrer(IP, Port):
                     #Si jamais un des clients s'est déconnecté
                         Déconnexion(client)
 
-        thread = threading.Thread(target=FonctionServeur)
-        thread.daemon = True #Ce flag signifie que quand il ne reste que ce thread, le programme s'arrête.
-        thread.start()
-        return
+                
+        threadServeur = threading.Thread(target=FonctionServeur)
+        threadServeur.daemon = True #Ce flag signifie que quand il ne reste que ce thread, le programme s'arrête.
+        threadServeur.start()

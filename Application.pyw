@@ -1,4 +1,5 @@
 # coding: utf8
+import sys
 import time
 import socket
 import tkinter
@@ -277,7 +278,7 @@ def affichageConversation():
         
     """ Cette fonction sert à générer l'interface de la conversation"""
 
-    global cadreParametres, saisieMessage, nomUser, filMessages, bouttonEnvoyer, Connexion
+    global cadreParametres, saisieMessage, nomUser, filMessages, bouttonEnvoyer, Connexion, threadRéception
     #On récuperer les objets et les variables nécéssaire au fonctionnement de la fonction
 
     logo.pack_forget()
@@ -306,9 +307,9 @@ def affichageConversation():
     #On associe l'appui a a fonction envoyer avec une fonction lambda afin de pouvoir envoyer aucun argument
 
     Connexion = True
-    thread = threading.Thread(target=reception)
-    thread.daemon = True #Ce flag signifie que quand il ne reste que ce thread, le programme s'arrête.
-    thread.start()
+    threadRéception = threading.Thread(target=reception)
+    threadRéception.daemon = True #Ce flag signifie que quand il ne reste que ce thread, le programme s'arrête.
+    threadRéception.start()
     #On commence à recevoir des messages
 
     Fonctions.placeholder(saisieMessage, "Saisissez votre message ici", True)
@@ -623,6 +624,16 @@ def infosServeur():
 
     fenInfos.mainloop()
 
+def fermeture():
+
+    """ Fonction appellée quand l'utilisateur veut fermer la fenêtre """
+    RéponseUser  = tkinter.messagebox.askokcancel("Kripto","Vous partez déja ?")
+    
+    if RéponseUser == True:
+
+        sys.exit()
+        #On utilise sys.exit() plutôt que exit() car cela éviter au threads de tourner en arrière plan
+        
 
 
 fen = Tk()
@@ -631,6 +642,7 @@ fen.title("Kripto - Un chat chiffré")
 fen.configure(bg="grey")
 fen.resizable(width=False, height=False)
 fen.iconbitmap(bitmap="Médias/icone.ico")
+fen.protocol("WM_DELETE_WINDOW", fermeture)
 
 barreMenu = Menu(fen)
 barreMenu.add_command(label="Aide", command=Fonctions.pasCode)
