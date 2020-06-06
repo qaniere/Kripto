@@ -8,6 +8,20 @@ from tkinter import messagebox
 from Modules import ChiffrementRSA
 
 
+Débug = True
+
+def log(message):
+
+    """ Fonction qui logge dans un fichier "logs.txt" """
+
+    if Débug:
+
+        fichier = open("logs.txt", "a", encoding="utf-8")
+        fichier.write(str(message) + "\n")
+        fichier.close()
+    return
+
+
 def Démarrer(IP, Port):
 
     fen = Tk()
@@ -78,6 +92,7 @@ def Démarrer(IP, Port):
         if RoleClient[Client] == "Client":
             annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient de se déconnecter"
             print(annonce)
+            log(annonce)
 
             listeClient.remove(Client)
             listeDesPseudos.remove(nomClient[Client])
@@ -91,6 +106,7 @@ def Démarrer(IP, Port):
             #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
         else:
             annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient d'arrêter le serveur."
+            log(annonce)
 
             listeClient.remove(Client)
             listeDesPseudos.remove(nomClient[Client])
@@ -111,10 +127,10 @@ def Démarrer(IP, Port):
 
     try:
         Serveur.bind((IP, Port))
-
     except OSError:
     #Si jamais le lancement du serveur échoue (IP Invalide), on affiche un message d'erreur
         tkinter.messagebox.showerror(title="Aïe...", message="IL semblerait que votre IP ne soit pas valide. Réferez vous à l'aide pour régler ce problème.")
+        log("Erreur - IP invalide")
     else:
         #On configure le serveur en mode non-bloquant : Au lieu d'attendre une réponse et de bloquer le programme, l'instruction retourne
         #une exeception si jamais aucune données n'est envoyée, ce qui empecherait la gestion de plusieurs clients
@@ -122,7 +138,9 @@ def Démarrer(IP, Port):
 
         #Démarrage du serveur
         Serveur.listen()
-        print("Serveur démarré à", time.strftime("%H:%M:%S"), "sur le port", Port)
+        annonce = "Serveur démarré à " + time.strftime("%H:%M:%S") + " sur le port " + str(Port)
+        print(annonce)
+        log(annonce)
         
 
         def FonctionServeur():
@@ -142,6 +160,7 @@ def Démarrer(IP, Port):
                     données = objetClient.recv(32768)
                     données = données.decode("utf-8")
                     #On recoit et on convertir les données du client
+                    log("Données recues ==> " + données)
 
                     données = données.split("|")
                     #On transforme ces données en liste
@@ -167,6 +186,7 @@ def Démarrer(IP, Port):
                         #Si c'est la première connexion, on précise que c,'est l'hôte
                             RoleClient[objetClient] = "Hôte"
                             print(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
+                            log(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
                             HoteConnecté = True
 
                         else:
@@ -174,6 +194,7 @@ def Démarrer(IP, Port):
 
                             RoleClient[objetClient] = "Client"
                             annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[objetClient]} vient de rejoindre le chat"
+                            log(annonce)
                             print(annonce)
                             envoi(annonce, "Annonce")
 
@@ -197,6 +218,7 @@ def Démarrer(IP, Port):
                         message = client.recv(32768) #L'argument dans la fonction recv définit combien de caractères on reçoit
                         message = message.decode("utf-8")
                         #On recoit le message et on le décode
+                        log("Message recu ==> " + message)
 
                         message = message.split("-")
                         #Le message comporte un petit entête
@@ -220,14 +242,17 @@ def Démarrer(IP, Port):
                         message = ChiffrementRSA.déchiffrement(message[1], CléPrivée, Module)
                         #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
                         #0 étant la longueur de ce message
+                        log("Message déchiffré = " + message)
 
                         if message == "":
                         #Le message recu vide, la connexion à été temporairement perdue
                         #Au bout d'un nombre défini d'exceptions, on déconnecte le client
 
                             if nombreErreurs[client] < 5:
+                                log("Une erreur pour " + nomClient[client])
                                 nombreErreurs[client] += 1
                             else:
+                                log("Lancement de la procédure de déconnexion pour " + nomClient[client])
                                 Déconnexion(client)
 
                         else:
@@ -254,6 +279,7 @@ def Démarrer(IP, Port):
                             #Cela peut être du a un client pas à jour
 
                                 print(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
+                                log(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
 
                     except BlockingIOError:
                     # Si aucun message n'a été envoyé, on temporise pour éviter de trop consommer des ressources
@@ -263,6 +289,7 @@ def Démarrer(IP, Port):
 
                     except ConnectionResetError:
                     #Si jamais un des clients s'est déconnecté
+                        log("Déconnexion de " + nomClient[client])
                         Déconnexion(client)
 
                 
