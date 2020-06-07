@@ -1,5 +1,6 @@
 # coding: utf8
 import time
+import math
 import socket
 import tkinter
 import threading
@@ -22,7 +23,7 @@ def log(message):
     return
 
 
-def Démarrer(IP, Port):
+def Démarrer(IP, Port, NombreClientsMax):
 
     fen = Tk()
     fen.withdraw()
@@ -32,8 +33,13 @@ def Démarrer(IP, Port):
     Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
     #On génère notre jeu de clés Privée et Publique, ainsi que notre module qu'on rend accesible à tout le programme avec Global
 
+    global ClientsMax, listeClient, listeDesPseudos
 
-    global listeClient, listeDesPseudos
+    if NombreClientsMax == "0":
+        ClientsMax = math.inf
+    else:
+        ClientsMax = int(NombreClientsMax)
+    # On passe par une variable intérmédiaire car on ne peut modifier la portée d'un paramètre
 
     listeClient = []
     listeDesPseudos = []
@@ -146,10 +152,8 @@ def Démarrer(IP, Port):
         def FonctionServeur():
         #Si il y'a une nouvelle connnexion, on traite la connexion
 
-            global HoteConnecté
-            global listeClient, listeDesPseudos
-            global nomClient, RoleClient, CléPubliqueClient, ModuleClient, nombreErreurs
-
+            global HoteConnecté, listeClient, listeDesPseudos, nomClient, RoleClient, CléPubliqueClient, ModuleClient, nombreErreurs
+            global ClientsMax
             
             while True:
                 try:
@@ -165,9 +169,8 @@ def Démarrer(IP, Port):
                     données = données.split("|")
                     #On transforme ces données en liste
 
-                    if données[0] not in listeDesPseudos:
-                    #Si un autre utilisateur est déja connecté avec le même nom d'utilisateur
-
+                    if données[0] not in listeDesPseudos and ClientsMax >= len(listeClient) +1:
+                        
                         objetClient.send(bytes(f"{str(CléPublique)}|{str(Module)}", "utf-8"))
                         #On envoi au client les informations de chiffremment du serveur
 
@@ -200,9 +203,20 @@ def Démarrer(IP, Port):
 
                         listeClient.append(objetClient)
                         #On stocke l'objet client
-                    else:
+                    elif données[0] in listeDesPseudos:
+                    #Si le nom est déja pris
+
                         objetClient.send(bytes("False", "utf-8"))
-                        #Sinon on envoi au client l'interdeiction de se connecter
+                        time.sleep(0.4) #Le délai évite que les message de mélangent
+                        objetClient.send(bytes("Votre nom d'utilisateur est déja utilisé dans ce serveur, veuillez en changer.", "utf-8"))
+  
+                    elif ClientsMax < len(listeClient) + 1:
+                    #Si le serveur est complet
+
+                        objetClient.send(bytes("False", "utf-8"))
+                        time.sleep(0.4)
+                        objetClient.send(bytes("Le serveur a atteint sa capacité maximale", "utf-8"))
+
 
                 except IOError:
                 #Si personne n'essaie de se connecter, on ne fait rien
@@ -210,7 +224,6 @@ def Démarrer(IP, Port):
 
                 for client in listeClient:
                 #On récupere chaque client dans la liste des clients connectés
-
 
                     try:
                     #Si un message est envoyé, on le récupere, sinon l'instruction génére une exception

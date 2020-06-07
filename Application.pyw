@@ -371,9 +371,10 @@ def connexion():
         else:
         #Si le serveur ne donne pas son autorisation
 
-            MessageErreur = "Un utilisateur avec le même nom d'utilisateur que le votre est déja connecté. Changez de nom d'utilisateur pour accéder à ce serveur."
-            #On raccourci la ligne du dessous avec cette variable
-            tkinter.messagebox.showerror(title="Aïe...", message=MessageErreur)	
+            motif = ConnexionSocket.recv(4096)
+            #On recoit du serveur le motif du refus de 
+            
+            tkinter.messagebox.showerror(title="Connexion refusée", message=motif.decode("utf-8"))	
 
     except (ConnectionRefusedError, socket.timeout):
     #Si on arrive pas à se connecter au serveur
@@ -408,7 +409,7 @@ def démarrerServeur():
     IP = entreIP.get()
     Port = int(entrePort.get())
 
-    fen.after(10, Serveur.Démarrer(IP, Port))
+    fen.after(10, Serveur.Démarrer(IP, Port, Paramètres.DicoParamètres["NombreUsersMax"]))
     #On lance de manière asynchrone le démarrage du serveur
 
     if connexion() == True:

@@ -1,3 +1,4 @@
+# coding: utf8
 import os
 import winsound
 import tkinter as tk
@@ -9,7 +10,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 
 
-ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi", "SonRéception"]
+ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi", "SonRéception", "NombreUsersMax"]
 DicoParamètres = {}
 
 
@@ -18,7 +19,7 @@ def EnregistrerParamètres():
     """ Fonction qui récupére les paramètres dans l'interface et les enregistre dans 
     un fichier """
 
-    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception
+    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax
 
     # Récupération du nom d'utilisateur
     
@@ -68,6 +69,15 @@ def EnregistrerParamètres():
 
     FichierParamètres = open("Paramètres", "w", encoding="utf-8")
 
+    # Récupération du nombre maximums de clients connectés au serveur
+
+    if NombreUsersMax.get() != "":
+
+        DicoParamètres["NombreUsersMax"] = NombreUsersMax.get()
+
+    else:
+        DicoParamètres["NombreUsersMax"] = "0"
+
     for Paramètre in ListeParamètres:
     # On récupere chaque paramètres
 
@@ -111,7 +121,7 @@ def InterfaceParamètres():
 
     """ Fonction qui affiche les paramètres """
 
-    global fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception
+    global fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax
 
     fen = tk.Tk()
     fen.geometry("550x460")
@@ -130,11 +140,13 @@ def InterfaceParamètres():
     CadreGénéral = tk.Frame(notebook, bg="grey", width=550, height=460)
     CadreSonEnvoi = tk.Frame(notebook, bg="grey", width=550, height=460)
     CadreSonRéception = tk.Frame(notebook, bg="grey", width=550, height=460)
+    CadreServeur = tk.Frame(notebook, bg="grey", width=550, height=460)
     # On définit les cadres, qui seront en fait les onglets
     
     notebook.add(CadreGénéral, text=" Général ")
     notebook.add(CadreSonEnvoi, text=" Son d'envoi ")
     notebook.add(CadreSonRéception, text=" Son de réception ")
+    notebook.add(CadreServeur, text=" Serveur ")
 
     """ Widgets de l'onglet général """
 
@@ -370,16 +382,22 @@ def InterfaceParamètres():
     Enregistrer = Button(cadreBouttons2, text="Enregistrer", width="20", command=EnregistrerParamètres)
     Enregistrer.pack(side=LEFT, padx=7)
     ####
+
+    """ Widgets de l'onglets serveur """
+
+    Label(CadreServeur, text="Nombre de clients maximum (0 = Infini) :", bg="grey").grid(row=0, column=0, padx=15, pady=20)
+
+    NombreUsersMax = Spinbox(CadreServeur, from_=0, to=999)
+    NombreUsersMax.grid(row=0, column=1)
+
+    if DicoParamètres["NombreUsersMax"] != "Inconnu":
+        NombreUsersMax.delete(0, 'end')
+        NombreUsersMax.insert(0, DicoParamètres["NombreUsersMax"])
+
+    Enregistrer = Button(CadreServeur, text="Enregistrer", width="20", command=EnregistrerParamètres)
+    Enregistrer.grid(row=1, column=1)
     
     notebook.grid(row=0, column=0, sticky="n")
     # On place les onglets dans la fenêtre
     
     fen.mainloop()
-
-if __name__ == "__main__":
-# Si le fichier est executé et non importé comme un module
-
-    # LectureParamètres()
-    # InterfaceParamètres()
-    # Zone à décommenter durant le développement sur les paramétres
-    pass
