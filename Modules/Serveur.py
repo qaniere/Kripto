@@ -296,7 +296,7 @@ def Démarrer(IP, Port, NombreClientsMax):
 
                     except BlockingIOError:
                     # Si aucun message n'a été envoyé, on temporise pour éviter de trop consommer des ressources
-                    # Exemple, sans temporisation, 38% du proco, on passe à peine 1% avec une délai ressenti
+                    # Exemple, sans temporisation, 38% du processeur, on passe à peine 1% avec un délai non ressenti
                 
                         time.sleep(0.1)
 

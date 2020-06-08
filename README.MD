@@ -17,8 +17,6 @@
     - Gérer les paramètres du serveur 
         - Mot de passe (Asynchrone)
 
-    - Empêcher l'écriture du séparateur dans les options paramètres
-
 - Pouvoir revenir en arrière lors du choix "Hôte/Client"
 
 - Ajouter des commandes :

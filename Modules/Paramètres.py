@@ -10,7 +10,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 
 
-ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi", "SonRéception", "NombreUsersMax"]
+ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi", "SonRéception", "NombreUsersMax", "MotDePasse"]
 DicoParamètres = {}
 
 
@@ -19,7 +19,7 @@ def EnregistrerParamètres():
     """ Fonction qui récupére les paramètres dans l'interface et les enregistre dans 
     un fichier """
 
-    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax
+    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax, MotDePasse
 
     # Récupération du nom d'utilisateur
     
@@ -78,11 +78,19 @@ def EnregistrerParamètres():
     else:
         DicoParamètres["NombreUsersMax"] = "0"
 
+    # Récuperation du mot de passe du serveur
+
+    if MotDePasse.get() != "":
+
+        DicoParamètres["MotDePasse"] = MotDePasse.get()
+
+    else:
+        DicoParamètres["MotDePasse"] = "Inconnu"
+
     for Paramètre in ListeParamètres:
     # On récupere chaque paramètres
 
-        FichierParamètres.write(DicoParamètres[Paramètre] + "/-;-/")
-        # On utilise un séparateur peu commun pour éviter tout problème
+        FichierParamètres.write(DicoParamètres[Paramètre] + "\n")
 
     FichierParamètres.close()
 
@@ -101,7 +109,7 @@ def LectureParamètres():
         FichierParamètres = open("Paramètres", "r", encoding="utf-8")
         Contenu = FichierParamètres.read()
 
-        ValeursParamètres = Contenu.split("/-;-/")
+        ValeursParamètres = Contenu.split("\n")
 
         for index in range(len(ListeParamètres)):
         # Pour chaque paramètres
@@ -121,7 +129,7 @@ def InterfaceParamètres():
 
     """ Fonction qui affiche les paramètres """
 
-    global fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax
+    global fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax, MotDePasse
 
     fen = tk.Tk()
     fen.geometry("550x460")
@@ -279,7 +287,7 @@ def InterfaceParamètres():
     ListeFichierSonEnvoi = Listbox(CadreSonEnvoi, width="60", height="17")
     ListeFichierSonEnvoi.pack()
 
-    ListeFichierSonEnvoi.bind("<Button-1>", lambda x: CallbackClicSonEnvoi())
+    ListeFichierSonEnvoi.bind("<Button-1>", lambda: CallbackClicSonEnvoi())
 
     ListeFichiers = os.listdir("Sons")
     # On récupere dans une liste chaque fichier du dossier Sons
@@ -360,7 +368,7 @@ def InterfaceParamètres():
     ListeFichierSonRéception = Listbox(CadreSonRéception, width="60", height="17")
     ListeFichierSonRéception.pack()
 
-    ListeFichierSonRéception.bind("<Button-1>", lambda x: CallbackClicSonRéception())
+    ListeFichierSonRéception.bind("<Button-1>", lambda: CallbackClicSonRéception())
 
     ListeFichiers = os.listdir("Sons")
     # On récupere dans une liste chaque fichier du dossier Sons
@@ -394,8 +402,39 @@ def InterfaceParamètres():
         NombreUsersMax.delete(0, 'end')
         NombreUsersMax.insert(0, DicoParamètres["NombreUsersMax"])
 
+    Label(CadreServeur, text="Mot de passe du serveur :", bg="grey").grid(row=1, column=0, padx=15, pady=20)
+
+    MotDePasse = Entry(CadreServeur, show="•")
+    MotDePasse.grid(row=1, column=1)
+
+    if DicoParamètres["MotDePasse"] != "Inconnu":
+        MotDePasse.insert(0, DicoParamètres["MotDePasse"])
+
+    def AfficherMDP():
+
+        global AffichageMDP, MotDePasse, MontrerMDP
+
+        if AffichageMDP == False:
+
+            MotDePasse.configure(show="")
+            MontrerMDP.configure(text="Cacher")
+            AffichageMDP = True
+        
+        else:
+
+            MotDePasse.configure(show="•")
+            MontrerMDP.configure(text="Afficher")
+            AffichageMDP = False
+
+    global AffichageMDP, MontrerMDP
+
+    AffichageMDP = False
+
+    MontrerMDP = Button(CadreServeur, text="Afficher", command= lambda: AfficherMDP())
+    MontrerMDP.grid(row=1, column=2)
+
     Enregistrer = Button(CadreServeur, text="Enregistrer", width="20", command=EnregistrerParamètres)
-    Enregistrer.grid(row=1, column=1)
+    Enregistrer.grid(row=2, column=1)
     
     notebook.grid(row=0, column=0, sticky="n")
     # On place les onglets dans la fenêtre
