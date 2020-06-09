@@ -82,7 +82,7 @@ def Démarrer(IP, Port, NombreClientsMax):
             #Si le destinaire n'est pas l'expéditeur
 
                 messageEnvoi = ChiffrementRSA.chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
-                #On transforme les caractéres du message en chiffre selon leur ID Ascii, puis ensuite on chiffre le message
+                #On transforme les caractéres du message en chiffre selon leur ID Unicode, puis ensuite on chiffre le message
                 #Avec la clé publiq ue et le module de chaque client
 
                 ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
