@@ -48,8 +48,11 @@ def envoyer():
         return
         #On stoppe l'éxeuction de la fonction
 
+    elif message == "/stop":
+        
+        RetournerMenu()
     
-    if len(message) != 0 and EnvoiOK:
+    elif len(message) != 0 and EnvoiOK:
 
         EnvoiOK = False
         #On rend impossible l'envoi de nouveaux messages
