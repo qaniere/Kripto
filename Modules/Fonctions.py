@@ -21,7 +21,7 @@ def formaterPaquet(TypePaquet, Contenu):
 
     if TypePaquet == "Message":
     
-        Paquet = f"Message|{time.strftime('%H:%M:%S')}|{Contenu}"
+        Paquet = f"Message|{time.strftime("%H:%M:%S")}|{Contenu}"
         #La longueur du paquet est indéterminé à ce stade, alors on met un caractére facilement remplaçable à la place.
 
     elif TypePaquet == "Commande":
