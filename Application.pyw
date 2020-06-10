@@ -57,7 +57,7 @@ def envoyer():
         EnvoiOK = False
         #On rend impossible l'envoi de nouveaux messages
             
-        messageInterface = f"[{time.strftime("%H:%M:%S")}] {nomUser} → {message}"
+        messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} → {message}"
         #On garde de coté un message avec un formaté spécialement pour l'interface, mais on ne l'utilise que si l'envoi est réussi.
 
         message = Fonctions.formaterPaquet("Message", message)
