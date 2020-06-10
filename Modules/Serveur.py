@@ -86,7 +86,7 @@ def Démarrer(IP, Port, NombreClientsMax):
                 #Avec la clé publiq ue et le module de chaque client
 
                 ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
-                messageEnvoi = ChaineMessage.encode('utf-8')
+                messageEnvoi = ChaineMessage.encode("utf-8")
                 destinataire.send(bytes(messageEnvoi))
                 #On encode le tout en UTF8 et on l'envoi au client
 
@@ -96,7 +96,7 @@ def Démarrer(IP, Port, NombreClientsMax):
         """ Fonction qui supprimme des variables du serveur les infos d'un client qui vient de se déconnecter """
 
         if RoleClient[Client] == "Client":
-            annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient de se déconnecter"
+            annonce = f"[{time.strftime("%H:%M:%S")}] {nomClient[Client]} vient de se déconnecter"
             print(annonce)
             log(annonce)
 
@@ -111,7 +111,7 @@ def Démarrer(IP, Port, NombreClientsMax):
             envoi(annonce, "Annonce")
             #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
         else:
-            annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient d'arrêter le serveur."
+            annonce = f"[{time.strftime("%H:%M:%S")}] {nomClient[Client]} vient d'arrêter le serveur."
             log(annonce)
 
             listeClient.remove(Client)
@@ -188,15 +188,15 @@ def Démarrer(IP, Port, NombreClientsMax):
                         if HoteConnecté == False:
                         #Si c'est la première connexion, on précise que c,'est l'hôte
                             RoleClient[objetClient] = "Hôte"
-                            print(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
-                            log(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
+                            print(f"[{time.strftime("%H:%M:%S")}] L'hôte vient de se connecter")
+                            log(f"[{time.strftime("%H:%M:%S")}] L'hôte vient de se connecter")
                             HoteConnecté = True
 
                         else:
                         #Sinon c'est un client
 
                             RoleClient[objetClient] = "Client"
-                            annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[objetClient]} vient de rejoindre le chat"
+                            annonce = f"[{time.strftime("%H:%M:%S")}] {nomClient[objetClient]} vient de rejoindre le chat"
                             log(annonce)
                             print(annonce)
                             envoi(annonce, "Annonce")
