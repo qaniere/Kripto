@@ -11,6 +11,7 @@ from tkinter import messagebox
 def formaterPaquet(TypePaquet, Contenu):
         
     """
+    
     Fonction qui permer de formater les messages selon des régles spécifiques pour optimiser le traitement coté 
     serveur.
 
