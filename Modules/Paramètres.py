@@ -399,7 +399,7 @@ def InterfaceParamètres():
     NombreUsersMax.grid(row=0, column=1)
 
     if DicoParamètres["NombreUsersMax"] != "Inconnu":
-        NombreUsersMax.delete(0, "end")
+        NombreUsersMax.delete(0, 'end')
         NombreUsersMax.insert(0, DicoParamètres["NombreUsersMax"])
 
     Label(CadreServeur, text="Mot de passe du serveur :", bg="grey").grid(row=1, column=0, padx=15, pady=20)

@@ -69,7 +69,7 @@ def envoyer():
         
         messageFinal = f"{len(message)}-{message}"
         #On rajoute un en tête avec la longueur totale du message
-        messageFinal = messageFinal.encode("utf-8")
+        messageFinal = messageFinal.encode('utf-8')
         #On encode le tout en UTF8
 
         try:
@@ -124,7 +124,7 @@ def envoyer():
                 else:
                     winsound.PlaySound("Sons/Pop.wav", winsound.SND_ASYNC)
             
-            saisieMessage.delete(0, "end")
+            saisieMessage.delete(0, 'end')
             #On vide la zone de saisie du message
 
             def RéactivationEnvoi():
@@ -253,8 +253,8 @@ def ActiverSon():
 def RetournerMenu():
     global filMessages, saisieMessage, bouttonEnvoyer
 
-    Confirmation = messagebox.askquestion (f"Vous partez déja {nomUser} ?","Vous voulez vraiment retourner au menu ?",icon = "warning")
-    if Confirmation == "yes":
+    Confirmation = messagebox.askquestion (f"Vous partez déja {nomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
+    if Confirmation == 'yes':
 
         filMessages.pack_forget()
         saisieMessage.pack_forget()
@@ -306,7 +306,7 @@ def affichageConversation():
     #On associe le clic gauche sur la zone de saisie du message à la fonction placeholder
     #On utilise une lambda pour appeler une fonction avec des arguments
 
-    fen.bind_all("<Return>", lambda c: envoyer())
+    fen.bind_all('<Return>', lambda c: envoyer())
     #On associe l'appui a a fonction envoyer avec une fonction lambda afin de pouvoir envoyer aucun argument
 
     Connexion = True
@@ -343,7 +343,7 @@ def connexion():
         #Le code après cette instruction est executé uniquement si la connection réussit
 
         données = f"{nomUser}|{CléPublique}|{Module}"
-        données = données.encode("utf-8")
+        données = données.encode('utf-8')
 
         ConnexionSocket.send(bytes(données))
 
@@ -420,8 +420,8 @@ def démarrerServeur():
 
         if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
 
-            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="*")
-            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show="*")
+            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
             #On demande le mot et sa confirmation
 
             while ConfirmationMotDePasse != MotDePasse:
@@ -451,8 +451,8 @@ def seConnecter():
 
         if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
 
-            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="*")
-            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show="*")
+            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
             #On demande le mot et sa confirmation
 
             while ConfirmationMotDePasse != MotDePasse:

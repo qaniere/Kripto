@@ -86,7 +86,7 @@ def Démarrer(IP, Port, NombreClientsMax):
                 #Avec la clé publiq ue et le module de chaque client
 
                 ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
-                messageEnvoi = ChaineMessage.encode("utf-8")
+                messageEnvoi = ChaineMessage.encode('utf-8')
                 destinataire.send(bytes(messageEnvoi))
                 #On encode le tout en UTF8 et on l'envoi au client
 
@@ -144,7 +144,7 @@ def Démarrer(IP, Port, NombreClientsMax):
 
         #Démarrage du serveur
         Serveur.listen()
-        annonce = "Serveur démarré à " + time.strftime('%H:%M:%S') + " sur le port " + str(Port)
+        annonce = "Serveur démarré à " + time.strftime("%H:%M:%S") + " sur le port " + str(Port)
         print(annonce)
         log(annonce)
         
