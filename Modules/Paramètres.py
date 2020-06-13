@@ -287,7 +287,7 @@ def InterfaceParamètres():
     ListeFichierSonEnvoi = Listbox(CadreSonEnvoi, width="60", height="17")
     ListeFichierSonEnvoi.pack()
 
-    ListeFichierSonEnvoi.bind("<Button-1>", lambda: CallbackClicSonEnvoi())
+    ListeFichierSonEnvoi.bind("<Button-1>", lambda x: CallbackClicSonEnvoi())
 
     ListeFichiers = os.listdir("Sons")
     # On récupere dans une liste chaque fichier du dossier Sons
@@ -368,7 +368,7 @@ def InterfaceParamètres():
     ListeFichierSonRéception = Listbox(CadreSonRéception, width="60", height="17")
     ListeFichierSonRéception.pack()
 
-    ListeFichierSonRéception.bind("<Button-1>", lambda: CallbackClicSonRéception())
+    ListeFichierSonRéception.bind("<Button-1>", lambda x: CallbackClicSonRéception())
 
     ListeFichiers = os.listdir("Sons")
     # On récupere dans une liste chaque fichier du dossier Sons
@@ -430,7 +430,7 @@ def InterfaceParamètres():
 
     AffichageMDP = False
 
-    MontrerMDP = Button(CadreServeur, text="Afficher", command= lambda: AfficherMDP())
+    MontrerMDP = Button(CadreServeur, text="Afficher", command= lambda x: AfficherMDP())
     MontrerMDP.grid(row=1, column=2)
 
     Enregistrer = Button(CadreServeur, text="Enregistrer", width="20", command=EnregistrerParamètres)
