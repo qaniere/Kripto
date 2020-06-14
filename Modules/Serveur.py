@@ -23,39 +23,46 @@ def log(message):
     return
 
 
-def Démarrer(IP, Port, NombreClientsMax):
+def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
+
+    global Module, CléPublique, CléPrivée, ClientsMax, listeClient, listeDesPseudos, HoteConnecté, nomClient, RoleClient, CléPubliqueClient, ModuleClient, nombreErreurs, MDP, PrésenceMDP, Statut
 
     fen = Tk()
     fen.withdraw()
     #On crée une fenêtre qu'on affiche pas pour éviter qu'une fenêtre se génère lors de message d'erreurs
 
-    global Module, CléPublique, CléPrivée
     Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
-    #On génère notre jeu de clés Privée et Publique, ainsi que notre module qu'on rend accesible à tout le programme avec Global
+    #On génère notre jeu de clés Privée et Publique, ainsi que notre module de chiffrement
 
-    global ClientsMax, listeClient, listeDesPseudos
-
-    if NombreClientsMax == "0":
+    if NombreClientsMax == "0" or NombreClientsMax == "Inconnu":
         ClientsMax = math.inf
+
     else:
         ClientsMax = int(NombreClientsMax)
     # On passe par une variable intérmédiaire car on ne peut modifier la portée d'un paramètre
+
+    if MotDePasse != "Inconnu":  
+        PrésenceMDP = True     
+        MDP = MotDePasse
+
+    else:
+        PrésenceMDP = False
+        MDP = None
+
 
     listeClient = []
     listeDesPseudos = []
     #On initialise la liste qui contient les objets clients, ainsi que la liste de tous les pseudos de
     # tous les clients connectés pour éviter les doublons
 
-    global HoteConnecté
     HoteConnecté = False
-
-    global nomClient, RoleClient, CléPubliqueClient, ModuleClient, nombreErreurs
 
     nomClient = {}
     RoleClient= {}
     CléPubliqueClient = {}
     ModuleClient = {}
     nombreErreurs = {}
+    Statut = {}
     #On initialise des dictionnaires vides qui serviront à récuperer les informations de chaque objet client.
     #Exemple, Marc est un objet client, quand veut récuperer son nom d'utilisateur, on utilise la syntaxe "nomClient[Marc}"
 
@@ -128,8 +135,8 @@ def Démarrer(IP, Port, NombreClientsMax):
 
 
 
-    #On défini les paramêtres du socket
     Serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #On défini les paramêtres du socket
 
     try:
         Serveur.bind((IP, Port))
@@ -150,10 +157,8 @@ def Démarrer(IP, Port, NombreClientsMax):
         
 
         def FonctionServeur():
-        #Si il y'a une nouvelle connnexion, on traite la connexion
 
-            global HoteConnecté, listeClient, listeDesPseudos, nomClient, RoleClient, CléPubliqueClient, ModuleClient, nombreErreurs
-            global ClientsMax
+            global HoteConnecté, listeClient, listeDesPseudos, nomClient, RoleClient, CléPubliqueClient, ModuleClient, nombreErreurs, ClientsMax, MDP, PrésenceMDP, Statut
             
             while True:
                 try:
@@ -171,7 +176,7 @@ def Démarrer(IP, Port, NombreClientsMax):
 
                     if données[0] not in listeDesPseudos and ClientsMax >= len(listeClient) +1:
                         
-                        objetClient.send(bytes(f"{str(CléPublique)}|{str(Module)}", "utf-8"))
+                        objetClient.send(bytes(f"{str(CléPublique)}|{str(Module)}|{str(PrésenceMDP)}", "utf-8"))
                         #On envoi au client les informations de chiffremment du serveur
 
                         nomClient[objetClient] = données[0]
@@ -184,6 +189,13 @@ def Démarrer(IP, Port, NombreClientsMax):
 
                         listeDesPseudos.append(données[0])
                         #On ajoute son pseudo à la liste
+
+                        if PrésenceMDP == None:
+                            Statut[objetClient] = "Connecté"
+
+                        else:
+                            Statut[objetClient] = "Attente"
+
 
                         if HoteConnecté == False:
                         #Si c'est la première connexion, on précise que c,'est l'hôte
@@ -228,71 +240,88 @@ def Démarrer(IP, Port, NombreClientsMax):
                     try:
                     #Si un message est envoyé, on le récupere, sinon l'instruction génére une exception
 
-                        message = client.recv(32768) #L'argument dans la fonction recv définit combien de caractères on reçoit
-                        message = message.decode("utf-8")
-                        #On recoit le message et on le décode
-                        log("Message recu ==> " + message)
+                        if Statut[client] == "Connecté":
 
-                        message = message.split("-")
-                        #Le message comporte un petit entête
-                        #Exemple = 564-6646464/65656/4564564654, 564 est içi la longueur totale du message. Cela peut arriver que les très long messages (Fichiers) fassent plus
-                        #de 2048 la taille taille du buffer
+                            message = client.recv(32768) #L'argument dans la fonction recv définit combien de caractères on reçoit
+                            message = message.decode("utf-8")
+                            #On recoit le message et on le décode
+                            log("Message recu ==> " + message)
+
+                            message = message.split("-")
+                            #Le message comporte un petit entête
+                            #Exemple = 564-6646464/65656/4564564654, 564 est içi la longueur totale du message. Cela peut arriver que les très long messages (Fichiers) fassent plus
+                            #de 2048 la taille taille du buffer
 
 
-                        LongeurMessage = int(message[0])
+                            LongeurMessage = int(message[0])
 
-                        while len(message[1]) < LongeurMessage:
-                        #Tant que le message recu est plus petit que la longueur totale du message
+                            while len(message[1]) < LongeurMessage:
+                            #Tant que le message recu est plus petit que la longueur totale du message
 
-                            suite = client.recv(32768)
-                            suite = suite.decode("utf-8")
+                                suite = client.recv(32768)
+                                suite = suite.decode("utf-8")
 
-                            message[1] += suite
-                            #On ajoute la suite du message recu
+                                message[1] += suite
+                                #On ajoute la suite du message recu
 
-                        #A ce stade le message est complet
+                            #A ce stade le message est complet
 
-                        message = ChiffrementRSA.déchiffrement(message[1], CléPrivée, Module)
-                        #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
-                        #0 étant la longueur de ce message
-                        log("Message déchiffré = " + message)
+                            message = ChiffrementRSA.déchiffrement(message[1], CléPrivée, Module)
+                            #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
+                            #0 étant la longueur de ce message
+                            log("Message déchiffré = " + message)
 
-                        if message == "":
-                        #Le message recu vide, la connexion à été temporairement perdue
-                        #Au bout d'un nombre défini d'exceptions, on déconnecte le client
+                            if message == "":
+                            #Le message recu vide, la connexion à été temporairement perdue
+                            #Au bout d'un nombre défini d'exceptions, on déconnecte le client
 
-                            if nombreErreurs[client] < 5:
-                                log("Une erreur pour " + nomClient[client])
-                                nombreErreurs[client] += 1
+                                if nombreErreurs[client] < 5:
+                                    log("Une erreur pour " + nomClient[client])
+                                    nombreErreurs[client] += 1
+                                else:
+                                    log("Lancement de la procédure de déconnexion pour " + nomClient[client])
+                                    Déconnexion(client)
+
                             else:
-                                log("Lancement de la procédure de déconnexion pour " + nomClient[client])
-                                Déconnexion(client)
+                            #Si le message n'est pas vide
+
+                                nombreErreurs[client] = 0
+                                #On remet à zéro le nombre d'erreurs
+
+                                MessageListe = message.split("|")
+                                Type = MessageListe[0]
+                                #On récupere le message sous forme de liste afin de déterminer son type
+
+                                if Type == "Message":
+                                        HeureMessage = MessageListe[1]
+                                        Contenu = MessageListe[2]
+                                        #On récupere les information du message
+
+                                        messageFormaté = f"[{HeureMessage}] {nomClient[client]} → {Contenu}"
+                                        print(messageFormaté)
+                                        envoi(messageFormaté, "Message", client)
+
+                                else:
+                                #Si le message recu ne respecte aucune forme de message, il est invalide
+                                #Cela peut être du a un client pas à jour, ou bien une tentative de connexion frauduleuse
+
+                                    print(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
+                                    log(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
 
                         else:
-                        #Si le message n'est pas vide
+                        #Si le client doit rentrer son mot de passe
 
-                            nombreErreurs[client] = 0
-                            #On remet à zéro le nombre d'erreurs
+                            MotDePasseClient = client.recv(4096)
+                            MotDePasseClient = MotDePasseClient.decode("utf-8")
 
-                            MessageListe = message.split("|")
-                            Type = MessageListe[0]
-                            #On récupere le message sous forme de liste afin de déterminer son type
+                            if MotDePasseClient == MDP:
 
-                            if Type == "Message":
-                                    HeureMessage = MessageListe[1]
-                                    Contenu = MessageListe[2]
-                                    #On récupere les information du message
-
-                                    messageFormaté = f"[{HeureMessage}] {nomClient[client]} → {Contenu}"
-                                    print(messageFormaté)
-                                    envoi(messageFormaté, "Message", client)
+                                client.send(bytes("OK", "utf-8"))         
+                                Statut[client] = "Connecté"
 
                             else:
-                            #Si le message recu ne respecte aucune forme de message, il est invalide
-                            #Cela peut être du a un client pas à jour
-
-                                print(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
-                                log(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
+                                client.send(bytes("Nan", "utf-8")) 
+                                
 
                     except BlockingIOError:
                     # Si aucun message n'a été envoyé, on temporise pour éviter de trop consommer des ressources

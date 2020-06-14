@@ -207,7 +207,7 @@ def reception():
                     else:
                         winsound.PlaySound("Sons/Dong.wav", winsound.SND_ASYNC)
             else:
-                input("message vide")
+                print("message vide")
 
         except BlockingIOError:
         #Si aucun message n'a été envoyé, on ne fait rien et on attend pour préserver les ressources la machine
@@ -362,8 +362,28 @@ def connexion():
 
             CléPubliqueServeur = int(AutorisationEtDonnées[0])
             ModuleServeur = int(AutorisationEtDonnées[1])
-
             #On converti les données en entiers, puis on les affectes au variables adaptées
+
+            PrésenceMotDePasse = AutorisationEtDonnées[2]
+
+            if PrésenceMotDePasse == "True":
+
+                ConnexionEnAttente  = True
+
+                while ConnexionEnAttente:
+
+                    MotDePasse = tkinter.simpledialog.askstring("Mot de passe du serveur", "Ce serveur demande un mot de passe pour se connecter", show='*')
+                    ConnexionSocket.send(bytes(MotDePasse, "utf-8"))
+
+                    Autorisation = ConnexionSocket.recv(4096)
+                    Autorisation =  Autorisation.decode("utf-8")
+
+                    if Autorisation == "OK":
+                        ConnexionEnAttente = False
+                    
+                    else:
+                        tkinter.messagebox.showwarning(title="Mot de passe incorrect", message="Le mot de passe est incorrect")
+
 
             ConnexionSocket.setblocking(0)
             #On définit le mode de connexion sur non bloquant (Voir explications dans la fonction reception)
@@ -412,7 +432,7 @@ def démarrerServeur():
     IP = entreIP.get()
     Port = int(entrePort.get())
 
-    fen.after(10, Serveur.Démarrer(IP, Port, Paramètres.DicoParamètres["NombreUsersMax"]))
+    fen.after(10, Serveur.Démarrer(IP, Port, Paramètres.DicoParamètres["NombreUsersMax"], Paramètres.DicoParamètres["MotDePasse"]))
     #On lance de manière asynchrone le démarrage du serveur
 
     if connexion() == True:
@@ -525,7 +545,7 @@ def hote():
         Fonctions.placeholder(entreNom, suggestionNom[0], True)
         #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
 
-    entreNom.bind("<Button-1>", lambda b: Fonctions.placeholder(entreNom, "", False))
+    entreNom.bind("<Button-1>", lambda : Fonctions.placeholder(entreNom, "", False))
     #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
 
     bouttonStart = Button(cadreParametres, text="Démarrer", command=démarrerServeur)
