@@ -12,16 +12,13 @@
 
 ## Liste de fonctionnalités à implémenter 
 
-- Gestion des paramétres : 
-
-    - Gérer les paramètres du serveur 
-        - Mot de passe (Asynchrone)
 
 - Pouvoir revenir en arrière lors du choix "Hôte/Client"
 
+- Envoi chiffré du mot de passe 
+
 - Ajouter des commandes :
   
-    - [ ] /stop : Commande pour stopper le serveur (Confirmation demandée)
     - [ ] /lock - /unlock : Commande pour empêcher l'arrivé de nouveaux utilisateurs
     - [ ] /ban : Commande pour bannir un utilisateur 
     - [ ] /kick : Commande pour jeter l'utilisateur dehors 
@@ -48,5 +45,7 @@
     - [ ] Suppresion des fichiers à la fin du serveur
 
  - Enlever toutes les fast string pour des raisons de compatibilité
+
+ - NETTOYER LE CODE !!!!
 
  - Rédiger l'aide en TopLevel
