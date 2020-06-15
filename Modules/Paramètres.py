@@ -430,7 +430,7 @@ def InterfaceParamètres():
 
     AffichageMDP = False
 
-    MontrerMDP = Button(CadreServeur, text="Afficher", command= lambda x: AfficherMDP())
+    MontrerMDP = Button(CadreServeur, text="Afficher", command= lambda: AfficherMDP())
     MontrerMDP.grid(row=1, column=2)
 
     Enregistrer = Button(CadreServeur, text="Enregistrer", width="20", command=EnregistrerParamètres)
