@@ -274,7 +274,7 @@ def InterfaceParamètres():
 
 
     if DicoParamètres["SonEnvoi"] == "Inconnu":
-        son = "Pop.waw"
+        son = "Pop.wav"
     else:
         son = DicoParamètres["SonEnvoi"] 
 
