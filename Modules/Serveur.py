@@ -113,6 +113,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
             del nomClient[Client]
             del CléPubliqueClient[Client]
             del RoleClient[Client]
+            del Statut[Client]
             #On supprime les informations du client déconnecté
             #On utilise le mot clé del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
 
@@ -128,6 +129,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
             del CléPubliqueClient[Client]
             del RoleClient[Client]
             del nombreErreurs[Client]
+            del Statut[Client]
             #On vide tout les données de l'hôte
 
             envoi(annonce, "Annonce")
@@ -191,7 +193,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                         listeDesPseudos.append(données[0])
                         #On ajoute son pseudo à la liste
 
-                        if PrésenceMDP == None:
+                        if PrésenceMDP == False:
                             Statut[objetClient] = "Connecté"
 
                         else:
@@ -215,12 +217,12 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                             envoi(annonce, "Annonce")
 
                         listeClient.append(objetClient)
-                        #On stocke l'objet client
+
                     elif données[0] in listeDesPseudos:
                     #Si le nom est déja pris
 
                         objetClient.send(bytes("False", "utf-8"))
-                        time.sleep(0.4) #Le délai évite que les message de mélangent
+                        time.sleep(0.4) #Le délai évite que les paquets de mélangent
                         objetClient.send(bytes("Votre nom d'utilisateur est déja utilisé dans ce serveur, veuillez en changer.", "utf-8"))
   
                     elif ClientsMax < len(listeClient) + 1:
@@ -321,8 +323,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                     log(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
 
                         else:
-                        #Si le client doit rentrer son mot de passe
-
+                        #Si le client doit rentrer le mot de passe du serveur
+                        
                             MotDePasseClient = client.recv(4096)
                             MotDePasseClient = MotDePasseClient.decode("utf-8")
 

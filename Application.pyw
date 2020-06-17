@@ -26,41 +26,37 @@ Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
 #On génére une clé publique et une clé publique et on garde en mémoire le module de chiffrement
 
 NombreErreurs = 0
-#On initialise le compte d'erreurs
 
 EnvoiOK = True
 SonActivé = True
 #Par défault, on considére que le son est activé et que l'utilisateur peut envoyer des messages
 
-def envoyer():
+def envoyer(ModeManuel = None, MessageManuel = None):
+    #Le mode manuel est un mode qui ne récupére pas l'entrée, mais le message passé en argument
 
     """Fonction qui chiffre et envoi les message au serveur. Les messages sont chiffrés en fonction du serveur"""
 
     global saisieMessage, nomUser, filMessages, ConnexionSocket, NombreErreurs, CléPubliqueServeur, ModuleServeur, SonActivé, EnvoiOK
-    #On récuper toutes les variables et objets nécésssaires au fonctionnement de la fonction
 
-    message = saisieMessage.get()
-    #On récupere le message dans l'entrée où il a été saisi
+    if ModeManuel == True:
+        message = MessageManuel
+    
+    else:
+        message = saisieMessage.get()
 
     if len(message) > 1000:
 
         tkinter.messagebox.showerror(title="Attention au spam !", message="Afin d'éviter de surcharger le serveur, les messages de plus de 1000 caractères sont interdits")
         return
-        #On stoppe l'éxeuction de la fonction
 
     elif message[0] == "/":
         
         message = Fonctions.formaterPaquet("Commande", message)
-        #On formate le paquet
-
         message = ChiffrementRSA.chiffrement(message, CléPubliqueServeur, ModuleServeur)
-        #On transforme le message en liste de chiffres, correspondant à leur identifiant Ascii, puis on chiffre le message
-        #On récupere alors une liste d'entiers
         
         messageFinal = f"{len(message)}-{message}"
         #On rajoute un en tête avec la longueur totale du message
         messageFinal = messageFinal.encode('utf-8')
-        #On encode le tout en UTF8
 
         try:
             ConnexionSocket.send(bytes(messageFinal))
@@ -79,7 +75,6 @@ def envoyer():
                 #On stocke le message dans un variable pour diminuer la taille de la ligne d'en dessous
                 tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
                 exit() #TODO => Remplacer par retour au menu
-        RetournerMenu()
     
     elif len(message) != 0 and EnvoiOK:
 
@@ -279,31 +274,37 @@ def ActiverSon():
     barreMenu.insert_command(2, label="Couper Son", command=CouperSon)
     #On supprime la commande à l'index 2 du menu pour y ajouter la commande CouperSon à la même position
 
-def RetournerMenu():
+def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None):
     global filMessages, saisieMessage, bouttonEnvoyer
 
-    Confirmation = messagebox.askquestion (f"Vous partez déja {nomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
-    if Confirmation == 'yes':
+    Confirmation = None
 
-        filMessages.pack_forget()
-        saisieMessage.pack_forget()
-        bouttonEnvoyer.pack_forget()
-        #On efface l'interface de conversation
+    if DemandeConfirmation == True:
+        Confirmation = messagebox.askquestion (f"Vous partez déja {nomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
 
-        fen.unbind_all(ALL)
-        #On supprime tout les raccourcis
-    
-        barreMenu.delete(1)
-        barreMenu.delete(1)
-        barreMenu.delete(3)
-        #On efface certaines commandes du menu : "Menu, Couper Son et Infos Serveur"
+    if Confirmation == 'yes' or DemandeConfirmation == None:
 
-        deconnexion()
-        #Lancement de la procédure de déconnexion
+        if ConversationEnCours == True:
+            if Role == "Hote":
+
+                envoyer(True, "/stop") #L'envoi du /stop permet d'éviter au serveur de crasher / tourner dans le vide
+                time.sleep(0.3)
+
+
+            filMessages.pack_forget()
+            saisieMessage.pack_forget()
+            bouttonEnvoyer.pack_forget()
+
+            fen.unbind_all(ALL)
+        
+            barreMenu.delete(1)
+            barreMenu.delete(1)
+            barreMenu.delete(3)
+            #On efface les commandes "Menu, Couper Son et Infos Serveur" du menu
+
+            deconnexion()
 
         AfficherMenu()
-        #Affichage du menu
-
 
 
 def affichageConversation():
@@ -311,16 +312,13 @@ def affichageConversation():
     """ Cette fonction sert à générer l'interface de la conversation"""
 
     global cadreParametres, saisieMessage, nomUser, filMessages, bouttonEnvoyer, Connexion, threadRéception
-    #On récuperer les objets et les variables nécéssaire au fonctionnement de la fonction
 
     logo.pack_forget()
     cadreParametres.pack_forget()
-    #On efface les élements de connexion / paramétrage du serveur
 
     barreMenu.insert_command(1, label="Couper Son", command=CouperSon)
     barreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
-    barreMenu.insert_command(0, label="Menu", command=RetournerMenu)
-    #On insère les boutons dans le menu au index donnés
+    barreMenu.insert_command(0, label="Menu", command= lambda : RetournerMenu(DemandeConfirmation = True, ConversationEnCours = True))
 
     filMessages = Listbox(fen, width="70", height="20")
     filMessages.pack(pady=15)
