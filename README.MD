@@ -13,9 +13,13 @@
 ## Liste de fonctionnalités à implémenter 
 
 
+- Fixer la lamba du placeholder des noms
+
 - Pouvoir revenir en arrière lors du choix "Hôte/Client"
 
 - Envoi chiffré du mot de passe 
+
+- Confirmation en cas de /stop (Aussi changer le mode de retourner menu)
 
 - Ajouter des commandes :
   
@@ -25,8 +29,6 @@
     - [ ] /op : Commande qui permet de changer le rôle (Hôte à client, client à hôte)
 
 - Afficher nombres d'utilisateurs connectés
-
-- Transformer la fonction réception en thread
 
 - Implémenter le Pierre Feuille Ciseaux :
 
@@ -38,7 +40,7 @@
     
 - Envoyer des fichiers :
 
-    - [ ] Chiffrer les fichiers très vite (Threads)
+    - [ ] Chiffrer les fichiers très vite (Threads) (Ne pas hésiter à mettre une restriction de taille)
     - [ ] Télécharger fichier coté serveur
     - [ ] Serveur qui propose fichier => "PhotoChat.jpg est dispo, (1.3mo), faite /fichier 1 pour télécharger
     - [ ] Téléchargement du fichier (Mettre une liste d'attente pour pas pénaliser ?)
