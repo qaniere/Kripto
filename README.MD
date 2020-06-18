@@ -13,8 +13,6 @@
 ## Liste de fonctionnalités à implémenter 
 
 
-- Fixer la lamba du placeholder des noms
-
 - Pouvoir revenir en arrière lors du choix "Hôte/Client"
 
 - Envoi chiffré du mot de passe 

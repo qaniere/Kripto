@@ -176,7 +176,7 @@ def reception():
         #Au lieu d'attendre un message, si rien n'est envoyé cela va générer une exception, ce qui permet un fonctionnement asynchrone.
 
             messageRecu = ConnexionSocket.recv(32768)
-            #2048 est la limite d'octets recevables
+            #32768 est la limite d'octets recevables
             messageRecu = messageRecu.decode("utf-8")
 
             if messageRecu != "":
@@ -572,7 +572,7 @@ def hote():
         Fonctions.placeholder(entreNom, suggestionNom[0], True)
         #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
 
-    entreNom.bind("<Button-1>", lambda : Fonctions.placeholder(entreNom, "", False))
+    entreNom.bind("<Button-1>", lambda z: Fonctions.placeholder(entreNom, "", False))
     #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
 
     bouttonStart = Button(cadreParametres, text="Démarrer", command=démarrerServeur)
