@@ -13,7 +13,6 @@ from random import randint, choices
 from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde, Serveur
 
 Paramètres.LectureParamètres()
-# On lit les paramètres
 
 listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
@@ -27,9 +26,12 @@ Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
 
 NombreErreurs = 0
 
+global SousMenuCliqué
+
 EnvoiOK = True
 SonActivé = True
-#Par défault, on considére que le son est activé et que l'utilisateur peut envoyer des messages
+SousMenuCliqué = False
+
 
 def envoyer(ModeManuel = None, MessageManuel = None):
     #Le mode manuel est un mode qui ne récupére pas l'entrée, mais le message passé en argument
@@ -274,37 +276,60 @@ def ActiverSon():
     barreMenu.insert_command(2, label="Couper Son", command=CouperSon)
     #On supprime la commande à l'index 2 du menu pour y ajouter la commande CouperSon à la même position
 
-def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None):
-    global filMessages, saisieMessage, bouttonEnvoyer
+def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None):
+
+    global filMessages, saisieMessage, bouttonEnvoyer, SousMenuCliqué
 
     Confirmation = None
 
     if DemandeConfirmation == True:
         Confirmation = messagebox.askquestion (f"Vous partez déja {nomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
 
-    if Confirmation == 'yes' or DemandeConfirmation == None:
+    if Confirmation == "yes" or DemandeConfirmation == None:
 
-        if ConversationEnCours == True:
+        if ConversationEnCours:
+
+        #Si l'utilisateur était dans la fenêtre de conversation
+
+            SousMenuCliqué = False
+
             if Role == "Hote":
 
                 envoyer(True, "/stop") #L'envoi du /stop permet d'éviter au serveur de crasher / tourner dans le vide
                 time.sleep(0.3)
 
-
+            barreMenu.delete(1)
+            barreMenu.insert_command(1, label="Menu", command= lambda : RetournerMenu(DepuisMenu = True))
+            #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
+            
             filMessages.pack_forget()
             saisieMessage.pack_forget()
             bouttonEnvoyer.pack_forget()
 
             fen.unbind_all(ALL)
-        
-            barreMenu.delete(1)
-            barreMenu.delete(1)
+    
+            barreMenu.delete(2)
             barreMenu.delete(3)
-            #On efface les commandes "Menu, Couper Son et Infos Serveur" du menu
+            #On efface les commandes "Couper Son" et "Infos Serveur" du menu
 
             deconnexion()
 
-        AfficherMenu()
+        if DepuisMenu:
+        #Si l'utilisateur était dans la fenêtre de menu
+
+            if SousMenuCliqué:
+            #Si l'utilisateur était dans le sous menu (Démarrage du serveur ou connexion)
+
+                logo.pack_forget()
+                cadreParametres.pack_forget()
+
+        if SousMenuCliqué or ConversationEnCours:
+        #Si l"utilisateur n'est pas dans le menu principal
+
+            if SousMenuCliqué: 
+                SousMenuCliqué = False
+
+            AfficherMenu()
 
 
 def affichageConversation():
@@ -316,9 +341,12 @@ def affichageConversation():
     logo.pack_forget()
     cadreParametres.pack_forget()
 
-    barreMenu.insert_command(1, label="Couper Son", command=CouperSon)
+    barreMenu.delete(1)
+    barreMenu.insert_command(1, label="Menu", command= lambda : RetournerMenu(DemandeConfirmation = True, ConversationEnCours = True))
+    #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
+
+    barreMenu.insert_command(2, label="Couper Son", command=CouperSon)
     barreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
-    barreMenu.insert_command(0, label="Menu", command= lambda : RetournerMenu(DemandeConfirmation = True, ConversationEnCours = True))
 
     filMessages = Listbox(fen, width="70", height="20")
     filMessages.pack(pady=15)
@@ -399,7 +427,7 @@ def connexion():
 
                 while ConnexionEnAttente:
 
-                    MotDePasse = tkinter.simpledialog.askstring("Mot de passe du serveur", "Ce serveur demande un mot de passe pour se connecter", show='*')
+                    MotDePasse = tkinter.simpledialog.askstring("Mot de passe du serveur", "Ce serveur demande un mot de passe pour se connecter", show="•")
                     ConnexionSocket.send(bytes(MotDePasse, "utf-8"))
 
                     Autorisation = ConnexionSocket.recv(4096)
@@ -467,14 +495,14 @@ def démarrerServeur():
 
         if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
 
-            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
-            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
+            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="•")
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show="•")
             #On demande le mot et sa confirmation
 
             while ConfirmationMotDePasse != MotDePasse:
             #Tant que la confirmination n'est validée
 
-                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
+                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show="•")
             
             FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
             #On initialise le fichier de sauvegarde
@@ -518,8 +546,10 @@ def hote():
         
     """ Fonction qui affiche l'interface de création de serveur """
 
-    global entrePort, IP, nomUser, cadreParametres, entreNom, entreIP, listeNoms
-    #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
+    global entrePort, IP, nomUser, cadreParametres, entreNom, entreIP, listeNoms, SousMenuCliqué
+    #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
+
+    SousMenuCliqué = True
 
     messageBienvenue.pack_forget()
     cadreBouttons.pack_forget()
@@ -584,8 +614,10 @@ def client():
         
     """ Cette fonction permet à un client de se connecter au serveur""" 
 
-    global entreIP, entrePort, entreNom, cadreParametres, listeNoms
+    global entreIP, entrePort, entreNom, cadreParametres, listeNoms, SousMenuCliqué
     #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
+
+    SousMenuCliqué = True
 
     messageBienvenue.pack_forget()
     cadreBouttons.pack_forget()
@@ -696,6 +728,7 @@ fen.iconbitmap(bitmap="Médias/icone.ico")
 fen.protocol("WM_DELETE_WINDOW", fermeture)
 
 barreMenu = Menu(fen)
+barreMenu.add_command(label="Menu", command= lambda : RetournerMenu(DepuisMenu = True))
 barreMenu.add_command(label="Aide", command=Fonctions.pasCode)
 barreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde.LecteurSauvegarde)
 barreMenu.add_command(label="Paramètres", command=Paramètres.InterfaceParamètres)
