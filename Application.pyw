@@ -76,7 +76,7 @@ def envoyer(ModeManuel = None, MessageManuel = None):
                 messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
                 #On stocke le message dans un variable pour diminuer la taille de la ligne d'en dessous
                 tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
-                exit() #TODO => Remplacer par retour au menu
+                
     
     elif len(message) != 0 and EnvoiOK:
 
@@ -114,7 +114,7 @@ def envoyer(ModeManuel = None, MessageManuel = None):
                 messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
                 #On stocke le message dans un variable pour diminuer la taille de la ligne d'en dessous
                 tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
-                exit() #TODO => Remplacer par retour au menu
+                RetournerMenu(ConversationEnCours = True)
 
         else:
         #Si il n'a pas eu d'execeptions
@@ -421,29 +421,40 @@ def connexion():
 
             PrésenceMotDePasse = AutorisationEtDonnées[2]
 
-            if PrésenceMotDePasse == "True":
-
+            if PrésenceMotDePasse == "True" and Role != "Hote":
+            # l'hôte n'a pas besoin de se connecter
+            
                 ConnexionEnAttente  = True
 
                 while ConnexionEnAttente:
 
-                    MotDePasse = tkinter.simpledialog.askstring("Mot de passe du serveur", "Ce serveur demande un mot de passe pour se connecter", show="•")
-                    ConnexionSocket.send(bytes(MotDePasse, "utf-8"))
-
-                    Autorisation = ConnexionSocket.recv(4096)
-                    Autorisation =  Autorisation.decode("utf-8")
-
-                    if Autorisation == "OK":
-                        ConnexionEnAttente = False
+                    MotDePasseServeur= tkinter.simpledialog.askstring("Mot de passe du serveur", "Ce serveur demande un mot de passe pour se connecter", show="•")
                     
+                    if MotDePasseServeur == None or MotDePasseServeur == "":
+                    #Si l'utilisateur annule la connexion, il faut se déconnecter du serveur
+
+                        ConnexionSocket.close()
+                        return False
+
                     else:
-                        tkinter.messagebox.showwarning(title="Mot de passe incorrect", message="Le mot de passe est incorrect")
+
+                        MotDePasseServeurChiffré = ChiffrementRSA.chiffrement(MotDePasseServeur, CléPubliqueServeur, ModuleServeur)
+
+                        ConnexionSocket.send(bytes(MotDePasseServeurChiffré, "utf-8"))
+
+                        Autorisation = ConnexionSocket.recv(4096)
+                        Autorisation =  Autorisation.decode("utf-8")
+
+                        if Autorisation == "OK":
+                            ConnexionEnAttente = False
+                        
+                        else:
+                            tkinter.messagebox.showwarning(title="Mot de passe incorrect", message="Le mot de passe est incorrect")
 
 
             ConnexionSocket.setblocking(0)
             #On définit le mode de connexion sur non bloquant (Voir explications dans la fonction reception)
-
-            
+  
             return True
             #On retoune que la connexion a été validé 
         else:
@@ -453,6 +464,8 @@ def connexion():
             #On recoit du serveur le motif du refus de 
             
             tkinter.messagebox.showerror(title="Connexion refusée", message=motif.decode("utf-8"))	
+
+            return False
 
     except (ConnectionRefusedError, socket.timeout):
     #Si on arrive pas à se connecter au serveur

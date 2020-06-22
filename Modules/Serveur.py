@@ -1,10 +1,10 @@
 # coding: utf8
 import sys
 import time
-import math
 import socket
 import tkinter
 import threading
+from math import inf
 from tkinter import *
 from tkinter import messagebox
 from Modules import ChiffrementRSA
@@ -36,8 +36,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
     #On génère notre jeu de clés Privée et Publique, ainsi que notre module de chiffrement
 
     if NombreClientsMax == "0" or NombreClientsMax == "Inconnu":
-        ClientsMax = math.inf
-
+        ClientsMax = inf
+        #On utilise l'infini car si on cherche à vérifier si la limite à été dépassée, le résultat sera toujours false
     else:
         ClientsMax = int(NombreClientsMax)
     # On passe par une variable intérmédiaire car on ne peut modifier la portée d'un paramètre
@@ -202,7 +202,9 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                         if HoteConnecté == False:
                         #Si c'est la première connexion, on précise que c,'est l'hôte
+
                             RoleClient[objetClient] = "Hôte"
+                            Statut[objetClient] = "Connecté" #L'hôte est toujours connecté, pas bessoin de mot de passe
                             print(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
                             log(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
                             HoteConnecté = True
@@ -211,10 +213,13 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                         #Sinon c'est un client
 
                             RoleClient[objetClient] = "Client"
-                            annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[objetClient]} vient de rejoindre le chat"
-                            log(annonce)
-                            print(annonce)
-                            envoi(annonce, "Annonce")
+
+                            if PrésenceMDP == False:
+
+                                annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[objetClient]} vient de rejoindre le chat"
+                                log(annonce)
+                                print(annonce)
+                                envoi(annonce, "Annonce")
 
                         listeClient.append(objetClient)
 
@@ -222,7 +227,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                     #Si le nom est déja pris
 
                         objetClient.send(bytes("False", "utf-8"))
-                        time.sleep(0.4) #Le délai évite que les paquets de mélangent
+                        time.sleep(0.5) #Le délai évite que les paquets se mélangent
                         objetClient.send(bytes("Votre nom d'utilisateur est déja utilisé dans ce serveur, veuillez en changer.", "utf-8"))
   
                     elif ClientsMax < len(listeClient) + 1:
@@ -328,13 +333,31 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                             MotDePasseClient = client.recv(4096)
                             MotDePasseClient = MotDePasseClient.decode("utf-8")
 
-                            if MotDePasseClient == MDP:
+                            if MotDePasseClient == "":
 
-                                client.send(bytes("OK", "utf-8"))         
-                                Statut[client] = "Connecté"
+                                listeClient.remove(client)
+                                listeDesPseudos.remove(nomClient[client])
+                                del nomClient[client]
+                                del CléPubliqueClient[client]
+                                del RoleClient[client]
+                                del Statut[client]
 
                             else:
-                                client.send(bytes("Nan", "utf-8")) 
+
+                                MotDePasseClient = ChiffrementRSA.déchiffrement(MotDePasseClient, CléPrivée, Module)
+
+                                if MotDePasseClient == MDP:
+
+                                    client.send(bytes("OK", "utf-8"))         
+                                    Statut[client] = "Connecté"
+
+                                    annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[client]} vient de rejoindre le chat"
+                                    log(annonce)
+                                    print(annonce)
+                                    envoi(annonce, "Annonce")
+
+                                else:
+                                    client.send(bytes("Nan", "utf-8")) 
                                 
 
                     except BlockingIOError:

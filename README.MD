@@ -13,8 +13,6 @@
 ## Liste de fonctionnalités à implémenter 
 
 
-- Envoi chiffré du mot de passe 
-
 - Confirmation en cas de /stop (Aussi changer le mode de retourner menu)
 
 - Ajouter des commandes :
@@ -25,6 +23,8 @@
     - /op : Commande qui permet de changer le rôle (Hôte à client, client à hôte)
 
 - Afficher nombres d'utilisateurs connectés
+
+- Voir si c'est possible de passer le thread de reception en bloquant
 
 - Envoyer des fichiers :
 
