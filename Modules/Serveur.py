@@ -317,8 +317,12 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                     if Commande == "stop":
 
                                         if RoleClient[client] == "Hôte":
-                                            envoi(f"[{HeureCommande}] {nomClient[client]} vient d'arrêter le serveur", "Annonce")
-                                            arretServeur()
+                                            
+                                            Confirmation = messagebox.askquestion (f"Vous partez déja {nomClient[client]} ?","Vous voulez vraiment arrêter le serveur ?",icon = 'warning')
+
+                                            if Confirmation == "yes":
+                                                envoi(f"[{HeureCommande}] {nomClient[client]} vient d'arrêter le serveur", "Annonce")
+                                                arretServeur()
 
                                 else:
                                 #Si le message recu ne respecte aucune forme de message, il est invalide
