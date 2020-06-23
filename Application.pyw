@@ -33,7 +33,7 @@ SonActivé = True
 SousMenuCliqué = False
 
 
-def envoyer(ModeManuel = None, MessageManuel = None):
+def envoyer(ModeManuel = False, MessageManuel = None):
     #Le mode manuel est un mode qui ne récupére pas l'entrée, mais le message passé en argument
 
     """Fonction qui chiffre et envoi les message au serveur. Les messages sont chiffrés en fonction du serveur"""
@@ -49,34 +49,48 @@ def envoyer(ModeManuel = None, MessageManuel = None):
     if len(message) > 1000:
 
         tkinter.messagebox.showerror(title="Attention au spam !", message="Afin d'éviter de surcharger le serveur, les messages de plus de 1000 caractères sont interdits")
-        return
-
-    elif message[0] == "/":
-        
-        message = Fonctions.formaterPaquet("Commande", message)
-        message = ChiffrementRSA.chiffrement(message, CléPubliqueServeur, ModuleServeur)
-        
-        messageFinal = f"{len(message)}-{message}"
-        #On rajoute un en tête avec la longueur totale du message
-        messageFinal = messageFinal.encode('utf-8')
-
-        try:
-            ConnexionSocket.send(bytes(messageFinal))
-            #On essaie d'envoyer le message au serveur.
-
-        except (ConnectionResetError, ConnectionAbortedError):
-        #Si le serveur ne répond pas
     
-            if NombreErreurs < 3:
-                tkinter.messagebox.showerror(title="Aïe...", message="Impossible de joindre le serveur. Veuillez réessayer.")
-                NombreErreurs += 1
-            else:
-            #Si il y'a plus de trois erreurs, on stoppe le programme, en invitant l'utilisateur à se reconnecter
+    elif message == "": pass
+    elif message[0] == "/":
 
-                messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
-                #On stocke le message dans un variable pour diminuer la taille de la ligne d'en dessous
-                tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
-                
+        RéponseUser = None
+        stop = False
+
+        if message == "/stop" and ModeManuel == False and Role == "Hote":
+
+            RéponseUser = tkinter.messagebox.askokcancel("Kripto","Voulez vraiment arrêter le serveur ?")
+            stop = True
+
+        elif message == "/stop" and ModeManuel == False and Role == "Client":
+
+            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas arrêter le serveur, vous n'êtes pas l'hôte de la disscusion")
+
+    
+        if RéponseUser == True and Role == "Hote" or ModeManuel == True or message != "/stop":
+
+            message = Fonctions.formaterPaquet("Commande", message)
+            message = ChiffrementRSA.chiffrement(message, CléPubliqueServeur, ModuleServeur)
+            
+            messageFinal = f"{len(message)}-{message}"
+            messageFinal = messageFinal.encode('utf-8')
+
+            try: ConnexionSocket.send(bytes(messageFinal))
+            except (ConnectionResetError, ConnectionAbortedError):
+            #Si le serveur ne répond pas
+        
+                if NombreErreurs < 3:
+                    tkinter.messagebox.showerror(title="Aïe...", message="Impossible de joindre le serveur. Veuillez réessayer.")
+                    NombreErreurs += 1
+                else:
+                #Si il y'a plus de trois erreurs, on stoppe le programme, en invitant l'utilisateur à se reconnecter
+
+                    messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
+                    tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
+                    RetournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
+            
+            if stop == True: 
+                RetournerMenu(DemandeConfirmation = None, ConversationEnCours = True, DemandeArrêt = False)
+ 
     
     elif len(message) != 0 and EnvoiOK:
 
@@ -114,7 +128,7 @@ def envoyer(ModeManuel = None, MessageManuel = None):
                 messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
                 #On stocke le message dans un variable pour diminuer la taille de la ligne d'en dessous
                 tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
-                RetournerMenu(ConversationEnCours = True)
+                RetournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
 
         else:
         #Si il n'a pas eu d'execeptions
@@ -276,7 +290,7 @@ def ActiverSon():
     barreMenu.insert_command(2, label="Couper Son", command=CouperSon)
     #On supprime la commande à l'index 2 du menu pour y ajouter la commande CouperSon à la même position
 
-def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None):
+def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None, DemandeArrêt = True):
 
     global filMessages, saisieMessage, bouttonEnvoyer, SousMenuCliqué
 
@@ -293,7 +307,7 @@ def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
 
             SousMenuCliqué = False
 
-            if Role == "Hote":
+            if Role == "Hote" and  DemandeArrêt == True:
 
                 envoyer(True, "/stop") #L'envoi du /stop permet d'éviter au serveur de crasher / tourner dans le vide
                 time.sleep(0.3)

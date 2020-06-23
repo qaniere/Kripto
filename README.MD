@@ -12,9 +12,6 @@
 
 ## Liste de fonctionnalités à implémenter 
 
-
-- Confirmation en cas de /stop (Aussi changer le mode de retourner menu)
-
 - Ajouter des commandes :
   
     - /lock - /unlock : Commande pour empêcher l'arrivé de nouveaux utilisateurs
