@@ -12,6 +12,11 @@
 
 ## Liste de fonctionnalités à implémenter 
 
+
+- Nettoyer et refactor le code (En cours)
+
+- Pouvoir annuler la connexion si pas de mot de passe sauvegarde
+
 - Ajouter des commandes :
   
     - /lock - /unlock : Commande pour empêcher l'arrivé de nouveaux utilisateurs
@@ -43,8 +48,8 @@
 
  - Enlever toutes les fast string pour des raisons de compatibilité
 
- - Nettoyer et refactor le code
-
  - Rédiger l'aide en TopLevel
+
+ - Remettre à jour les lignes de l'index
 
  - Petite page web de présentation, d'installation et de documentation.
