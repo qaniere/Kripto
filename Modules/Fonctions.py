@@ -2,6 +2,7 @@
 import time
 import tkinter
 import subprocess
+import webbrowser
 from tkinter import *
 from tkinter import messagebox
 
@@ -167,3 +168,6 @@ texteDeBase = {}
 if __name__ == "__main__":
 
     formaterPaquet("Commande", "/stop")
+    
+def callback(url):
+    webbrowser.open_new(url)
