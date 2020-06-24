@@ -12,25 +12,408 @@ from tkinter import messagebox
 from random import randint, choices
 from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde, Serveur
 
-Paramètres.LectureParamètres()
 
-listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
-#La liste des noms qui seront suggérés à l'utilisateur.
+"""   INDEX   """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-FichierSauvegarde = None
-MotDePasse = None
-#Initilisation du mot de passe de la sauvegarde et le fichier de sauvegarde
+I.définition de AfficherMenu()................................................54
 
-Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
-#On génére une clé publique et une clé publique et on garde en mémoire le module de chiffrement
+II.Hôte et clients............................................................76
+    A.Travail spécifique à l'hôte.............................................76
+        1.définition de hote()................................................76
+        2.définition de démarrerServeur()....................................142
+    B.définition de client().................................................182
 
-NombreErreurs = 0
+III.Connexion et envoi de messages...........................................235
+    A.Connexion et déconnexion...............................................235
+        1.définition de connexion()..........................................235
+        2.définition de déconnexion()........................................342
+    B.Afficher la conversation...............................................350
+        1.définition de affichageConversation()..............................350
+        2.définition de seConnecter()........................................390
+    C.Envoyer et recevoir....................................................419
+        1.définition de envoyer()............................................419
+        2.définition de recevoir()...........................................562
 
-global SousMenuCliqué
+IV.Barre d'application.......................................................645
+    A.définition de retournerMenu()..........................................645
+    B.définition de infosServeur()...........................................701
+    C.définition de aide()...................................................746
+    D.Activer et désactiver le son...........................................786
+        1.définition de activerSon().........................................786
+        2.définition de couperSon()..........................................795
+    E.définition de contact()................................................805
 
-EnvoiOK = True
-SonActivé = True
-SousMenuCliqué = False
+V.définition de fermeture()..................................................842
+
+VI.Lancement du programme....................................................853
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+
+def AfficherMenu():
+
+    global messageBienvenue, cadreBouttons, logo
+
+    logo = Label(fen, bg="grey", image=imageLogo)
+    logo.pack()
+
+    messageBienvenue = Label(fen, text="Bienvenue dans Kripto. Pour démarrez, dites-nous \nsi vous voulez être hôte ou bien client.", bg="grey", font=policeBienvenue)
+    messageBienvenue.pack()
+
+    cadreBouttons = Frame(fen, bg="grey")
+    cadreBouttons.pack(pady=60)
+
+    bouttonHote = Button(cadreBouttons, text="Être hôte", font=policeBoutton, command=hote)
+    bouttonHote.pack(side=LEFT, padx=7)
+
+    bouttonClient = Button(cadreBouttons, text="Être client", font=policeBoutton, command=client)
+    bouttonClient.pack(side=LEFT, padx=7)
+    #On affiche un placeholder dans le zone de saisie des filMessages
+
+
+
+def hote():
+
+    """ Fonction qui affiche l'interface de création de serveur """
+
+    global entrePort, IP, nomUser, cadreParametres, entreNom, entreIP, listeNoms, SousMenuCliqué
+    #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
+
+    SousMenuCliqué = True
+
+    messageBienvenue.pack_forget()
+    cadreBouttons.pack_forget()
+    #On efface le menu
+
+    hote = socket.gethostname()
+    IP = socket.gethostbyname(hote)
+    #On récupere l'addresse IP de la machine
+
+    cadreParametres = Frame(fen, bg="grey")
+    cadreParametres.pack()
+
+    votreIP = Label(cadreParametres, text="Votre Adresse IP", bg="Grey")
+    votreIP.pack(anchor=CENTER, pady=7)
+
+    entreIP = Entry(cadreParametres)
+    entreIP.insert("end", IP)
+    entreIP.pack(anchor=CENTER)
+
+    votrePort = Label(cadreParametres, text="Port", bg="Grey")
+    votrePort.pack(anchor=CENTER, pady=7)
+
+
+    entrePort = Entry(cadreParametres)
+    entrePort.pack(anchor=CENTER)
+
+    if Paramètres.DicoParamètres["PortPréféré"] != "Inconnu":
+    # Si l'utilisateur a définit un port par défaut
+        Fonctions.placeholder(entrePort, Paramètres.DicoParamètres["PortPréféré"], True)
+
+    else:
+        portRecommande = randint(49152, 65535)
+        #On recommande un port dans la plage de ceux les moins utilisés
+        Fonctions.placeholder(entrePort, portRecommande, True)
+        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
+
+
+    votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
+    votreNom.pack(anchor=CENTER, pady=7)
+
+    entreNom = Entry(cadreParametres)
+    entreNom.pack(anchor=CENTER)
+
+    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
+    # Si l'utilisateur a définit un nom d'utilisateur par défaut
+        Fonctions.placeholder(entreNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
+    else:
+        suggestionNom = choices(listeNoms)
+        #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
+        Fonctions.placeholder(entreNom, suggestionNom[0], True)
+        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
+
+    entreNom.bind("<Button-1>", lambda z: Fonctions.placeholder(entreNom, "", False))
+    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
+
+    bouttonStart = Button(cadreParametres, text="Démarrer", command=démarrerServeur)
+    bouttonStart.pack(pady=20)
+
+def démarrerServeur():
+
+    """ Cette fonction sert à démarrez le serveur quand on est hôte"""
+
+    global entreIP, entrePort, IP, Port, Role, FichierSauvegarde, MotDePasse, entreNom
+    #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
+
+    if len(entreNom.get()) > 16:
+
+        tkinter.messagebox.showerror(title="Aie...", message="Votre nom d'utilisateur doit faire moins de 16 caractères")
+        return
+        #On stoppe l'exécution de la fonction
+
+    Role = "Hote"
+    IP = entreIP.get()
+    Port = int(entrePort.get())
+
+    fen.after(10, Serveur.Démarrer(IP, Port, Paramètres.DicoParamètres["NombreUsersMax"], Paramètres.DicoParamètres["MotDePasse"]))
+    #On lance de manière asynchrone le démarrage du serveur
+
+    if connexion() == True:
+    #Si la connexion est une réussite, on affiche les conversations
+
+        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+
+            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="•")
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show="•")
+            #On demande le mot et sa confirmation
+
+            while ConfirmationMotDePasse != MotDePasse:
+            #Tant que la confirmination n'est validée
+
+                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show="•")
+
+            FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
+            #On initialise le fichier de sauvegarde
+
+        affichageConversation()
+
+
+def client():
+
+    """ Cette fonction permet à un client de se connecter au serveur"""
+
+    global entreIP, entrePort, entreNom, cadreParametres, listeNoms, SousMenuCliqué
+    #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
+
+    SousMenuCliqué = True
+
+    messageBienvenue.pack_forget()
+    cadreBouttons.pack_forget()
+    #On efface le menu
+
+    cadreParametres = Frame(fen, bg="grey")
+    cadreParametres.pack()
+
+    IpduServeur = Label(cadreParametres, text="Adresse IP du serveur", bg="Grey")
+    IpduServeur.pack(anchor=CENTER, pady=7)
+
+    entreIP = Entry(cadreParametres)
+    entreIP.insert("end", "192.168.1.")
+    entreIP.pack(anchor=CENTER)
+
+    PortduServeur = Label(cadreParametres, text="Port du serveur", bg="Grey")
+    PortduServeur.pack(anchor=CENTER, pady=7)
+
+    entrePort = Entry(cadreParametres)
+    entrePort.pack(anchor=CENTER)
+
+    votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
+    votreNom.pack(anchor=CENTER, pady=7)
+
+    entreNom = Entry(cadreParametres)
+    entreNom.pack(anchor=CENTER)
+
+    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
+    # Si l'utilisateur a définit un nom d'utilisateur par défaut
+
+        Fonctions.placeholder(entreNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
+    else:
+        suggestionNom = choices(listeNoms)
+        #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
+        Fonctions.placeholder(entreNom, suggestionNom[0], True)
+        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
+
+    entreNom.bind("<Button-1>", lambda b: Fonctions.placeholder(entreNom, "", False))
+    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
+
+    bouttonStart = Button(cadreParametres, text="Se connecter",  command=seConnecter)
+    bouttonStart.pack(pady=20)
+
+
+
+def connexion():
+
+    """ Cette fonction sert à se connecter au serveur et à envoyer le nom d'utilisateur, la clé publique, le module de chiffrement au serveur,
+    et on recoit les informations de chiffrement du serveur, la clé publique et le module de chiffrement"""
+
+    global IP, Port, nomUser, entreNom, ConnexionSocket, entreIP, Role, CléPublique, CléPubliqueServeur, ModuleServeur
+    #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
+
+    IP = entreIP.get()
+    nomUser = entreNom.get()
+
+    ConnexionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #On défini notre connexion socket
+    # - AF_INET => Protocole IPV4
+    # - SOCK_STREAM => Stream veut dire cours d'eau, comme un flot continu de donnés qui est envoyé
+
+    ConnexionSocket.settimeout(5)
+    #Si au bout de 5secondes, il n'y pas de réponse (Délai plus que nécéssaire pour des simples paquets TCP) une exception est générée
+
+    try:
+        ConnexionSocket.connect((IP, Port))
+        #Le code après cette instruction est executé uniquement si la connection réussit
+
+        données = f"{nomUser}|{CléPublique}|{Module}"
+        données = données.encode('utf-8')
+
+        ConnexionSocket.send(bytes(données))
+
+        #On formate, puis on envoi les données de chiffrement au serveur
+
+        AutorisationEtDonnées = ConnexionSocket.recv(2048)
+        AutorisationEtDonnées = AutorisationEtDonnées.decode("utf-8")
+
+        #On recoit de la part du serveur l'autorisation de se connecter, et les données de chiffrement du serveur
+
+        if AutorisationEtDonnées != "False":
+        #Si le serveur autorise la connexion
+
+            AutorisationEtDonnées = AutorisationEtDonnées.split("|")
+            #On récupere les données sous forme de le liste
+
+            CléPubliqueServeur = int(AutorisationEtDonnées[0])
+            ModuleServeur = int(AutorisationEtDonnées[1])
+            #On converti les données en entiers, puis on les affectes au variables adaptées
+
+            PrésenceMotDePasse = AutorisationEtDonnées[2]
+
+            if PrésenceMotDePasse == "True" and Role != "Hote":
+            # l'hôte n'a pas besoin de se connecter
+
+                ConnexionEnAttente  = True
+
+                while ConnexionEnAttente:
+
+                    MotDePasseServeur= tkinter.simpledialog.askstring("Mot de passe du serveur", "Ce serveur demande un mot de passe pour se connecter", show="•")
+
+                    if MotDePasseServeur == None or MotDePasseServeur == "":
+                    #Si l'utilisateur annule la connexion, il faut se déconnecter du serveur
+
+                        ConnexionSocket.close()
+                        return False
+
+                    else:
+
+                        MotDePasseServeurChiffré = ChiffrementRSA.chiffrement(MotDePasseServeur, CléPubliqueServeur, ModuleServeur)
+
+                        ConnexionSocket.send(bytes(MotDePasseServeurChiffré, "utf-8"))
+
+                        Autorisation = ConnexionSocket.recv(4096)
+                        Autorisation =  Autorisation.decode("utf-8")
+
+                        if Autorisation == "OK":
+                            ConnexionEnAttente = False
+
+                        else:
+                            tkinter.messagebox.showwarning(title="Mot de passe incorrect", message="Le mot de passe est incorrect")
+
+
+            ConnexionSocket.setblocking(0)
+            #On définit le mode de connexion sur non bloquant (Voir explications dans la fonction recevoir)
+
+            return True
+            #On retoune que la connexion a été validé
+        else:
+        #Si le serveur ne donne pas son autorisation
+
+            motif = ConnexionSocket.recv(4096)
+            #On recoit du serveur le motif du refus de
+
+            tkinter.messagebox.showerror(title="Connexion refusée", message=motif.decode("utf-8"))
+
+            return False
+
+    except (ConnectionRefusedError, socket.timeout):
+    #Si on arrive pas à se connecter au serveur
+
+        if Role == "Hote":
+        #Si c'est l'hôte, il a déja recu l'erreur de la part du serveur donc affiche rien
+
+            return False
+            #On indique que la connexion est un échec
+        else:
+            messageErreur = "IL semblerait que les coordonées du serveur ne soit pas valides. Réferez vous à l'aide pour régler ce problème."
+            #On raccourci la ligne du dessous avec cette variable
+            tkinter.messagebox.showerror(title="Aïe...", message=messageErreur)
+            return False
+
+def déconnexion():
+
+    global Connexion
+
+    Connexion = False
+    ConnexionSocket.close()
+
+
+def affichageConversation():
+
+    """ Cette fonction sert à générer l'interface de la conversation"""
+
+    global cadreParametres, saisieMessage, nomUser, filMessages, bouttonEnvoyer, Connexion, threadRéception
+
+    logo.pack_forget()
+    cadreParametres.pack_forget()
+
+    barreMenu.delete(1)
+    barreMenu.insert_command(1, label="Menu", command= lambda : retournerMenu(DemandeConfirmation = True, ConversationEnCours = True))
+    #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
+
+    barreMenu.insert_command(2, label="Couper Son", command=couperSon)
+    barreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
+
+    filMessages = Listbox(fen, width="70", height="20")
+    filMessages.pack(pady=15)
+
+    saisieMessage = Entry(fen, width="60")
+    saisieMessage.pack()
+
+    bouttonEnvoyer = Button(fen, text="Envoyer", command=envoyer)
+    bouttonEnvoyer.pack(pady=15)
+
+    saisieMessage.bind("<Button-1>", lambda a: Fonctions.placeholder(saisieMessage, "", False))
+    #On associe le clic gauche sur la zone de saisie du message à la fonction placeholder
+    #On utilise une lambda pour appeler une fonction avec des arguments
+
+    fen.bind_all('<Return>', lambda c: envoyer())
+    #On associe l'appui a a fonction envoyer avec une fonction lambda afin de pouvoir envoyer aucun argument
+
+    Connexion = True
+    threadRéception = threading.Thread(target=recevoir)
+    threadRéception.daemon = True #Ce flag signifie que quand il ne reste que ce thread, le programme s'arrête.
+    threadRéception.start()
+    #On commence à recevoir des messages
+
+    Fonctions.placeholder(saisieMessage, "Saisissez votre message ici", True)
+
+def seConnecter():
+
+    """ Fonction qui affiche l'interface de discusion si la connexion est une réussite"""
+
+    global entreIP, entrePort, IP, Port, Role, FichierSauvegarde, MotDePasse
+    #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
+
+    Role = "Client"
+    Port = int(entrePort.get())
+    IP = entreIP.get()
+
+    if connexion() == True:
+
+        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+
+            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
+            #On demande le mot et sa confirmation
+
+            while ConfirmationMotDePasse != MotDePasse:
+            #Tant que la confirmination n'est validée
+
+                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
+
+            FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
+            #On initialise le fichier de sauvegarde
+        affichageConversation()
 
 
 def envoyer(ModeManuel = False, MessageManuel = None):
@@ -86,10 +469,10 @@ def envoyer(ModeManuel = False, MessageManuel = None):
 
                     messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
                     tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
-                    RetournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
+                    retournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
 
             if stop == True:
-                RetournerMenu(DemandeConfirmation = None, ConversationEnCours = True, DemandeArrêt = False)
+                retournerMenu(DemandeConfirmation = None, ConversationEnCours = True, DemandeArrêt = False)
 
 
     elif len(message) != 0 and EnvoiOK:
@@ -128,7 +511,7 @@ def envoyer(ModeManuel = False, MessageManuel = None):
                 messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
                 #On stocke le message dans un variable pour diminuer la taille de la ligne d'en dessous
                 tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
-                RetournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
+                retournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
 
         else:
         #Si il n'a pas eu d'execeptions
@@ -176,9 +559,7 @@ def envoyer(ModeManuel = False, MessageManuel = None):
             fen.after(500, RéactivationEnvoi)
             #Au bout de 500ms en asynchrone, on appelle la fonction qui rendra possible l'envoi de messages
 
-
-
-def reception():
+def recevoir():
 
     """ Fonction qui s'appelle elle même toutes les 10ms qui permet de vérifier
     la présence de nouveaux messages"""
@@ -261,36 +642,7 @@ def reception():
 
 
 
-def deconnexion():
-
-    global Connexion
-
-    Connexion = False
-    ConnexionSocket.close()
-
-
-
-def CouperSon():
-    global SonActivé
-
-    SonActivé = False
-
-    barreMenu.delete(2)
-    barreMenu.insert_command(2, label="Activer Son", command=ActiverSon)
-    #On supprime la commande à l'index 2 du menu pour y ajouter la commande ActiverSon à la même position
-
-
-
-def ActiverSon():
-    global SonActivé
-
-    SonActivé = True
-
-    barreMenu.delete(2)
-    barreMenu.insert_command(2, label="Couper Son", command=CouperSon)
-    #On supprime la commande à l'index 2 du menu pour y ajouter la commande CouperSon à la même position
-
-def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None, DemandeArrêt = True):
+def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None, DemandeArrêt = True):
 
     global filMessages, saisieMessage, bouttonEnvoyer, SousMenuCliqué
 
@@ -313,7 +665,7 @@ def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
                 time.sleep(0.3)
 
             barreMenu.delete(1)
-            barreMenu.insert_command(1, label="Menu", command= lambda : RetournerMenu(DepuisMenu = True))
+            barreMenu.insert_command(1, label="Menu", command= lambda : retournerMenu(DepuisMenu = True))
             #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
 
             filMessages.pack_forget()
@@ -326,7 +678,7 @@ def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
             barreMenu.delete(3)
             #On efface les commandes "Couper Son" et "Infos Serveur" du menu
 
-            deconnexion()
+            déconnexion()
 
         if DepuisMenu:
         #Si l'utilisateur était dans la fenêtre de menu
@@ -344,350 +696,6 @@ def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
                 SousMenuCliqué = False
 
             AfficherMenu()
-
-
-def affichageConversation():
-
-    """ Cette fonction sert à générer l'interface de la conversation"""
-
-    global cadreParametres, saisieMessage, nomUser, filMessages, bouttonEnvoyer, Connexion, threadRéception
-
-    logo.pack_forget()
-    cadreParametres.pack_forget()
-
-    barreMenu.delete(1)
-    barreMenu.insert_command(1, label="Menu", command= lambda : RetournerMenu(DemandeConfirmation = True, ConversationEnCours = True))
-    #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
-
-    barreMenu.insert_command(2, label="Couper Son", command=CouperSon)
-    barreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
-
-    filMessages = Listbox(fen, width="70", height="20")
-    filMessages.pack(pady=15)
-
-    saisieMessage = Entry(fen, width="60")
-    saisieMessage.pack()
-
-    bouttonEnvoyer = Button(fen, text="Envoyer", command=envoyer)
-    bouttonEnvoyer.pack(pady=15)
-
-    saisieMessage.bind("<Button-1>", lambda a: Fonctions.placeholder(saisieMessage, "", False))
-    #On associe le clic gauche sur la zone de saisie du message à la fonction placeholder
-    #On utilise une lambda pour appeler une fonction avec des arguments
-
-    fen.bind_all('<Return>', lambda c: envoyer())
-    #On associe l'appui a a fonction envoyer avec une fonction lambda afin de pouvoir envoyer aucun argument
-
-    Connexion = True
-    threadRéception = threading.Thread(target=reception)
-    threadRéception.daemon = True #Ce flag signifie que quand il ne reste que ce thread, le programme s'arrête.
-    threadRéception.start()
-    #On commence à recevoir des messages
-
-    Fonctions.placeholder(saisieMessage, "Saisissez votre message ici", True)
-    #On affiche un placeholder dans le zone de saisie des messages
-
-
-def connexion():
-
-    """ Cette fonction sert à se connecter au serveur et à envoyer le nom d'utilisateur, la clé publique, le module de chiffrement au serveur,
-    et on recoit les informations de chiffrement du serveur, la clé publique et le module de chiffrement"""
-
-    global IP, Port, nomUser, entreNom, ConnexionSocket, entreIP, Role, CléPublique, CléPubliqueServeur, ModuleServeur
-    #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
-
-    IP = entreIP.get()
-    nomUser = entreNom.get()
-
-    ConnexionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #On défini notre connexion socket
-    # - AF_INET => Protocole IPV4
-    # - SOCK_STREAM => Stream veut dire cours d'eau, comme un flot continu de donnés qui est envoyé
-
-    ConnexionSocket.settimeout(5)
-    #Si au bout de 5secondes, il n'y pas de réponse (Délai plus que nécéssaire pour des simples paquets TCP) une exception est générée
-
-    try:
-        ConnexionSocket.connect((IP, Port))
-        #Le code après cette instruction est executé uniquement si la connection réussit
-
-        données = f"{nomUser}|{CléPublique}|{Module}"
-        données = données.encode('utf-8')
-
-        ConnexionSocket.send(bytes(données))
-
-        #On formate, puis on envoi les données de chiffrement au serveur
-
-        AutorisationEtDonnées = ConnexionSocket.recv(2048)
-        AutorisationEtDonnées = AutorisationEtDonnées.decode("utf-8")
-
-        #On recoit de la part du serveur l'autorisation de se connecter, et les données de chiffrement du serveur
-
-        if AutorisationEtDonnées != "False":
-        #Si le serveur autorise la connexion
-
-            AutorisationEtDonnées = AutorisationEtDonnées.split("|")
-            #On récupere les données sous forme de le liste
-
-            CléPubliqueServeur = int(AutorisationEtDonnées[0])
-            ModuleServeur = int(AutorisationEtDonnées[1])
-            #On converti les données en entiers, puis on les affectes au variables adaptées
-
-            PrésenceMotDePasse = AutorisationEtDonnées[2]
-
-            if PrésenceMotDePasse == "True" and Role != "Hote":
-            # l'hôte n'a pas besoin de se connecter
-
-                ConnexionEnAttente  = True
-
-                while ConnexionEnAttente:
-
-                    MotDePasseServeur= tkinter.simpledialog.askstring("Mot de passe du serveur", "Ce serveur demande un mot de passe pour se connecter", show="•")
-
-                    if MotDePasseServeur == None or MotDePasseServeur == "":
-                    #Si l'utilisateur annule la connexion, il faut se déconnecter du serveur
-
-                        ConnexionSocket.close()
-                        return False
-
-                    else:
-
-                        MotDePasseServeurChiffré = ChiffrementRSA.chiffrement(MotDePasseServeur, CléPubliqueServeur, ModuleServeur)
-
-                        ConnexionSocket.send(bytes(MotDePasseServeurChiffré, "utf-8"))
-
-                        Autorisation = ConnexionSocket.recv(4096)
-                        Autorisation =  Autorisation.decode("utf-8")
-
-                        if Autorisation == "OK":
-                            ConnexionEnAttente = False
-
-                        else:
-                            tkinter.messagebox.showwarning(title="Mot de passe incorrect", message="Le mot de passe est incorrect")
-
-
-            ConnexionSocket.setblocking(0)
-            #On définit le mode de connexion sur non bloquant (Voir explications dans la fonction reception)
-
-            return True
-            #On retoune que la connexion a été validé
-        else:
-        #Si le serveur ne donne pas son autorisation
-
-            motif = ConnexionSocket.recv(4096)
-            #On recoit du serveur le motif du refus de
-
-            tkinter.messagebox.showerror(title="Connexion refusée", message=motif.decode("utf-8"))
-
-            return False
-
-    except (ConnectionRefusedError, socket.timeout):
-    #Si on arrive pas à se connecter au serveur
-
-        if Role == "Hote":
-        #Si c'est l'hôte, il a déja recu l'erreur de la part du serveur donc affiche rien
-
-            return False
-            #On indique que la connexion est un échec
-        else:
-            messageErreur = "IL semblerait que les coordonées du serveur ne soit pas valides. Réferez vous à l'aide pour régler ce problème."
-            #On raccourci la ligne du dessous avec cette variable
-            tkinter.messagebox.showerror(title="Aïe...", message=messageErreur)
-            return False
-
-
-
-def démarrerServeur():
-
-    """ Cette fonction sert à démarrez le serveur quand on est hôte"""
-
-    global entreIP, entrePort, IP, Port, Role, FichierSauvegarde, MotDePasse, entreNom
-    #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
-
-    if len(entreNom.get()) > 16:
-
-        tkinter.messagebox.showerror(title="Aie...", message="Votre nom d'utilisateur doit faire moins de 16 caractères")
-        return
-        #On stoppe l'exécution de la fonction
-
-    Role = "Hote"
-    IP = entreIP.get()
-    Port = int(entrePort.get())
-
-    fen.after(10, Serveur.Démarrer(IP, Port, Paramètres.DicoParamètres["NombreUsersMax"], Paramètres.DicoParamètres["MotDePasse"]))
-    #On lance de manière asynchrone le démarrage du serveur
-
-    if connexion() == True:
-    #Si la connexion est une réussite, on affiche les conversations
-
-        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
-
-            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="•")
-            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show="•")
-            #On demande le mot et sa confirmation
-
-            while ConfirmationMotDePasse != MotDePasse:
-            #Tant que la confirmination n'est validée
-
-                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show="•")
-
-            FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
-            #On initialise le fichier de sauvegarde
-
-        affichageConversation()
-
-
-
-def seConnecter():
-
-    """ Fonction qui affiche l'interface de discusion si la connexion est une réussite"""
-
-    global entreIP, entrePort, IP, Port, Role, FichierSauvegarde, MotDePasse
-    #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
-
-    Role = "Client"
-    Port = int(entrePort.get())
-    IP = entreIP.get()
-
-    if connexion() == True:
-
-        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
-
-            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
-            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
-            #On demande le mot et sa confirmation
-
-            while ConfirmationMotDePasse != MotDePasse:
-            #Tant que la confirmination n'est validée
-
-                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
-
-            FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
-            #On initialise le fichier de sauvegarde
-        affichageConversation()
-
-
-
-
-def hote():
-
-    """ Fonction qui affiche l'interface de création de serveur """
-
-    global entrePort, IP, nomUser, cadreParametres, entreNom, entreIP, listeNoms, SousMenuCliqué
-    #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
-
-    SousMenuCliqué = True
-
-    messageBienvenue.pack_forget()
-    cadreBouttons.pack_forget()
-    #On efface le menu
-
-    hote = socket.gethostname()
-    IP = socket.gethostbyname(hote)
-    #On récupere l'addresse IP de la machine
-
-    cadreParametres = Frame(fen, bg="grey")
-    cadreParametres.pack()
-
-    votreIP = Label(cadreParametres, text="Votre Adresse IP", bg="Grey")
-    votreIP.pack(anchor=CENTER, pady=7)
-
-    entreIP = Entry(cadreParametres)
-    entreIP.insert("end", IP)
-    entreIP.pack(anchor=CENTER)
-
-    votrePort = Label(cadreParametres, text="Port", bg="Grey")
-    votrePort.pack(anchor=CENTER, pady=7)
-
-
-    entrePort = Entry(cadreParametres)
-    entrePort.pack(anchor=CENTER)
-
-    if Paramètres.DicoParamètres["PortPréféré"] != "Inconnu":
-    # Si l'utilisateur a définit un port par défaut
-        Fonctions.placeholder(entrePort, Paramètres.DicoParamètres["PortPréféré"], True)
-
-    else:
-        portRecommande = randint(49152, 65535)
-        #On recommande un port dans la plage de ceux les moins utilisés
-        Fonctions.placeholder(entrePort, portRecommande, True)
-        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
-
-
-    votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
-    votreNom.pack(anchor=CENTER, pady=7)
-
-    entreNom = Entry(cadreParametres)
-    entreNom.pack(anchor=CENTER)
-
-    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
-    # Si l'utilisateur a définit un nom d'utilisateur par défaut
-        Fonctions.placeholder(entreNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
-    else:
-        suggestionNom = choices(listeNoms)
-        #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
-        Fonctions.placeholder(entreNom, suggestionNom[0], True)
-        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
-
-    entreNom.bind("<Button-1>", lambda z: Fonctions.placeholder(entreNom, "", False))
-    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
-
-    bouttonStart = Button(cadreParametres, text="Démarrer", command=démarrerServeur)
-    bouttonStart.pack(pady=20)
-
-
-
-def client():
-
-    """ Cette fonction permet à un client de se connecter au serveur"""
-
-    global entreIP, entrePort, entreNom, cadreParametres, listeNoms, SousMenuCliqué
-    #On récupere les objets et les variables nécéssaire au fonctionnement de la fonction
-
-    SousMenuCliqué = True
-
-    messageBienvenue.pack_forget()
-    cadreBouttons.pack_forget()
-    #On efface le menu
-
-    cadreParametres = Frame(fen, bg="grey")
-    cadreParametres.pack()
-
-    IpduServeur = Label(cadreParametres, text="Adresse IP du serveur", bg="Grey")
-    IpduServeur.pack(anchor=CENTER, pady=7)
-
-    entreIP = Entry(cadreParametres)
-    entreIP.insert("end", "192.168.1.")
-    entreIP.pack(anchor=CENTER)
-
-    PortduServeur = Label(cadreParametres, text="Port du serveur", bg="Grey")
-    PortduServeur.pack(anchor=CENTER, pady=7)
-
-    entrePort = Entry(cadreParametres)
-    entrePort.pack(anchor=CENTER)
-
-    votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
-    votreNom.pack(anchor=CENTER, pady=7)
-
-    entreNom = Entry(cadreParametres)
-    entreNom.pack(anchor=CENTER)
-
-    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
-    # Si l'utilisateur a définit un nom d'utilisateur par défaut
-
-        Fonctions.placeholder(entreNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
-    else:
-        suggestionNom = choices(listeNoms)
-        #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
-        Fonctions.placeholder(entreNom, suggestionNom[0], True)
-        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
-
-    entreNom.bind("<Button-1>", lambda b: Fonctions.placeholder(entreNom, "", False))
-    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
-
-    bouttonStart = Button(cadreParametres, text="Se connecter",  command=seConnecter)
-    bouttonStart.pack(pady=20)
-
 
 
 def infosServeur():
@@ -734,6 +742,7 @@ def infosServeur():
 
     fenInfos.mainloop()
 
+
 def aide():
     """ Cette fonction affiche l'aide dans une fenêtre en top level"""
 
@@ -773,6 +782,26 @@ def aide():
 
     fenAide.mainloop()
 
+
+def activerSon():
+    global SonActivé
+
+    SonActivé = True
+
+    barreMenu.delete(2)
+    barreMenu.insert_command(2, label="Couper Son", command=couperSon)
+    #On supprime la commande à l'index 2 du menu pour y ajouter la commande couperSon à la même position
+
+def couperSon():
+    global SonActivé
+
+    SonActivé = False
+
+    barreMenu.delete(2)
+    barreMenu.insert_command(2, label="Activer Son", command=activerSon)
+    #On supprime la commande à l'index 2 du menu pour y ajouter la commande activerSon à la même position
+
+
 def contact():
     """ Cette fonction affiches les informations du serveur dans une fenêtre en top level"""
 
@@ -809,6 +838,7 @@ def contact():
     fenContact.mainloop()
 
 
+
 def fermeture():
 
     """ Fonction appellée quand l'utilisateur veut fermer la fenêtre """
@@ -820,6 +850,27 @@ def fermeture():
         #On utilise sys.exit() plutôt que exit() car cela éviter au threads de tourner en arrière plan
 
 
+Paramètres.LectureParamètres()
+
+listeNoms = ["Autruche", "JeanBon", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
+#La liste des noms qui seront suggérés à l'utilisateur.
+
+FichierSauvegarde = None
+MotDePasse = None
+#Initilisation du mot de passe de la sauvegarde et le fichier de sauvegarde
+
+Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
+#On génére une clé publique et une clé publique et on garde en mémoire le module de chiffrement
+
+NombreErreurs = 0
+
+global SousMenuCliqué
+
+EnvoiOK = True
+SonActivé = True
+SousMenuCliqué = False
+
+
 fen = Tk()
 fen.geometry("550x460")
 fen.title("Kripto - Un chat chiffré")
@@ -829,7 +880,7 @@ fen.iconbitmap(bitmap="Médias/icone.ico")
 fen.protocol("WM_DELETE_WINDOW", fermeture)
 
 barreMenu = Menu(fen)
-barreMenu.add_command(label="Menu", command= lambda : RetournerMenu(DepuisMenu = True))
+barreMenu.add_command(label="Menu", command= lambda : retournerMenu(DepuisMenu = True))
 barreMenu.add_command(label="Aide", command=aide)
 barreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde.LecteurSauvegarde)
 barreMenu.add_command(label="Paramètres", command=Paramètres.InterfaceParamètres)
@@ -843,25 +894,6 @@ policeTitre = tkFont.Font(size=14,weight="bold")
 policeSousTitre = tkFont.Font(size=12)
 
 imageLogo = PhotoImage(file="Médias/Logo.png")
-
-def AfficherMenu():
-
-    global messageBienvenue, cadreBouttons, logo
-
-    logo = Label(fen, bg="grey", image=imageLogo)
-    logo.pack()
-
-    messageBienvenue = Label(fen, text="Bienvenue dans Kripto. Pour démarrez, dites-nous \nsi vous voulez être hôte ou bien client.", bg="grey", font=policeBienvenue)
-    messageBienvenue.pack()
-
-    cadreBouttons = Frame(fen, bg="grey")
-    cadreBouttons.pack(pady=60)
-
-    bouttonHote = Button(cadreBouttons, text="Être hôte", font=policeBoutton, command=hote)
-    bouttonHote.pack(side=LEFT, padx=7)
-
-    bouttonClient = Button(cadreBouttons, text="Être client", font=policeBoutton, command=client)
-    bouttonClient.pack(side=LEFT, padx=7)
 
 AfficherMenu()
 fen.mainloop()
