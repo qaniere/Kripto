@@ -129,7 +129,7 @@ def InterfaceParamètres():
 
     """ Fonction qui affiche les paramètres """
 
-    global fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax, MotDePasse
+    global fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax, MotDePasse, AffichageMDP, MontrerMDP
 
     fen = tk.Tk()
     fen.geometry("550x460")
@@ -426,7 +426,6 @@ def InterfaceParamètres():
             MontrerMDP.configure(text="Afficher")
             AffichageMDP = False
 
-    global AffichageMDP, MontrerMDP
 
     AffichageMDP = False
 
