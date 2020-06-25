@@ -39,9 +39,17 @@ II. Hôte et clients............................................................
             Cette fonction lance le thread du serveur, en récupérant les informations
             données sur l'interface de connexion.
 
-    B. Définition de DevenirClient()..................................................220
+    B. Fonctions spécifiques au client
 
-       Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter 
+        1. Définition de DevenirClient()..................................................220
+
+            Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter 
+
+        2. Définition de SeConnecter()..................................................220
+
+            Fonction qui récupere les informations saisies par l'utilisateur dans la fonction
+            DevenirClient() et qui initie une connexion avec le serveur.
+    
 
 III. Connexion et envoi de messages...................................................271
 
@@ -51,20 +59,28 @@ III. Connexion et envoi de messages.............................................
 
         1. Définition de Connexion()..................................................271
 
-            Cette fonction sert à se connecter au serveur et à envoyer le nom 
+            Cette fonction sert à se connecter au serveur et à Envoyer le nom 
             d'utilisateur, la clé publique, le module de chiffrement au serveur, et on 
             recoit les informations de chiffrement du serveur, la clé publique et le 
             module de chiffrement. Si le serveur demande un mot de passe,  c'est cette 
             fonction qui le récupére auprès de l'utilisateur, le chiffre et l'envoi au 
             serveur.
 
-    B. Afficher la conversation........................................................381
+    B. Définition de AffichageConversations().......................................381
 
-        1. Définition de AffichageConversations().......................................381
-
-        2.définition de seConnecter().................................................421
+        Cette fonction sert à générer l'interface de la conversation
+   
     C.Envoyer et recevoir.............................................................450
-        1.définition de envoyer().....................................................450
+
+        1. Définition de Envoyer().....................................................450
+
+            Fonctions qui fonctionne avec deux mode :
+
+                - Le mode "automatique": La fonction récupere la valeur du champ de saisie
+                et l'envoi au serveur
+                
+                - Le mode "manuel": La fonction est appellée et envoie le message au serveur
+
         2.définition de recevoir()....................................................593
 
 IV.Barre d'application................................................................676
@@ -86,11 +102,14 @@ VI.Lancement du programme.......................................................
 
 def AfficherMenu():
 
+    #FINIE
+
     """ Fonction qui affiche le menu principal de l'application """
 
     global MessageBienvenue, CadreBouttons, Logo
 
-    Logo = Label(fen, bg="grey", image=imageLogo).pack()
+    Logo = Label(fen, bg="grey", image=ImageLogo)
+    Logo.pack()
 
     MessageBienvenue = Label(fen, text="Bienvenue dans Kripto. Pour démarrez, dites-nous \nsi vous voulez être hôte ou bien client.", bg="grey", font=PoliceTitre)
     MessageBienvenue.pack()
@@ -107,6 +126,8 @@ def AfficherMenu():
 
 def DevenirHôte():
 
+    #FINIE
+
     """ Fonction qui affiche l'interface qui permet de définir l'Ip et le port qui seront
     utilisées par le serveur. """
 
@@ -121,7 +142,8 @@ def DevenirHôte():
     Machine = socket.gethostname()
     IP = socket.gethostbyname(Machine)
 
-    CadreParamètres = Frame(fen, bg="grey").pack()
+    CadreParamètres = Frame(fen, bg="grey")
+    CadreParamètres.pack()
 
     # Label de l'adresse Ip
     Label(CadreParamètres, text="Votre Adresse IP", bg="Grey").pack(anchor=CENTER, pady=7)
@@ -222,6 +244,8 @@ def DémarrerServeur():
 
 def DevenirClient():
 
+    # FINIE
+
     """ Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter"""
 
     global InputIp, InputPort, InputNom, CadreParamètres, SousMenuCliqué
@@ -232,48 +256,47 @@ def DevenirClient():
     MessageBienvenue.pack_forget()
     CadreBouttons.pack_forget()
 
-    CadreParamètres = Frame(fen, bg="grey").pack()
+    CadreParamètres = Frame(fen, bg="grey")
+    CadreParamètres.pack()
 
     #Label Adresse ip du serveur
-    Label(cadreParametres, text="Adresse IP du serveur", bg="Grey").pack(anchor=CENTER, pady=7)
+    Label(CadreParamètres, text="Adresse IP du serveur", bg="Grey").pack(anchor=CENTER, pady=7)
 
-    entreIP = Entry(cadreParametres)
-    entreIP.insert("end", "192.168.1.")
-    entreIP.pack(anchor=CENTER)
+    InputIp = Entry(CadreParamètres)
+    InputIp.insert("end", "192.168.1.")
+    InputIp.pack(anchor=CENTER)
 
-    PortduServeur = Label(cadreParametres, text="Port du serveur", bg="Grey")
+    PortduServeur = Label(CadreParamètres, text="Port du serveur", bg="Grey")
     PortduServeur.pack(anchor=CENTER, pady=7)
 
-    entrePort = Entry(cadreParametres)
-    entrePort.pack(anchor=CENTER)
+    InputPort = Entry(CadreParamètres)
+    InputPort.pack(anchor=CENTER)
 
-    votreNom = Label(cadreParametres, text="Votre nom d'utilisateur", bg="Grey")
-    votreNom.pack(anchor=CENTER, pady=7)
+    #Label de nom
+    Label(CadreParamètres, text="Votre nom d'utilisateur", bg="Grey").pack(anchor=CENTER, pady=7)
 
-    entreNom = Entry(cadreParametres)
-    entreNom.pack(anchor=CENTER)
+    InputNom = Entry(CadreParamètres)
+    InputNom.pack(anchor=CENTER)
 
     if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
     # Si l'utilisateur a définit un nom d'utilisateur par défaut
+        Fonctions.placeholder(InputNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
 
-        Fonctions.placeholder(entreNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
     else:
-        suggestionNom = choices(ListeNoms)
-        #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
-        Fonctions.placeholder(entreNom, suggestionNom[0], True)
-        #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
+        SuggestionDeNom = choices(ListeNoms)
+        Fonctions.placeholder(InputNom, SuggestionDeNom[0], True)
 
-    entreNom.bind("<Button-1>", lambda b: Fonctions.placeholder(entreNom, "", False))
+    InputNom.bind("<Button-1>", lambda b: Fonctions.placeholder(InputNom, "", False))
     #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
 
-    bouttonStart = Button(cadreParametres, text="Se connecter",  command=seConnecter)
-    bouttonStart.pack(pady=20)
-
+    Button(CadreParamètres, text="Se connecter",  command=SeConnecter).pack(pady=20)
 
 
 def Connexion():
 
-    """ Cette fonction sert à se connecter au serveur et à envoyer le nom d'utilisateur, la clé publique, le module de chiffrement au serveur,
+    # FINIE
+
+    """ Cette fonction sert à se connecter au serveur et à Envoyer le nom d'utilisateur, la clé publique, le module de chiffrement au serveur,
     et on recoit les informations de chiffrement du serveur, la clé publique et le module de chiffrement. Si le serveur demande un mot de passe,
     c'est cette fonction qui le récupére auprès de l'utilisateur, le chiffre l'envoi au serveur."
     """
@@ -372,12 +395,42 @@ def Connexion():
             tkinter.messagebox.showerror(title="Connexion refusée par le serveur", message=motif.decode("utf-8"))
             return False
 
+
+def SeConnecter():
+
+    #FINIE
+
+    """ Fonction qui affiche l'interface de discusion si la connexion au serveur est une réussite"""
+
+    global InputIp, IP, InputPort, Port, Rôle, FichierSauvegarde, MotDePasse
+
+    Rôle = "Client"
+    Port = int(InputPort.get())
+    IP = InputIp.get()
+
+    if Connexion() == True:
+
+        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+
+            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
+
+            while ConfirmationMotDePasse != MotDePasse:
+
+                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
+
+            FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
+
+        AffichageConversations()
+
     
 def AffichageConversations():
 
+    #FINIE
+
     """ Cette fonction sert à générer l'interface de la conversation"""
 
-    global CadreParamètres, saisieMessage, nomUser, filMessages, bouttonEnvoyer, Connexion, threadRéception
+    global CadreParamètres, SaisieMessage, NomUser, FilsMessages, BouttonEnvoyer, Connexion, ThreadRéception
 
     Logo.pack_forget()
     CadreParamètres.pack_forget()
@@ -389,75 +442,44 @@ def AffichageConversations():
     BarreMenu.insert_command(2, label="Couper Son", command=couperSon)
     BarreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
 
-    filMessages = Listbox(fen, width="70", height="20")
-    filMessages.pack(pady=15)
+    FilsMessages = Listbox(fen, width="70", height="20")
+    FilsMessages.pack(pady=15)
 
-    saisieMessage = Entry(fen, width="60")
-    saisieMessage.pack()
+    SaisieMessage = Entry(fen, width="60")
+    SaisieMessage.pack()
 
-    bouttonEnvoyer = Button(fen, text="Envoyer", command=envoyer)
-    bouttonEnvoyer.pack(pady=15)
+    BouttonEnvoyer = Button(fen, text="Envoyer", command=Envoyer)
+    BouttonEnvoyer.pack(pady=15)
 
-    saisieMessage.bind("<Button-1>", lambda a: Fonctions.placeholder(saisieMessage, "", False))
-    #On associe le clic gauche sur la zone de saisie du message à la fonction placeholder
+    SaisieMessage.bind("<Button-1>", lambda a: Fonctions.placeholder(SaisieMessage, "", False))
     #On utilise une lambda pour appeler une fonction avec des arguments
 
-    fen.bind_all('<Return>', lambda c: envoyer())
-    #On associe l'appui a a fonction envoyer avec une fonction lambda afin de pouvoir envoyer aucun argument
+    fen.bind_all('<Return>', lambda c: Envoyer())
+    #On associe l'appui a a fonction Envoyer avec une fonction lambda afin de pouvoir Envoyer aucun argument
 
-    Connexion = True
-    threadRéception = threading.Thread(target=recevoir)
-    threadRéception.daemon = True #Ce flag signifie que quand il ne reste que ce thread, le programme s'arrête.
-    threadRéception.start()
-    #On commence à recevoir des messages
+    Connexion = True #Tant que cette variable est égale à True, le thread tournera
 
-    Fonctions.placeholder(saisieMessage, "Saisissez votre message ici", True)
+    ThreadRéception = threading.Thread(target=recevoir)
+    ThreadRéception.daemon = True #Cet attribut signifie que quand il ne reste que ce thread, le programme s'arrête.
+    ThreadRéception.start()
 
-def seConnecter():
-
-    """ Fonction qui affiche l'interface de discusion si la connexion est une réussite"""
-
-    global entreIP, entrePort, IP, Port, Role, FichierSauvegarde, MotDePasse
-    #On récupereles objets et les variables nécéssaire au fonctionnement de la fonction
-
-    Role = "Client"
-    Port = int(entrePort.get())
-    IP = entreIP.get()
-
-    if connexion() == True:
-
-        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
-
-            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
-            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
-            #On demande le mot et sa confirmation
-
-            while ConfirmationMotDePasse != MotDePasse:
-            #Tant que la confirmination n'est validée
-
-                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
-
-            FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
-            #On initialise le fichier de sauvegarde
-        AffichageConversations()
+    Fonctions.placeholder(SaisieMessage, "Saisissez votre message ici", True)
 
 
-def envoyer(ModeManuel = False, MessageManuel = None):
+def Envoyer(ModeManuel = False, MessageManuel = None):
+
+    #FINIE
+
     #Le mode manuel est un mode qui ne récupére pas l'entrée, mais le message passé en argument
 
     """Fonction qui chiffre et envoi les message au serveur. Les messages sont chiffrés en fonction du serveur"""
 
-    global saisieMessage, nomUser, filMessages, ConnexionSocket, NombreErreurs, CléPubliqueServeur, ModuleServeur, SonActivé, EnvoiPossible
+    global SaisieMessage, NomUser, FilsMessages, ConnexionSocket, NombreErreurs, CléPubliqueServeur, ModuleServeur, SonActivé, EnvoiPossible
 
-    if ModeManuel == True:
-        message = MessageManuel
+    if ModeManuel == True: message = MessageManuel
+    else: message = SaisieMessage.get()
 
-    else:
-        message = saisieMessage.get()
-
-    if len(message) > 1000:
-
-        tkinter.messagebox.showerror(title="Attention au spam !", message="Afin d'éviter de surcharger le serveur, les messages de plus de 1000 caractères sont interdits")
+    if len(message) > 1000: tkinter.messagebox.showerror(title="Attention au spam !", message="Afin d'éviter de surcharger le serveur, les messages de plus de 1000 caractères sont interdits")
 
     elif message == "": pass
     elif message[0] == "/":
@@ -497,40 +519,30 @@ def envoyer(ModeManuel = False, MessageManuel = None):
                     tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
                     retournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
 
-            if stop == True:
-                retournerMenu(DemandeConfirmation = None, ConversationEnCours = True, DemandeArrêt = False)
-
+            if stop == True: retournerMenu(DemandeConfirmation = None, ConversationEnCours = True, DemandeArrêt = False)
 
     elif len(message) != 0 and EnvoiPossible:
 
         EnvoiPossible = False
-        #On rend impossible l'envoi de nouveaux messages
 
-        messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} → {message}"
+        messageInterface = f"[{time.strftime('%H:%M:%S')}] {NomUser} → {message}"
         #On garde de coté un message avec un formaté spécialement pour l'interface, mais on ne l'utilise que si l'envoi est réussi.
 
         message = Fonctions.formaterPaquet("Message", message)
-        #On formate le paquet
 
         message = ChiffrementRSA.chiffrement(message, CléPubliqueServeur, ModuleServeur)
-        #On transforme le message en liste de chiffres, correspondant à leur identifiant Ascii, puis on chiffre le message
-        #On récupere alors une liste d'entiers
-
         messageFinal = f"{len(message)}-{message}"
         #On rajoute un en tête avec la longueur totale du message
         messageFinal = messageFinal.encode('utf-8')
-        #On encode le tout en UTF8
 
-        try:
-            ConnexionSocket.send(bytes(messageFinal))
-            #On essaie d'envoyer le message au serveur.
-
+        try: ConnexionSocket.send(bytes(messageFinal))
         except (ConnectionResetError, ConnectionAbortedError):
         #Si le serveur ne répond pas
 
             if NombreErreurs < 3:
                 tkinter.messagebox.showerror(title="Aïe...", message="Impossible de joindre le serveur. Veuillez réessayer.")
                 NombreErreurs += 1
+
             else:
             #Si il y'a plus de trois erreurs, on stoppe le programme, en invitant l'utilisateur à se reconnecter
 
@@ -545,24 +557,21 @@ def envoyer(ModeManuel = False, MessageManuel = None):
             if len(messageInterface) > 70:
             #Si le message à afficher fait plus de 70 caratères
 
-                listeLignes = Fonctions.couperPhrases(messageInterface)
+                LignesMessages = Fonctions.couperPhrases(messageInterface)
                 #On recupere plusieurs lignes de moins de 70 caractères dans une liste
 
-                for ligne in listeLignes:
-                #On insere chaque ligne
-                    filMessages.insert(END, ligne)
+                for ligne in LignesMessages:
+                    FilsMessages.insert(END, ligne)
 
                     if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
                         Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
-                        #On sauvegarde la ligne
             else:
-                filMessages.insert(END, messageInterface)
+                FilsMessages.insert(END, messageInterface)
 
                 if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
                     Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, messageInterface)
-                    #On sauvegarde le message
 
-            filMessages.yview(END)
+            FilsMessages.yview(END)
             #On défile tout en bas cette dernière, vers le message le plus récent
 
             if SonActivé == True:
@@ -573,7 +582,7 @@ def envoyer(ModeManuel = False, MessageManuel = None):
                 else:
                     winsound.PlaySound("Sons/Pop.wav", winsound.SND_ASYNC)
 
-            saisieMessage.delete(0, 'end')
+            SaisieMessage.delete(0, 'end')
             #On vide la zone de saisie du message
 
             def RéactivationEnvoi():
@@ -590,7 +599,7 @@ def recevoir():
     """ Fonction qui s'appelle elle même toutes les 10ms qui permet de vérifier
     la présence de nouveaux messages"""
 
-    global filMessages, ConnexionSocket, CléPrivée, Module, SonActivé, Connexion
+    global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, Connexion
     #On récupere les variables nécéssaires au fonctionemment de la fonction
 
     while Connexion == True:
@@ -627,25 +636,25 @@ def recevoir():
                 if len(messageRecu) > 70:
                 #Si le message à afficher fait plus de 70 caratères
 
-                    listeLignes = couperPhrases(messageRecu)
+                    LignesMessages = couperPhrases(messageRecu)
                     #On recupere plusieurs lignes de moins de 70 caractères dans une liste
 
-                    for ligne in listeLignes:
+                    for ligne in LignesMessages:
                     #On insere chaque ligne
-                        filMessages.insert(END, ligne)
+                        FilsMessages.insert(END, ligne)
 
                         if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
                             NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
                             #On sauvegarde la ligne
 
                 else:
-                    filMessages.insert(END, messageRecu)
+                    FilsMessages.insert(END, messageRecu)
 
                     if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
                         Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, messageRecu)
                         #On sauvegarde le nouveau message
 
-                filMessages.yview(END)
+                FilsMessages.yview(END)
                 #On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
 
                 if SonActivé == True:
@@ -670,12 +679,12 @@ def recevoir():
 
 def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None, DemandeArrêt = True):
 
-    global filMessages, saisieMessage, bouttonEnvoyer, SousMenuCliqué, Connexion
+    global FilsMessages, SaisieMessage, BouttonEnvoyer, SousMenuCliqué, Connexion
 
     Confirmation = None
 
     if DemandeConfirmation == True:
-        Confirmation = messagebox.askquestion (f"Vous partez déja {nomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
+        Confirmation = messagebox.askquestion (f"Vous partez déja {NomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
 
     if Confirmation == "yes" or DemandeConfirmation == None:
 
@@ -687,16 +696,16 @@ def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
 
             if Role == "Hote" and  DemandeArrêt == True:
 
-                envoyer(True, "/stop") #L'envoi du /stop permet d'éviter au serveur de crasher / tourner dans le vide
+                Envoyer(True, "/stop") #L'envoi du /stop permet d'éviter au serveur de crasher / tourner dans le vide
                 time.sleep(0.3)
 
             BarreMenu.delete(1)
             BarreMenu.insert_command(1, label="Menu", command= lambda : retournerMenu(DepuisMenu = True))
             #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
 
-            filMessages.pack_forget()
-            saisieMessage.pack_forget()
-            bouttonEnvoyer.pack_forget()
+            FilsMessages.pack_forget()
+            SaisieMessage.pack_forget()
+            BouttonEnvoyer.pack_forget()
 
             fen.unbind_all(ALL)
 
@@ -746,19 +755,19 @@ def infosServeur():
     TitreAdresseServeur = Label(fenInfos, text="Adresse du serveur", bg="Grey", font=PoliceTitre)
     TitreAdresseServeur.pack(pady=10)
 
-    AdresseServeur = Label(fenInfos, text=IP, bg="Grey", font=policeSousTitre)
+    AdresseServeur = Label(fenInfos, text=IP, bg="Grey", font=PoliceSousTitre)
     AdresseServeur.pack()
 
     TitrePortServeur = Label(fenInfos, text="Port du serveur", bg="Grey", font=PoliceTitre)
     TitrePortServeur.pack(pady=10)
 
-    PortServeur = Label(fenInfos, text=Port, bg="Grey", font=policeSousTitre)
+    PortServeur = Label(fenInfos, text=Port, bg="Grey", font=PoliceSousTitre)
     PortServeur.pack()
 
     TitreUtilisateursCo = Label(fenInfos, text="Utiliseurs connectées", bg="Grey", font=PoliceTitre)
     TitreUtilisateursCo.pack(pady=10)
 
-    UtilisateurCo = Label(fenInfos, text="N/C", bg="Grey", font=policeSousTitre)
+    UtilisateurCo = Label(fenInfos, text="N/C", bg="Grey", font=PoliceSousTitre)
     UtilisateurCo.pack()
 
     BouttonFermer = Button(fenInfos, text="Fermer", command=QuitterInfos)
@@ -788,17 +797,17 @@ def aide():
     TitreAideIP = Label(fenAide, text="Si votre IP n'est pas valide", bg="Grey", font=PoliceTitre)
     TitreAideIP.pack(pady=10)
 
-    AideIP0 = Label(fenAide, text="Entrez vous même l'adresse IPv4.\nPour la trouver :", bg="Grey", font=policeSousTitre)
+    AideIP0 = Label(fenAide, text="Entrez vous même l'adresse IPv4.\nPour la trouver :", bg="Grey", font=PoliceSousTitre)
     AideIP0.pack()
 
-    AideIP1 = Label(fenAide, text="le-routeur-wifi.com/adresse-ip-mac/", bg="Grey", font=policeSousTitre, fg="blue")
+    AideIP1 = Label(fenAide, text="le-routeur-wifi.com/adresse-ip-mac/", bg="Grey", font=PoliceSousTitre, fg="blue")
     AideIP1.pack()
     AideIP1.bind("<Button-1>", lambda e: Fonctions.callback("https://le-routeur-wifi.com/adresse-ip-mac/"))
 
     TitreAidePort0 = Label(fenAide, text="Si votre port n'est pas valide", bg="Grey", font=PoliceTitre)
     TitreAidePort0.pack(pady=10)
 
-    AidePort0 = Label(fenAide, text="Veillez à choisir un nombre entier\nentre 0 et 65535", bg="Grey", font=policeSousTitre)
+    AidePort0 = Label(fenAide, text="Veillez à choisir un nombre entier\nentre 0 et 65535", bg="Grey", font=PoliceSousTitre)
     AidePort0.pack()
 
     BouttonFermer = Button(fenAide, text="Fermer", command=QuitterAide)
@@ -850,13 +859,13 @@ def Contact():
     #Label d'objet
     Label(fenContact, text="Objet : ", bg="Grey", font=PoliceTitre).pack(pady=10)
 
-    InputObjet = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
+    InputObjet = Entry(fenContact, width = 50, bg="White", font=PoliceSousTitre)
     InputObjet.pack(padx=20)
 
     #Label de message
     Label(fenContact, text="Message : ", bg="Grey", font=PoliceTitre).pack(pady=10)
 
-    InputMessage = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
+    InputMessage = Entry(fenContact, width = 50, bg="White", font=PoliceSousTitre)
     InputMessage.pack(padx=20)
 
     Button(fenContact, text="Envoyer votre message", command=EnvoiAPI).pack(pady=20, side=BOTTOM)
@@ -917,9 +926,9 @@ fen.configure(menu=BarreMenu)
 PoliceTitreBienvenue = tkFont.Font(family="Verdanna",size=16,weight="bold")
 PoliceBoutton = tkFont.Font(family="Arial",size=12,weight="bold")
 PoliceTitre = tkFont.Font(size=14,weight="bold")
-policeSousTitre = tkFont.Font(size=12)
+PoliceSousTitre = tkFont.Font(size=12)
 
-imageLogo = PhotoImage(file="Médias/Logo.png")
+ImageLogo = PhotoImage(file="Médias/Logo.png")
 
 AfficherMenu()
 fen.mainloop()
