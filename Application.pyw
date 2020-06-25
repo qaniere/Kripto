@@ -797,7 +797,7 @@ def aide():
 
     AideIP1 = Label(fenAide, text="https://le-routeur-wifi.com/adresse-ip-mac/", bg="Grey", font=policeSousTitre, fg="blue")
     AideIP1.pack()
-    AideIP1.bind("<Button-1>", lambda e: Fonctions.callback("https://le-routeur-wifi.com/adresse-ip-mac/"))
+    AideIP1.bind("<Button-1>", lambda e: Fonctions.callback("le-routeur-wifi.com/adresse-ip-mac/"))
 
     TitreAidePort0 = Label(fenAide, text="Si votre port n'est pas valide", bg="Grey", font=policeTitre)
     TitreAidePort0.pack(pady=10)
