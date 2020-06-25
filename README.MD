@@ -17,6 +17,8 @@
 
 - Pouvoir annuler la connexion si pas de mot de passe sauvegarde
 
+- Régler le bug de la sauvegarde ! (Encoder en Base64)
+
 - Ajouter des commandes :
   
     - /lock - /unlock : Commande pour empêcher l'arrivé de nouveaux utilisateurs
@@ -37,19 +39,7 @@
     - Téléchargement du fichier (Avec une connexion parallèle)
     - Suppresion des fichiers à l'arrêt du serveur
 
-- Implémenter le Pierre Feuille Ciseaux :
-
-    - /play pour défier quelqu'un 
-    - /play ok ou /play non pour accepter / refuser la partie
-    - Afficher dans le chat "{user} vient de défier {user2} !"
-    - implémenter le jeu en lui même
-    - Afficher un message de victoire
-    
-
  - Enlever toutes les fast string pour des raisons de compatibilité
 
- - Rédiger l'aide en TopLevel
 
  - Remettre à jour les lignes de l'index
-
- - Petite page web de présentation, d'installation et de documentation.
