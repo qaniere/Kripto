@@ -9,7 +9,7 @@ def CréerUneIssue(Titre, Message, Plateforme):
     print(f"Plateforme => {Plateforme}")
 
     NomUtilisteur = "Kripiti"
-    MotDePasse = "Pass_Word_0"
+    MotDePasseKripti = "Pass_Word_0"
 
     PropriétaireDuRépertoire = "qaniere"
     NomDuRépetoire = "Kripto"
@@ -31,6 +31,6 @@ def CréerUneIssue(Titre, Message, Plateforme):
         return True
 
     else:
-        
+
         print (f"Erreur => {Requête.content}")
         return False
