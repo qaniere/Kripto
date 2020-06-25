@@ -70,7 +70,7 @@ III. Connexion et envoi de messages.............................................
 
         Cette fonction sert à générer l'interface de la conversation
    
-    C.Envoyer et recevoir.............................................................450
+    C.Envoyer et Recevoir.............................................................450
 
         1. Définition de Envoyer().....................................................450
 
@@ -81,23 +81,32 @@ III. Connexion et envoi de messages.............................................
                 
                 - Le mode "manuel": La fonction est appellée et envoie le message au serveur
 
-        2.définition de recevoir()....................................................593
+        2. Définition de Réception()....................................................593
 
-IV.Barre d'application................................................................676
-    A.définition de retournerMenu()...................................................676
-    B.définition de infosServeur()....................................................732
-    C.définition de aide()............................................................777
-    D.Activer et désactiver le son....................................................817
-        1.définition de activerSon()..................................................817
-        2.définition de couperSon()...................................................826
-    E.définition de Contact().........................................................836
+            Cette fonction est un thread (Suite d'instructions qui s'exécutent arrière plan de l'application). Il permet de recevoir 
+            des messages du serveur.
 
-V.définition de fermeture()...........................................................891
+IV. Barre d'application................................................................676
+
+    A. Définition de retournerMenu()...................................................676
+
+    B. Définition de infosServeur()....................................................732
+
+    C. Définition de aide()............................................................777
+
+    D. Activer et désactiver le son....................................................817
+
+        1. Définition de activerSon()..................................................817
+
+        2. Définition de couperSon()...................................................826
+
+    E. Définition de Contact().........................................................836
+
+V. Définition de fermeture()...........................................................891
 
 VI.Lancement du programme.............................................................902
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 
 
 def AfficherMenu():
@@ -459,7 +468,7 @@ def AffichageConversations():
 
     Connexion = True #Tant que cette variable est égale à True, le thread tournera
 
-    ThreadRéception = threading.Thread(target=recevoir)
+    ThreadRéception = threading.Thread(target=Réception)
     ThreadRéception.daemon = True #Cet attribut signifie que quand il ne reste que ce thread, le programme s'arrête.
     ThreadRéception.start()
 
@@ -594,77 +603,20 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
             fen.after(500, RéactivationEnvoi)
             #Au bout de 500ms en asynchrone, on appelle la fonction qui rendra possible l'envoi de messages
 
-def recevoir():
+def Réception():
 
-    """ Fonction qui s'appelle elle même toutes les 10ms qui permet de vérifier
-    la présence de nouveaux messages"""
+    """Cette fonction est un thread (Suite d'instructions qui s'exécutent arrière plan de l'application). Il permet de recevoir 
+    des messages du serveur."""
 
     global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, Connexion
-    #On récupere les variables nécéssaires au fonctionemment de la fonction
 
     while Connexion == True:
-        try:
+    #Quand Connexion est égal à False, le Thread s'arrête
+
+        try: MessageReçu = ConnexionSocket.recv(32768)
         #Cette partie du code est dans un bloc "try, except" car "ConnexionSocket.setblocking(0)" a été défini sur False
         #Au lieu d'attendre un message, si rien n'est envoyé cela va générer une exception, ce qui permet un fonctionnement asynchrone.
-
-            messageRecu = ConnexionSocket.recv(32768)
-            #32768 est la limite d'octets recevables
-            messageRecu = messageRecu.decode("utf-8")
-
-            if messageRecu != "":
-
-                messageRecu = messageRecu.split("-")
-                #Le message comporte un petit entête
-                #Exemple = 564-6646464/65656/4564564654, 564 est içi la longueur totale du message. Cela peut arriver que les très long messages (Fichiers)
-                #fassent plus de 2048 la taille taille du buffer
-
-                LongeurMessage = int(messageRecu[0])
-
-                while len(messageRecu[1]) < LongeurMessage:
-                #Tant que le message recu est plus petit que la longueur totale du message
-
-                    suite = ConnexionSocket.recv(32768)
-                    suite = suite.decode("utf-8")
-
-                    messageRecu[1] += suite
-                    #On ajoute la suite du message recu
-
-                messageRecu = ChiffrementRSA.déchiffrement(messageRecu[1], CléPrivée, Module)
-                #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
-                #0 étant la longueur de ce message
-
-                if len(messageRecu) > 70:
-                #Si le message à afficher fait plus de 70 caratères
-
-                    LignesMessages = couperPhrases(messageRecu)
-                    #On recupere plusieurs lignes de moins de 70 caractères dans une liste
-
-                    for ligne in LignesMessages:
-                    #On insere chaque ligne
-                        FilsMessages.insert(END, ligne)
-
-                        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
-                            NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
-                            #On sauvegarde la ligne
-
-                else:
-                    FilsMessages.insert(END, messageRecu)
-
-                    if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
-                        Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, messageRecu)
-                        #On sauvegarde le nouveau message
-
-                FilsMessages.yview(END)
-                #On insére le message dans la listbox des messages, puis on force le défilement tout en bas de cette dernière
-
-                if SonActivé == True:
-                    if Paramètres.DicoParamètres["SonRéception"] != "Inconnu":
-                        winsound.PlaySound("Sons/" + Paramètres.DicoParamètres["SonRéception"], winsound.SND_ASYNC)
-                    else:
-                        winsound.PlaySound("Sons/Dong.wav", winsound.SND_ASYNC)
-            else:
-                print("message vide")
-
+  
         except BlockingIOError:
         #Si aucun message n'a été envoyé, on ne fait rien et on attend pour préserver les ressources la machine
             time.sleep(0.1)
@@ -674,7 +626,61 @@ def recevoir():
 
             tkinter.messagebox.showerror(title="Aïe...", message="Le serveur a crashé...")
             exit()
+            #32768 est la limite d'octets recevables
 
+        else:
+        #Un message a été reçu
+
+            MessageReçu = MessageReçu.decode("utf-8")
+
+            if MessageReçu != "":
+
+                MessageReçu = MessageReçu.split("-")
+                #Le message comporte un petit entête
+                #Exemple = 564-6646464/65656/4564564654, 564 est içi la longueur totale du message.
+
+                LongeurMessage = int(MessageReçu[0])
+
+                while len(MessageReçu[1]) < LongeurMessage:
+                #Tant que le message recu est plus petit que la longueur totale du message
+
+                    SuiteDuMessage = ConnexionSocket.recv(32768)
+                    SuiteDuMessage = SuiteDuMessage.decode("utf-8")
+
+                    MessageReçu[1] += SuiteDuMessage
+                    #On ajoute la suite du message reçu
+
+                MessageReçu = ChiffrementRSA.déchiffrement(MessageReçu[1], CléPrivée, Module)
+                #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
+                #0 étant la longueur de ce message
+
+                if len(MessageReçu) > 70:
+                #Si le message à afficher fait plus de 70 caratères
+
+                    LignesMessages = Fonctions.couperPhrases(MessageReçu)
+                    #On recupére plusieurs lignes de moins de 70 caractères dans une liste
+
+                    for ligne in LignesMessages:
+
+                        FilsMessages.insert(END, ligne)
+
+                        if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+                            NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
+
+                else:
+                    FilsMessages.insert(END, MessageReçu)
+
+                    if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+                        Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, MessageReçu)
+
+                FilsMessages.yview(END)
+                #On force le défilement tout en bas de cette dernière
+
+                if SonActivé == True:
+                    if Paramètres.DicoParamètres["SonRéception"] != "Inconnu":
+                        winsound.PlaySound("Sons/" + Paramètres.DicoParamètres["SonRéception"], winsound.SND_ASYNC)
+                    else:
+                        winsound.PlaySound("Sons/Dong.wav", winsound.SND_ASYNC)
 
 
 def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None, DemandeArrêt = True):
