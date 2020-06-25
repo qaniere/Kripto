@@ -45,7 +45,9 @@ II. Hôte et clients............................................................
 
 III. Connexion et envoi de messages...................................................271
 
-    A. Connexion et déconnexion.......................................................271
+    Les fonctions dédiées à l'envoi et à la réception de messages au serveur
+
+    A. Connexion.......................................................271
 
         1. Définition de Connexion()..................................................271
 
@@ -56,9 +58,10 @@ III. Connexion et envoi de messages.............................................
             fonction qui le récupére auprès de l'utilisateur, le chiffre et l'envoi au 
             serveur.
 
-        2.définition de Déconnexion().................................................373
-    B.Afficher la conversation........................................................381
-        1.définition de affichageConversation().......................................381
+    B. Afficher la conversation........................................................381
+
+        1. Définition de AffichageConversations().......................................381
+
         2.définition de seConnecter().................................................421
     C.Envoyer et recevoir.............................................................450
         1.définition de envoyer().....................................................450
@@ -71,7 +74,7 @@ IV.Barre d'application..........................................................
     D.Activer et désactiver le son....................................................817
         1.définition de activerSon()..................................................817
         2.définition de couperSon()...................................................826
-    E.définition de contact().........................................................836
+    E.définition de Contact().........................................................836
 
 V.définition de fermeture()...........................................................891
 
@@ -89,16 +92,16 @@ def AfficherMenu():
 
     Logo = Label(fen, bg="grey", image=imageLogo).pack()
 
-    MessageBienvenue = Label(fen, text="Bienvenue dans Kripto. Pour démarrez, dites-nous \nsi vous voulez être hôte ou bien client.", bg="grey", font=policeBienvenue)
+    MessageBienvenue = Label(fen, text="Bienvenue dans Kripto. Pour démarrez, dites-nous \nsi vous voulez être hôte ou bien client.", bg="grey", font=PoliceTitre)
     MessageBienvenue.pack()
 
     CadreBouttons = Frame(fen, bg="grey")
     CadreBouttons.pack(pady=60)
 
-    BouttonHôte = Button(CadreBouttons, text="Être hôte", font=policeBoutton, command=DevenirHôte)
+    BouttonHôte = Button(CadreBouttons, text="Être hôte", font=PoliceBoutton, command=DevenirHôte)
     BouttonHôte.pack(side=LEFT, padx=7)
 
-    BouttonClient = Button(CadreBouttons, text="Être client", font=policeBoutton, command=DevenirClient)
+    BouttonClient = Button(CadreBouttons, text="Être client", font=PoliceBoutton, command=DevenirClient)
     BouttonClient.pack(side=LEFT, padx=7)
 
 
@@ -160,7 +163,7 @@ def DevenirHôte():
 
     else:
 
-        SuggestionNom = choices(listeNoms)
+        SuggestionNom = choices(ListeNoms)
         Fonctions.placeholder(InputNom, SuggestionNom[0], True)
 
     InputNom.bind("<Button-1>", lambda z: Fonctions.placeholder(InputNom, "", False))
@@ -214,7 +217,7 @@ def DémarrerServeur():
 
             FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
 
-        affichageConversation()
+        AffichageConversations()
 
 
 def DevenirClient():
@@ -255,7 +258,7 @@ def DevenirClient():
 
         Fonctions.placeholder(entreNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
     else:
-        suggestionNom = choices(listeNoms)
+        suggestionNom = choices(ListeNoms)
         #On suggére à l'utilisateur un nom d'utilisateur parmis la liste des noms
         Fonctions.placeholder(entreNom, suggestionNom[0], True)
         #On affiche la suggestion du nom, en envoyant le premier et le seul indice de la liste de la suggestions de nom
@@ -370,29 +373,21 @@ def Connexion():
             return False
 
     
-def Déconnexion():
-
-    global Connexion
-
-    Connexion = False
-    ConnexionSocket.close()
-
-
-def affichageConversation():
+def AffichageConversations():
 
     """ Cette fonction sert à générer l'interface de la conversation"""
 
     global CadreParamètres, saisieMessage, nomUser, filMessages, bouttonEnvoyer, Connexion, threadRéception
 
-    logo.pack_forget()
+    Logo.pack_forget()
     CadreParamètres.pack_forget()
 
-    barreMenu.delete(1)
-    barreMenu.insert_command(1, label="Menu", command= lambda : retournerMenu(DemandeConfirmation = True, ConversationEnCours = True))
+    BarreMenu.delete(1)
+    BarreMenu.insert_command(1, label="Menu", command= lambda : retournerMenu(DemandeConfirmation = True, ConversationEnCours = True))
     #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
 
-    barreMenu.insert_command(2, label="Couper Son", command=couperSon)
-    barreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
+    BarreMenu.insert_command(2, label="Couper Son", command=couperSon)
+    BarreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
 
     filMessages = Listbox(fen, width="70", height="20")
     filMessages.pack(pady=15)
@@ -444,7 +439,7 @@ def seConnecter():
 
             FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
             #On initialise le fichier de sauvegarde
-        affichageConversation()
+        AffichageConversations()
 
 
 def envoyer(ModeManuel = False, MessageManuel = None):
@@ -452,7 +447,7 @@ def envoyer(ModeManuel = False, MessageManuel = None):
 
     """Fonction qui chiffre et envoi les message au serveur. Les messages sont chiffrés en fonction du serveur"""
 
-    global saisieMessage, nomUser, filMessages, ConnexionSocket, NombreErreurs, CléPubliqueServeur, ModuleServeur, SonActivé, EnvoiOK
+    global saisieMessage, nomUser, filMessages, ConnexionSocket, NombreErreurs, CléPubliqueServeur, ModuleServeur, SonActivé, EnvoiPossible
 
     if ModeManuel == True:
         message = MessageManuel
@@ -506,9 +501,9 @@ def envoyer(ModeManuel = False, MessageManuel = None):
                 retournerMenu(DemandeConfirmation = None, ConversationEnCours = True, DemandeArrêt = False)
 
 
-    elif len(message) != 0 and EnvoiOK:
+    elif len(message) != 0 and EnvoiPossible:
 
-        EnvoiOK = False
+        EnvoiPossible = False
         #On rend impossible l'envoi de nouveaux messages
 
         messageInterface = f"[{time.strftime('%H:%M:%S')}] {nomUser} → {message}"
@@ -583,9 +578,9 @@ def envoyer(ModeManuel = False, MessageManuel = None):
 
             def RéactivationEnvoi():
 
-                global EnvoiOK
+                global EnvoiPossible
 
-                EnvoiOK = True
+                EnvoiPossible = True
 
             fen.after(500, RéactivationEnvoi)
             #Au bout de 500ms en asynchrone, on appelle la fonction qui rendra possible l'envoi de messages
@@ -675,7 +670,7 @@ def recevoir():
 
 def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None, DemandeArrêt = True):
 
-    global filMessages, saisieMessage, bouttonEnvoyer, SousMenuCliqué
+    global filMessages, saisieMessage, bouttonEnvoyer, SousMenuCliqué, Connexion
 
     Confirmation = None
 
@@ -695,8 +690,8 @@ def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
                 envoyer(True, "/stop") #L'envoi du /stop permet d'éviter au serveur de crasher / tourner dans le vide
                 time.sleep(0.3)
 
-            barreMenu.delete(1)
-            barreMenu.insert_command(1, label="Menu", command= lambda : retournerMenu(DepuisMenu = True))
+            BarreMenu.delete(1)
+            BarreMenu.insert_command(1, label="Menu", command= lambda : retournerMenu(DepuisMenu = True))
             #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
 
             filMessages.pack_forget()
@@ -705,11 +700,12 @@ def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
 
             fen.unbind_all(ALL)
 
-            barreMenu.delete(2)
-            barreMenu.delete(3)
+            BarreMenu.delete(2)
+            BarreMenu.delete(3)
             #On efface les commandes "Couper Son" et "Infos Serveur" du menu
 
-            Déconnexion()
+            Connexion = False
+            ConnexionSocket.close()
 
         if DepuisMenu:
         #Si l'utilisateur était dans la fenêtre de menu
@@ -747,19 +743,19 @@ def infosServeur():
     fenInfos.title("Infos du serveur")
     #Définition de l'apparence de la fenêtre
 
-    TitreAdresseServeur = Label(fenInfos, text="Adresse du serveur", bg="Grey", font=policeTitre)
+    TitreAdresseServeur = Label(fenInfos, text="Adresse du serveur", bg="Grey", font=PoliceTitre)
     TitreAdresseServeur.pack(pady=10)
 
     AdresseServeur = Label(fenInfos, text=IP, bg="Grey", font=policeSousTitre)
     AdresseServeur.pack()
 
-    TitrePortServeur = Label(fenInfos, text="Port du serveur", bg="Grey", font=policeTitre)
+    TitrePortServeur = Label(fenInfos, text="Port du serveur", bg="Grey", font=PoliceTitre)
     TitrePortServeur.pack(pady=10)
 
     PortServeur = Label(fenInfos, text=Port, bg="Grey", font=policeSousTitre)
     PortServeur.pack()
 
-    TitreUtilisateursCo = Label(fenInfos, text="Utiliseurs connectées", bg="Grey", font=policeTitre)
+    TitreUtilisateursCo = Label(fenInfos, text="Utiliseurs connectées", bg="Grey", font=PoliceTitre)
     TitreUtilisateursCo.pack(pady=10)
 
     UtilisateurCo = Label(fenInfos, text="N/C", bg="Grey", font=policeSousTitre)
@@ -789,7 +785,7 @@ def aide():
     fenAide.title("Aide")
     #Définition de l'apparence de la fenêtre
 
-    TitreAideIP = Label(fenAide, text="Si votre IP n'est pas valide", bg="Grey", font=policeTitre)
+    TitreAideIP = Label(fenAide, text="Si votre IP n'est pas valide", bg="Grey", font=PoliceTitre)
     TitreAideIP.pack(pady=10)
 
     AideIP0 = Label(fenAide, text="Entrez vous même l'adresse IPv4.\nPour la trouver :", bg="Grey", font=policeSousTitre)
@@ -799,7 +795,7 @@ def aide():
     AideIP1.pack()
     AideIP1.bind("<Button-1>", lambda e: Fonctions.callback("https://le-routeur-wifi.com/adresse-ip-mac/"))
 
-    TitreAidePort0 = Label(fenAide, text="Si votre port n'est pas valide", bg="Grey", font=policeTitre)
+    TitreAidePort0 = Label(fenAide, text="Si votre port n'est pas valide", bg="Grey", font=PoliceTitre)
     TitreAidePort0.pack(pady=10)
 
     AidePort0 = Label(fenAide, text="Veillez à choisir un nombre entier\nentre 0 et 65535", bg="Grey", font=policeSousTitre)
@@ -819,8 +815,8 @@ def activerSon():
 
     SonActivé = True
 
-    barreMenu.delete(2)
-    barreMenu.insert_command(2, label="Couper Son", command=couperSon)
+    BarreMenu.delete(2)
+    BarreMenu.insert_command(2, label="Couper Son", command=couperSon)
     #On supprime la commande à l'index 2 du menu pour y ajouter la commande couperSon à la même position
 
 def couperSon():
@@ -828,17 +824,21 @@ def couperSon():
 
     SonActivé = False
 
-    barreMenu.delete(2)
-    barreMenu.insert_command(2, label="Activer Son", command=activerSon)
+    BarreMenu.delete(2)
+    BarreMenu.insert_command(2, label="Activer Son", command=activerSon)
     #On supprime la commande à l'index 2 du menu pour y ajouter la commande activerSon à la même position
 
 
-def contact():
+def Contact():
     """ Cette fonction affiches les informations du serveur dans une fenêtre en top level"""
 
-    def QuitterContact():
-        """Fonction qui détruit la fenêtre des infos du serveur"""
-        fenContact.destroy()
+    def EnvoiAPI():
+
+        TitreIssue = InputObjet.get()
+        Message = InputMessage.get() + "\n" + platform.system() + " " + platform.release() + " " + platform.version()
+
+        print(TitreIssue)
+        print(Message)
 
     fenContact = Toplevel()
     fenContact.geometry("300x280")
@@ -846,40 +846,20 @@ def contact():
     fenContact.resizable(width=False, height=False)
     fenContact.iconbitmap(bitmap="Médias/information.ico")
     fenContact.title("Contact")
-    #Définition de l'apparence de la fenêtre
 
-    label0 = Label(fenContact, text="Objet : ", bg="Grey", font=policeTitre)
-    label0.pack(pady=10)
-    entrée0 = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
-    entrée0.pack(padx=20)
+    #Label d'objet
+    Label(fenContact, text="Objet : ", bg="Grey", font=PoliceTitre).pack(pady=10)
 
-    label1 = Label(fenContact, text="Message : ", bg="Grey", font=policeTitre)
-    label1.pack(pady=10)
-    entrée1 = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
-    entrée1.pack(padx=20)
+    InputObjet = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
+    InputObjet.pack(padx=20)
 
-    label2 = Label(fenContact, text="Tags : ", bg="Grey", font=policeTitre)
-    label2.pack(pady=10)
-    entrée2 = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
-    entrée2.pack(padx=20)
+    #Label de message
+    Label(fenContact, text="Message : ", bg="Grey", font=PoliceTitre).pack(pady=10)
 
-    def EnvoiAPI():
-        title = entrée0.get()
-        body = entrée1.get() + "\n" + platform.system() + " " + platform.release() + " " + platform.version()
-        labels = entrée2.get()
-        test = "Objet : " + title + "\nMessage : " + body + "\nTags : " + labels
+    InputMessage = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
+    InputMessage.pack(padx=20)
 
-        fenKripité = Toplevel()
-
-        label3 = Label(fenKripité, text=test)
-        label3.pack()
-        
-        fenKripité.mainloop()
-
-        #make_github_issue(title, body, labels)
-
-    bouton = Button(fenContact, text="Envoyer votre message", command=EnvoiAPI)
-    bouton.pack(pady=20, side=BOTTOM)
+    Button(fenContact, text="Envoyer votre message", command=EnvoiAPI).pack(pady=20, side=BOTTOM)
 
     fenContact.focus_force()
     #On affiche la fenêtre au premier plan
@@ -887,10 +867,10 @@ def contact():
     fenContact.mainloop()
 
 
-
 def fermeture():
 
     """ Fonction appellée quand l'utilisateur veut fermer la fenêtre """
+
     RéponseUser  = tkinter.messagebox.askokcancel("Kripto","Vous partez déja ?")
 
     if RéponseUser == True:
@@ -898,10 +878,11 @@ def fermeture():
         sys.exit()
         #On utilise sys.exit() plutôt que exit() car cela éviter au threads de tourner en arrière plan
 
+#Code exécuté au démarage de l'application
 
 Paramètres.LectureParamètres()
 
-listeNoms = ["Autruche", "Bob", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
+ListeNoms = ["Autruche", "Bob", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
 
 FichierSauvegarde = None
@@ -913,12 +894,9 @@ Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
 
 NombreErreurs = 0
 
-global SousMenuCliqué
-
-EnvoiOK = True
+EnvoiPossible = True
 SonActivé = True
 SousMenuCliqué = False
-
 
 fen = Tk()
 fen.geometry("550x460")
@@ -928,18 +906,17 @@ fen.resizable(width=False, height=False)
 fen.iconbitmap(bitmap="Médias/icone.ico")
 fen.protocol("WM_DELETE_WINDOW", fermeture)
 
-barreMenu = Menu(fen)
-barreMenu.add_command(label="Menu", command= lambda : retournerMenu(DepuisMenu = True))
-barreMenu.add_command(label="Aide", command=aide)
-barreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde.LecteurSauvegarde)
-barreMenu.add_command(label="Paramètres", command=Paramètres.InterfaceParamètres)
-barreMenu.add_command(label="Contact", command=contact)
-fen.configure(menu=barreMenu)
-#On configure la barre de menu
+BarreMenu = Menu(fen)
+BarreMenu.add_command(label="Menu", command= lambda : retournerMenu(DepuisMenu = True))
+BarreMenu.add_command(label="Aide", command=aide)
+BarreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde.LecteurSauvegarde)
+BarreMenu.add_command(label="Paramètres", command=Paramètres.InterfaceParamètres)
+BarreMenu.add_command(label="Contact", command=Contact)
+fen.configure(menu=BarreMenu)
 
-policeBienvenue = tkFont.Font(family="Verdanna",size=16,weight="bold")
-policeBoutton = tkFont.Font(family="Arial",size=12,weight="bold")
-policeTitre = tkFont.Font(size=14,weight="bold")
+PoliceTitreBienvenue = tkFont.Font(family="Verdanna",size=16,weight="bold")
+PoliceBoutton = tkFont.Font(family="Arial",size=12,weight="bold")
+PoliceTitre = tkFont.Font(size=14,weight="bold")
 policeSousTitre = tkFont.Font(size=12)
 
 imageLogo = PhotoImage(file="Médias/Logo.png")
