@@ -170,4 +170,5 @@ if __name__ == "__main__":
     formaterPaquet("Commande", "/stop")
     
 def callback(url):
+    """ Fonction qui permet de suivre un url """
     webbrowser.open_new(url)
