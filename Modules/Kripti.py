@@ -18,7 +18,7 @@ def CréerUneIssue(Titre, Message, Plateforme):
     print(url)
 
     session = requests.Session()
-    session.auth = (NomUtilisteur, MotDePasse)
+    session.auth = (NomUtilisteur, MotDePasseKripti)
 
     Issue = {"title": Titre,
              "body": Message + "\r\n" + Plateforme ,
