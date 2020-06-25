@@ -88,21 +88,34 @@ III. Connexion et envoi de messages.............................................
 
 IV. Barre d'application................................................................676
 
-    A. Définition de retournerMenu()...................................................676
+    A. Définition de RetournerMenu()...................................................676
 
-    B. Définition de infosServeur()....................................................732
+        Fonction qui efface le contenu de la fenêtre et affiche le menuPrincipal
 
-    C. Définition de aide()............................................................777
+    B. Définition de InfosServeur()....................................................732
+
+        La fenêtre qui affiche les informations sur le serveur
+
+    C. Définition de Aide()............................................................777
+
+        Fenêtre qui affiche de l'aide
 
     D. Activer et désactiver le son....................................................817
 
-        1. Définition de activerSon()..................................................817
+        Fonctions triviales
 
-        2. Définition de couperSon()...................................................826
+        1. Définition de ActiverSon()..................................................817
+
+        2. Définition de CouperSon()...................................................826
 
     E. Définition de Contact().........................................................836
 
+        Fonction qui permet à l'utilisateur de reporter un bug via les Issues GitHub avec notre
+        bot "Kripiti"
+
 V. Définition de fermeture()...........................................................891
+    
+    Fonctions appelée quand l'utilisateur ferme la fenêtre
 
 VI.Lancement du programme.............................................................902
 
@@ -110,8 +123,6 @@ VI.Lancement du programme.......................................................
 
 
 def AfficherMenu():
-
-    #FINIE
 
     """ Fonction qui affiche le menu principal de l'application """
 
@@ -134,8 +145,6 @@ def AfficherMenu():
 
 
 def DevenirHôte():
-
-    #FINIE
 
     """ Fonction qui affiche l'interface qui permet de définir l'Ip et le port qui seront
     utilisées par le serveur. """
@@ -253,8 +262,6 @@ def DémarrerServeur():
 
 def DevenirClient():
 
-    # FINIE
-
     """ Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter"""
 
     global InputIp, InputPort, InputNom, CadreParamètres, SousMenuCliqué
@@ -303,8 +310,6 @@ def DevenirClient():
 
 def Connexion():
 
-    # FINIE
-
     """ Cette fonction sert à se connecter au serveur et à Envoyer le nom d'utilisateur, la clé publique, le module de chiffrement au serveur,
     et on recoit les informations de chiffrement du serveur, la clé publique et le module de chiffrement. Si le serveur demande un mot de passe,
     c'est cette fonction qui le récupére auprès de l'utilisateur, le chiffre l'envoi au serveur."
@@ -331,7 +336,7 @@ def Connexion():
         if Rôle != "Hôte":
         #Si c'est l'hôte, il a déja recu l'erreur de la part du serveur donc affiche rien
 
-            MessageErreur = "IL semblerait que les coordonées du serveur ne soit pas valides. Réferez vous à l'aide pour régler ce problème."
+            MessageErreur = "IL semblerait que les coordonées du serveur ne soit pas valides. Réferez vous à l'Aide pour régler ce problème."
             tkinter.messagebox.showerror(title="Aïe...", message=MessageErreur)
     
         return False
@@ -407,8 +412,6 @@ def Connexion():
 
 def SeConnecter():
 
-    #FINIE
-
     """ Fonction qui affiche l'interface de discusion si la connexion au serveur est une réussite"""
 
     global InputIp, IP, InputPort, Port, Rôle, FichierSauvegarde, MotDePasse
@@ -435,8 +438,6 @@ def SeConnecter():
     
 def AffichageConversations():
 
-    #FINIE
-
     """ Cette fonction sert à générer l'interface de la conversation"""
 
     global CadreParamètres, SaisieMessage, NomUser, FilsMessages, BouttonEnvoyer, Connexion, ThreadRéception
@@ -445,11 +446,11 @@ def AffichageConversations():
     CadreParamètres.pack_forget()
 
     BarreMenu.delete(1)
-    BarreMenu.insert_command(1, label="Menu", command= lambda : retournerMenu(DemandeConfirmation = True, ConversationEnCours = True))
+    BarreMenu.insert_command(1, label="Menu", command= lambda : RetournerMenu(DemandeConfirmation = True, ConversationEnCours = True))
     #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
 
-    BarreMenu.insert_command(2, label="Couper Son", command=couperSon)
-    BarreMenu.insert_command(4, label="Infos du serveur", command=infosServeur)
+    BarreMenu.insert_command(2, label = "Couper Son", command = CouperSon)
+    BarreMenu.insert_command(4, label = "Infos du serveur", command = InfosServeur)
 
     FilsMessages = Listbox(fen, width="70", height="20")
     FilsMessages.pack(pady=15)
@@ -477,8 +478,6 @@ def AffichageConversations():
 
 def Envoyer(ModeManuel = False, MessageManuel = None):
 
-    #FINIE
-
     #Le mode manuel est un mode qui ne récupére pas l'entrée, mais le message passé en argument
 
     """Fonction qui chiffre et envoi les message au serveur. Les messages sont chiffrés en fonction du serveur"""
@@ -496,17 +495,17 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
         RéponseUser = None
         stop = False
 
-        if message == "/stop" and ModeManuel == False and Role == "Hote":
+        if message == "/stop" and ModeManuel == False and Rôle == "Hôte":
 
             RéponseUser = tkinter.messagebox.askokcancel("Kripto","Voulez vraiment arrêter le serveur ?")
             stop = True
 
-        elif message == "/stop" and ModeManuel == False and Role == "Client":
+        elif message == "/stop" and ModeManuel == False and Rôle == "Client":
 
             tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas arrêter le serveur, vous n'êtes pas l'hôte de la disscusion")
 
 
-        if RéponseUser == True and Role == "Hote" or ModeManuel == True or message != "/stop":
+        if RéponseUser == True and Rôle == "Hôte" or ModeManuel == True or message != "/stop":
 
             message = Fonctions.formaterPaquet("Commande", message)
             message = ChiffrementRSA.chiffrement(message, CléPubliqueServeur, ModuleServeur)
@@ -524,11 +523,11 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
                 else:
                 #Si il y'a plus de trois erreurs, on stoppe le programme, en invitant l'utilisateur à se reconnecter
 
-                    messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
+                    messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'Aide"
                     tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
-                    retournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
+                    RetournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
 
-            if stop == True: retournerMenu(DemandeConfirmation = None, ConversationEnCours = True, DemandeArrêt = False)
+            if stop == True: RetournerMenu(DemandeConfirmation = None, ConversationEnCours = True, DemandeArrêt = False)
 
     elif len(message) != 0 and EnvoiPossible:
 
@@ -555,10 +554,10 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
             else:
             #Si il y'a plus de trois erreurs, on stoppe le programme, en invitant l'utilisateur à se reconnecter
 
-                messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
+                messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'Aide"
                 #On stocke le message dans un variable pour diminuer la taille de la ligne d'en dessous
                 tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
-                retournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
+                RetournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
 
         else:
         #Si il n'a pas eu d'execeptions
@@ -683,30 +682,29 @@ def Réception():
                         winsound.PlaySound("Sons/Dong.wav", winsound.SND_ASYNC)
 
 
-def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None, DemandeArrêt = True):
+def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None, DemandeArrêt = True):
 
     global FilsMessages, SaisieMessage, BouttonEnvoyer, SousMenuCliqué, Connexion
 
     Confirmation = None
 
     if DemandeConfirmation == True:
-        Confirmation = messagebox.askquestion (f"Vous partez déja {NomUser} ?","Vous voulez vraiment retourner au menu ?",icon = 'warning')
+        Confirmation = messagebox.askquestion (f"Vous partez déja {NomUser} ?","Vous voulez vraiment retourner au menu ?", icon = "warning")
 
     if Confirmation == "yes" or DemandeConfirmation == None:
 
         if ConversationEnCours:
-
         #Si l'utilisateur était dans la fenêtre de conversation
 
             SousMenuCliqué = False
 
-            if Role == "Hote" and  DemandeArrêt == True:
+            if Rôle == "Hôte" and  DemandeArrêt == True:
 
                 Envoyer(True, "/stop") #L'envoi du /stop permet d'éviter au serveur de crasher / tourner dans le vide
                 time.sleep(0.3)
 
             BarreMenu.delete(1)
-            BarreMenu.insert_command(1, label="Menu", command= lambda : retournerMenu(DepuisMenu = True))
+            BarreMenu.insert_command(1, label="Menu", command= lambda : RetournerMenu(DepuisMenu = True))
             #On remplace la commande "Menu" pour car la commande associée doit avoir l'argument "ConversationEnCours" à jour
 
             FilsMessages.pack_forget()
@@ -719,7 +717,7 @@ def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
             BarreMenu.delete(3)
             #On efface les commandes "Couper Son" et "Infos Serveur" du menu
 
-            Connexion = False
+            Connexion = False #Le thread de réception est arrêté
             ConnexionSocket.close()
 
         if DepuisMenu:
@@ -728,7 +726,7 @@ def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
             if SousMenuCliqué:
             #Si l'utilisateur était dans le sous menu (Démarrage du serveur ou connexion)
 
-                logo.pack_forget()
+                Logo.pack_forget()
                 CadreParamètres.pack_forget()
 
         if SousMenuCliqué or ConversationEnCours:
@@ -740,15 +738,15 @@ def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
             AfficherMenu()
 
 
-def infosServeur():
+def InfosServeur():
+
     """ Cette fonction affiches les informations du serveur dans une fenêtre en top level"""
 
     global IP, Port
-    #On récupere les variables d'adresse du serveur
 
     def QuitterInfos():
         """Fonction qui détruit la fenêtre des infos du serveur"""
-        fenInfos.destroy()
+        
 
     fenInfos = Toplevel()
     fenInfos.geometry("300x280")
@@ -756,7 +754,6 @@ def infosServeur():
     fenInfos.resizable(width=False, height=False)
     fenInfos.iconbitmap(bitmap="Médias/information.ico")
     fenInfos.title("Infos du serveur")
-    #Définition de l'apparence de la fenêtre
 
     TitreAdresseServeur = Label(fenInfos, text="Adresse du serveur", bg="Grey", font=PoliceTitre)
     TitreAdresseServeur.pack(pady=10)
@@ -776,7 +773,7 @@ def infosServeur():
     UtilisateurCo = Label(fenInfos, text="N/C", bg="Grey", font=PoliceSousTitre)
     UtilisateurCo.pack()
 
-    BouttonFermer = Button(fenInfos, text="Fermer", command=QuitterInfos)
+    BouttonFermer = Button(fenInfos, text="Fermer", command = lambda: fenInfos.destroy())
     BouttonFermer.pack(pady=20, side=BOTTOM)
 
     fenInfos.focus_force()
@@ -785,11 +782,12 @@ def infosServeur():
     fenInfos.mainloop()
 
 
-def aide():
-    """ Cette fonction affiche l'aide dans une fenêtre en top level"""
+def Aide():
+
+    """ Cette fonction affiche l'Aide dans une fenêtre en top level"""
 
     def QuitterAide():
-        """Fonction qui détruit la fenêtre d'aide"""
+        """Fonction qui détruit la fenêtre d'Aide"""
         fenAide.destroy()
 
     fenAide = Toplevel()
@@ -825,26 +823,27 @@ def aide():
     fenAide.mainloop()
 
 
-def activerSon():
+def ActiverSon():
     global SonActivé
 
     SonActivé = True
 
     BarreMenu.delete(2)
-    BarreMenu.insert_command(2, label="Couper Son", command=couperSon)
-    #On supprime la commande à l'index 2 du menu pour y ajouter la commande couperSon à la même position
+    BarreMenu.insert_command(2, label="Couper le son", command=CouperSon)
+    #On supprime la commande à l'index 2 du menu pour y ajouter la commande CouperSon à la même position
 
-def couperSon():
+def CouperSon():
     global SonActivé
 
     SonActivé = False
 
     BarreMenu.delete(2)
-    BarreMenu.insert_command(2, label="Activer Son", command=activerSon)
-    #On supprime la commande à l'index 2 du menu pour y ajouter la commande activerSon à la même position
+    BarreMenu.insert_command(2, label="Activer le son", command=ActiverSon)
+    #On supprime la commande à l'index 2 du menu pour y ajouter la commande ActiverSon à la même position
 
 
 def Contact():
+
     """ Cette fonction affiches les informations du serveur dans une fenêtre en top level"""
 
     def EnvoiAPI():
@@ -922,8 +921,8 @@ fen.iconbitmap(bitmap="Médias/icone.ico")
 fen.protocol("WM_DELETE_WINDOW", fermeture)
 
 BarreMenu = Menu(fen)
-BarreMenu.add_command(label="Menu", command= lambda : retournerMenu(DepuisMenu = True))
-BarreMenu.add_command(label="Aide", command=aide)
+BarreMenu.add_command(label="Menu", command= lambda : RetournerMenu(DepuisMenu = True))
+BarreMenu.add_command(label="Aide", command=Aide)
 BarreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde.LecteurSauvegarde)
 BarreMenu.add_command(label="Paramètres", command=Paramètres.InterfaceParamètres)
 BarreMenu.add_command(label="Contact", command=Contact)
