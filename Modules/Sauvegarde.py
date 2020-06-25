@@ -213,8 +213,6 @@ def InitialisationSauvegarde(motDePasse):
     # On écrit l'annonce de façon chiffrée puis on saute une ligne
     # On converti en bytes pour faciliter la lecture
 
-
-
     return NomFichier
 
 
