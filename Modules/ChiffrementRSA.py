@@ -2,6 +2,7 @@
 from random import *
 
 
+
 def chiffrement(message, clefPublique, moduleDeChiffrement):
 
     """ Fonction qui chiffre le message selon l'algorithme RSA et le formate en une seule chaine de caractère.
@@ -28,7 +29,6 @@ def chiffrement(message, clefPublique, moduleDeChiffrement):
     return messageFinal
 
 
-
 def déchiffrement(message, clefPrivée, moduleDeChiffrement):
 
     """Fonction de décryptage : transforme le message indéchiffrable en message chiffré"""
@@ -50,6 +50,7 @@ def déchiffrement(message, clefPrivée, moduleDeChiffrement):
 
     #Le message est alors déchiffré
     return messageDéchiffré
+
 
 
 def génération(longueur):
@@ -102,7 +103,6 @@ def Miller_Rabin(premier):
     return True
 
 
-
 def primalité(premier):
 
     """Fonction de primalité : retourne True si premier est le nombre premier selon plusieurs algorithmes"""
@@ -120,7 +120,6 @@ def primalité(premier):
     return Miller_Rabin(premier)
 
 
-
 def mersenne(longueur):
 
     """Renvoie un nombre premier aléatoire de taille correspondant à la variable longueur en bits"""
@@ -131,7 +130,6 @@ def mersenne(longueur):
             return premier
 
 
-
 def pgcd(clefPublique, phiDuModuleDeChiffrement):
 
     "Fonction de calcul du PGCD (Plus Grand Commun Diviseur) de clefPublique et phi de moduleDeChiffrement : Ce PGCD servira de clef publique"
@@ -139,7 +137,6 @@ def pgcd(clefPublique, phiDuModuleDeChiffrement):
     while clefPublique != 0:
         clefPublique, phiDuModuleDeChiffrement = phiDuModuleDeChiffrement % clefPublique, clefPublique # % reste de la division euclidienne
     return phiDuModuleDeChiffrement
-
 
 
 def inverse(clefPublique, phiDuModuleDeChiffrement):

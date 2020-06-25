@@ -238,7 +238,7 @@ def NouvelleLigne(NomFichier, MotDePasse, chaine):
 
 
 
-def lectureSauvegarde(NomFichier, MDP):
+def lectureSauvegarde(NomFichier, MotDePasse):
 
 
     """ Fonction qui lit, déchiffre et retourne sous forme de liste
@@ -258,7 +258,7 @@ def lectureSauvegarde(NomFichier, MDP):
     for index in range(len(ListeLignes)):
     # Pour chaque ligne
 
-        ListeLignes[index] = DéchiffrementVignère(MDP, ListeLignes[index])
+        ListeLignes[index] = DéchiffrementVignère(MotDePasse, ListeLignes[index])
         # On déchiffre la ligne
 
         ListeLignes[index] = list(ListeLignes[index])
@@ -277,26 +277,26 @@ if __name__ == "__main__":
 
     """ Démonstration du module de sauvegarde chiffré """
 
-    mdp = input("Veuillez saisir un mot de passe pour chiffrer votre sauvegarde\n>>> ")
+    MotDePasse = input("Veuillez saisir un mot de passe pour chiffrer votre sauvegarde\n>>> ")
 
-    confirmationMDP = input("\nVeuillez saisir une seconde fois votre mot de passe\n>>> ")
+    confirmationMotDePasse = input("\nVeuillez saisir une seconde fois votre mot de passe\n>>> ")
 
-    while confirmationMDP != mdp:
+    while confirmationMotDePasse != MotDePasse:
 
-        confirmationMDP = input("\n Le mot de passe n'est confirmé. Veuillez saisir la confirmation du mot de passe\n>>> ")
+        confirmationMotDePasse = input("\n Le mot de passe n'est confirmé. Veuillez saisir la confirmation du mot de passe\n>>> ")
 
-    FichierSauvegarde = InitialisationSauvegarde(mdp)
+    FichierSauvegarde = InitialisationSauvegarde(MotDePasse)
     # On initialisae le fichier de sauvegarde au début de la conversations
 
     print(f"Un fichier de sauvegarde \"{FichierSauvegarde} à bien été crée")
 
-    NouvelleLigne(FichierSauvegarde, mdp, "Bonjour, je suis la nouvelle ligne")
+    NouvelleLigne(FichierSauvegarde, MotDePasse, "Bonjour, je suis la nouvelle ligne")
     # A chaque nouveau message, on ajoute une ligne
 
-    NouvelleLigne(FichierSauvegarde, mdp, "Salut ligne 2, moi c'est ligne 3 !")
+    NouvelleLigne(FichierSauvegarde, MotDePasse, "Salut ligne 2, moi c'est ligne 3 !")
 
     print()
     print(f"Voici les lignes contenus dans {FichierSauvegarde}")
-    print(lectureSauvegarde(FichierSauvegarde, mdp))
+    print(lectureSauvegarde(FichierSauvegarde, MotDePasse))
     # Fonction qui retourne chaque lignes déchiffrés du fichier
 

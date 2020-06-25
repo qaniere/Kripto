@@ -93,7 +93,7 @@ def couperPhrases(chaine):
     #On sépare la chaine pour vérifier le message contient des espaces, sans prendre en compte le header
     #Header => "[12:04:23] Auteur du message →"
 
-    resultat = []
+    résultat = []
 
     if " " in chaineSéparé:
     #Si le texte contient des espaces et que c'est pas "fzjkrzkfpozeijfoijfpofjzeoif"
@@ -108,11 +108,11 @@ def couperPhrases(chaine):
             #On récupere un ligne de 50 caractères maximums et un autre
             #ligne qu'on va retraitre si elle fait plus de 50 caratères
 
-            resultat.append(Ligne)
+            résultat.append(Ligne)
             #On ajoute la ligne de moins de 50 caratères à un liste
             #résulat qu'on retournera
      
-        resultat.append(NonTraité)
+        résultat.append(NonTraité)
         #On ajoute le reste de moins de 50
     else:
         chaine = SeparerCara(chaine)
@@ -128,14 +128,14 @@ def couperPhrases(chaine):
             if len(ligne) == 70:
             #Un fois que la nouvelle ligne fait la bonne taille
 
-                resultat.append(ligne)
+                résultat.append(ligne)
                 ligne = ""
                 #On ajoute la ligne au résultat et on la remet à zéro
         
-        resultat.append(ligne)
+        résultat.append(ligne)
         #On ajoute la ligne même si elle fait pas 70 caratères une fois sorti du while
 
-    return resultat
+    return résultat
 
 def placeholder(zone, nouveauTexte, premiereFois):
 
