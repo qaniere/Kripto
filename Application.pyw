@@ -13,69 +13,71 @@ from random import randint, choices
 from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde, Serveur
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-                                  Index
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-I. Définition de AfficherMenu().................................................54
+                                          Index
 
-    La fonction qui affiche le menu principal de l'application. Elle est appellée
-    au démarrage de l'application et quand l'utilisateur retourne au menu.
+I. Définition de AfficherMenu()........................................................84
 
-II. Hôte et clients.............................................................76
+    La fonction qui affiche le menu principal de l'application. Elle est appellée au 
+    démarrage de l'application et quand l'utilisateur retourne au menu.
 
-    Les fonctions qui servent à afficher le menus de connexion pour le client et
-    celles qui servent à démarrer le serveur.
+II. Hôte et clients...................................................................105
 
-    A. Travail spécifique à l'hôte.............................................76
+    Les fonctions qui servent à afficher le menus de connexion pour le client et celles 
+    qui servent à démarrer le serveur.
 
-        1. Définition de DevenirHôte()................................................76
+    A. Travail spécifique à l'hôte....................................................105
 
-            Cette fonction affiche le menu qui permet à l'hôte de configurer le
-            mode de connexion au serveur (Ip, Port et nom d'utilisateur)
+        1. Définition de DevenirHôte()................................................105
 
-        2. Définition de DémarrerServeur()....................................142
+            Cette fonction affiche le menu qui permet à l'hôte de configurer le mode de 
+            connexion au serveur (Ip, Port et nom d'utilisateur)
+
+        2. Définition de DémarrerServeur()............................................176
 
             Cette fonction lance le thread du serveur, en récupérant les informations
             données sur l'interface de connexion.
 
-    B. Définition de DevenirClient().................................................182
+    B. Définition de DevenirClient()..................................................220
 
-       Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter
+       Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter 
 
-III. Connexion et envoi de messages...........................................235
+III. Connexion et envoi de messages...................................................271
 
-    A. Connexion et déconnexion...............................................235
+    A. Connexion et déconnexion.......................................................271
 
-        1. Définition de Connexion()..........................................235
+        1. Définition de Connexion()..................................................271
 
-            Cette fonction sert à se connecter au serveur et à envoyer le nom d'utilisateur, 
-            la clé publique, le module de chiffrement au serveur, et on recoit les informations 
-            de chiffrement du serveur, la clé publique et le module de chiffrement. Si le serveur 
-            demande un mot de passe,  c'est cette fonction qui le récupére auprès de l'utilisateur, 
-            le chiffre et l'envoi au serveur.
+            Cette fonction sert à se connecter au serveur et à envoyer le nom 
+            d'utilisateur, la clé publique, le module de chiffrement au serveur, et on 
+            recoit les informations de chiffrement du serveur, la clé publique et le 
+            module de chiffrement. Si le serveur demande un mot de passe,  c'est cette 
+            fonction qui le récupére auprès de l'utilisateur, le chiffre et l'envoi au 
+            serveur.
 
-        2.définition de déconnexion()........................................342
-    B.Afficher la conversation...............................................350
-        1.définition de affichageConversation()..............................350
-        2.définition de seConnecter()........................................390
-    C.Envoyer et recevoir....................................................419
-        1.définition de envoyer()............................................419
-        2.définition de recevoir()...........................................562
+        2.définition de Déconnexion().................................................373
+    B.Afficher la conversation........................................................381
+        1.définition de affichageConversation().......................................381
+        2.définition de seConnecter().................................................421
+    C.Envoyer et recevoir.............................................................450
+        1.définition de envoyer().....................................................450
+        2.définition de recevoir()....................................................593
 
-IV.Barre d'application.......................................................645
-    A.définition de retournerMenu()..........................................645
-    B.définition de infosServeur()...........................................701
-    C.définition de aide()...................................................746
-    D.Activer et désactiver le son...........................................786
-        1.définition de activerSon().........................................786
-        2.définition de couperSon()..........................................795
-    E.définition de contact()................................................805
+IV.Barre d'application................................................................676
+    A.définition de retournerMenu()...................................................676
+    B.définition de infosServeur()....................................................732
+    C.définition de aide()............................................................777
+    D.Activer et désactiver le son....................................................817
+        1.définition de activerSon()..................................................817
+        2.définition de couperSon()...................................................826
+    E.définition de contact().........................................................836
 
-V.définition de fermeture()..................................................842
+V.définition de fermeture()...........................................................873
 
-VI.Lancement du programme....................................................853
+VI.Lancement du programme.............................................................884
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
 
@@ -96,7 +98,7 @@ def AfficherMenu():
     BouttonHôte = Button(CadreBouttons, text="Être hôte", font=policeBoutton, command=DevenirHôte)
     BouttonHôte.pack(side=LEFT, padx=7)
 
-    BouttonClient = Button(CadreBouttons, text="Être client", font=policeBoutton, command=client)
+    BouttonClient = Button(CadreBouttons, text="Être client", font=policeBoutton, command=DevenirClient)
     BouttonClient.pack(side=LEFT, padx=7)
 
 
@@ -368,7 +370,7 @@ def Connexion():
             return False
 
     
-def déconnexion():
+def Déconnexion():
 
     global Connexion
 
@@ -707,7 +709,7 @@ def retournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
             barreMenu.delete(3)
             #On efface les commandes "Couper Son" et "Infos Serveur" du menu
 
-            déconnexion()
+            Déconnexion()
 
         if DepuisMenu:
         #Si l'utilisateur était dans la fenêtre de menu
