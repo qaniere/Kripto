@@ -10,7 +10,8 @@ import tkinter.simpledialog
 import tkinter.font as tkFont
 from tkinter import messagebox
 from random import randint, choices
-from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde, Serveur
+from tkinter.scrolledtext import ScrolledText
+from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde, Serveur, Kripti
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -849,10 +850,10 @@ def Contact():
     def EnvoiAPI():
 
         TitreIssue = InputObjet.get()
-        Message = InputMessage.get() + "\n" + platform.system() + " " + platform.release() + " " + platform.version()
+        Message = InputMessage.get("1.0", tkinter.END)
+        Plateforme = platform.system() + " " + platform.release() + " " + platform.version()
 
-        print(TitreIssue)
-        print(Message)
+        Kripti.CréerUneIssue(TitreIssue, Message, Plateforme)
 
     fenContact = Toplevel()
     fenContact.geometry("300x280")
@@ -862,15 +863,15 @@ def Contact():
     fenContact.title("Contact")
 
     #Label d'objet
-    Label(fenContact, text="Objet : ", bg="Grey", font=PoliceTitre).pack(pady=10)
+    Label(fenContact, text="Quel est le problème ?", bg="Grey", font=PoliceTitre).pack(pady=10)
 
     InputObjet = Entry(fenContact, width = 50, bg="White", font=PoliceSousTitre)
     InputObjet.pack(padx=20)
 
     #Label de message
-    Label(fenContact, text="Message : ", bg="Grey", font=PoliceTitre).pack(pady=10)
+    Label(fenContact, text="Un peu plus de détails ?", bg="Grey", font=PoliceTitre).pack(pady=10)
 
-    InputMessage = Entry(fenContact, width = 50, bg="White", font=PoliceSousTitre)
+    InputMessage = ScrolledText(fenContact, width = 50, height = 5, bg="White", font=PoliceSousTitre)
     InputMessage.pack(padx=20)
 
     Button(fenContact, text="Envoyer votre message", command=EnvoiAPI).pack(pady=20, side=BOTTOM)
