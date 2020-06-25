@@ -5,21 +5,13 @@ import codecs
 import hashlib
 
 
-# TODO - J'ai supprimé le message au lecteur car jugé inutile par monsieur Germant
-
-
-# TODO - J'ai aussi supprimé ce genre de commentaires pour la même raison
-### Définition de la fonction de chiffrement ###
-
 
 def transformationChiffres(chaine):
 
     """Fonction qui renvoi sous forme de la liste d'entiers correspont chacun à la valeur
     unicode des caratères de la chaine précisée en arguments """
-    # TODO - Chiffré ne veut pas dire transformer en chiffres
-    # TODO - Lis ce lien : https://chiffrer.info/
 
-    liste = list(chaine) # TODO - Fonction évidente, pas besoin d'expliquer
+    liste = list(chaine)
 
     for index in range(len(liste)):
     # On récupere chaque caratères de la liste
@@ -60,7 +52,6 @@ def transformationCaratères(ListeUnicode):
         ListeUnicode[index] = chr(ListeUnicode[index])
         # chr(x) est la fonction qui pour toute valeur Unicode x nous renvoie son charactère Unicode (sous type str)
         # Cette fonction transforme donc la suite de charactère chiffrés sous forme Unicode en message
-        #TODO Bien commenté, GG :)
 
 
     return "".join(ListeUnicode)
@@ -279,8 +270,6 @@ def lectureSauvegarde(NomFichier, MDP):
 
     return ListeLignes
 
-
-# TODO Regarde la démo
 
 
 if __name__ == "__main__":
