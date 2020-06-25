@@ -853,7 +853,21 @@ def Contact():
         Message = InputMessage.get("1.0", tkinter.END)
         Plateforme = platform.system() + " " + platform.release() + " " + platform.version()
 
-        Kripti.CréerUneIssue(TitreIssue, Message, Plateforme)
+        if Kripti.CréerUneIssue(TitreIssue, Message, Plateforme) == True:
+            tkinter.messagebox.showinfo(
+
+                title = "Succès !", 
+                message = "Votre bug a été reporté à nos équipes avec succès. Merci de votre contribution !"
+            )
+
+            fenContact.destroy()
+
+        else:
+            tkinter.messagebox.showerror(
+                title = "Oups...",
+                message = "Impossible de reporter le bug pour le moment. Merci de retenter."
+            )
+
 
     fenContact = Toplevel()
     fenContact.geometry("300x280")

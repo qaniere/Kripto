@@ -28,5 +28,9 @@ def CréerUneIssue(Titre, Message, Plateforme):
 
     if Requête.status_code == 201:
         print ("Issue créée avec succès !")
+        return True
+
     else:
+        
         print (f"Erreur => {Requête.content}")
+        return False
