@@ -1,5 +1,5 @@
 # coding: utf8
-import sys
+import sys, platform
 import time
 import socket
 import tkinter
@@ -73,9 +73,9 @@ IV.Barre d'application..........................................................
         2.définition de couperSon()...................................................826
     E.définition de contact().........................................................836
 
-V.définition de fermeture()...........................................................873
+V.définition de fermeture()...........................................................891
 
-VI.Lancement du programme.............................................................884
+VI.Lancement du programme.............................................................902
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -848,20 +848,38 @@ def contact():
     fenContact.title("Contact")
     #Définition de l'apparence de la fenêtre
 
-    TitreContactKripto = Label(fenContact, text="Par Kripto", bg="Grey", font=policeTitre)
-    TitreContactKripto.pack(pady=10)
+    label0 = Label(fenContact, text="Objet : ", bg="Grey", font=policeTitre)
+    label0.pack(pady=10)
+    entrée0 = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
+    entrée0.pack(padx=20)
 
-    ContactKripto = Label(fenContact, text="IP : A trouver\nPort : A trouver", bg="Grey", font=policeSousTitre)
-    ContactKripto.pack()
+    label1 = Label(fenContact, text="Message : ", bg="Grey", font=policeTitre)
+    label1.pack(pady=10)
+    entrée1 = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
+    entrée1.pack(padx=20)
 
-    TitreContactEmail = Label(fenContact, text="Par e-mail", bg="Grey", font=policeTitre)
-    TitreContactEmail.pack(pady=10)
+    label2 = Label(fenContact, text="Tags : ", bg="Grey", font=policeTitre)
+    label2.pack(pady=10)
+    entrée2 = Entry(fenContact, width = 50, bg="White", font=policeSousTitre)
+    entrée2.pack(padx=20)
 
-    ContactEmail = Label(fenContact, text="A trouver", bg="Grey", font=policeSousTitre)
-    ContactEmail.pack()
+    def EnvoiAPI():
+        title = entrée0.get()
+        body = entrée1.get() + "\n" + platform.system() + " " + platform.release() + " " + platform.version()
+        labels = entrée2.get()
+        test = "Objet : " + title + "\nMessage : " + body + "\nTags : " + labels
 
-    BouttonFermer = Button(fenContact, text="Fermer", command=QuitterContact)
-    BouttonFermer.pack(pady=20, side=BOTTOM)
+        fenKripité = Toplevel()
+
+        label3 = Label(fenKripité, text=test)
+        label3.pack()
+        
+        fenKripité.mainloop()
+
+        #make_github_issue(title, body, labels)
+
+    bouton = Button(fenContact, text="Envoyer votre message", command=EnvoiAPI)
+    bouton.pack(pady=20, side=BOTTOM)
 
     fenContact.focus_force()
     #On affiche la fenêtre au premier plan
