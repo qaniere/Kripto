@@ -529,6 +529,7 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
 
         RéponseUser = None
         stop = False
+        Permission = True
 
         if message == "/stop" and ModeManuel == False and Rôle == "Hôte":
 
@@ -538,17 +539,24 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
         elif message == "/stop" and ModeManuel == False and Rôle == "Client":
 
             tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas arrêter le serveur, vous n'êtes pas l'hôte de la disscusion")
-        
+            Permission = False
+
         elif message == "/lock" and Rôle == "Client" or message == "/unlock" and Rôle == "Client":
 
             tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas verrouiler/déverrouiller le serveur, vous n'êtes pas l'hôte de la disscusion")
+            Permission = False
 
         elif "ban" in message and Rôle == "Client":
 
             tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas bannir un client, vous n'êtes pas l'hôte de la disscusion")
-            
+            Permission = False
 
-        if RéponseUser == True and Rôle == "Hôte" or ModeManuel == True or message != "/stop":
+        elif "kick" in message and Rôle == "Client":
+
+            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas kicker un client, vous n'êtes pas l'hôte de la disscusion")
+            Permission = False
+
+        if RéponseUser == True and Rôle == "Hôte" or ModeManuel == True or message != "/stop" and Permission == True:
 
             message = Fonctions.formaterPaquet("Commande", message)
             message = ChiffrementRSA.chiffrement(message, CléPubliqueServeur, ModuleServeur)
@@ -698,8 +706,14 @@ def Réception():
                 #0 étant la longueur de ce message
 
                 if MessageReçu == "ban":
-                    
+
                     tkinter.messagebox.showinfo(title = "Vous avez été banni", message = "Vous avez été banni du serveur, vous ne pouvez plus vous reconnecter.")
+                    ConnexionEnCours = False
+                    RetournerMenu(ConversationEnCours = True)
+
+                if MessageReçu == "kick":
+
+                    tkinter.messagebox.showinfo(title = "Vous avez été kické", message = "Vous avez été kické du serveur.")
                     ConnexionEnCours = False
                     RetournerMenu(ConversationEnCours = True)
 

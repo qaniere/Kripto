@@ -17,6 +17,20 @@ def ArrêtServeur():
     # Fermeture de la connexion
     sys.exit()
 
+def TrouverClient(PseudoRecherché, DicoDesNoms):
+
+    """ Renvoi l'objet client associée à un pseudo"""
+
+    Résultat = None
+
+    for ClientDuDico, Pseudo in DicoDesNoms.items():
+    #On itére sur chaque pseudo du dictonnaire pour trouver l'objet client
+
+        if Pseudo == PseudoRecherché:
+            Résultat = ClientDuDico
+
+    return Résultat
+
 
 def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
@@ -332,13 +346,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                             
                                                 NomDuBanni = Commande.replace("ban ", "")
 
-                                                Résultat = None
-
-                                                for ClientDuDico, Pseudo in Nom.items():
-                                                #On itére sur chaque pseudo du dictonnaire pour trouver l'ip du client à bannir
-                                                
-                                                    if Pseudo == NomDuBanni:
-                                                        Résultat = ClientDuDico
+                                                Résultat = TrouverClient(NomDuBanni, Nom)
+                                                #On cherche l'objet client associé au pseudo
 
                                                 if Résultat == None: 
 
@@ -364,6 +373,40 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                     Déconnexion(Résultat, Silencieux = True)
 
                                                     Annonce = f"[{time.strftime('%H:%M:%S')}] {NomDuBanni} a été banni par {Nom[client]}"
+                                                    print(Annonce)
+                                                    Envoi(Annonce, "Annonce")
+
+                                        elif "kick" in Commande:
+
+                                            if Rôle[client] == "Hôte":
+                                            
+                                                NomDuKické = Commande.replace("kick ", "")
+
+                                                Résultat = TrouverClient(NomDuKické, Nom)
+                                                #On cherche l'objet client associé au pseudo
+
+                                                if Résultat == None: 
+
+                                                    Annonce = f'[{time.strftime("%H:%M:%S")}] Impossible de trouver "{NomDuKické}"'
+                                                    print(Annonce)
+
+                                                    messageEnvoi = ChiffrementRSA.chiffrement(Annonce, CléPublique[client], ModuleDeChiffrement[client])
+                                                    ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
+                                                    messageEnvoi = ChaineMessage.encode('utf-8')
+                                                    client.send(bytes(messageEnvoi))
+                                                    #On envoi le message d'échec à l'exécuteur de la commande
+                                                    
+                                                else: 
+
+                                                    MessageDeKick = ChiffrementRSA.chiffrement("kick", CléPublique[Résultat], ModuleDeChiffrement[Résultat])
+                                                    ChaineMessage = f"{len(MessageDeKick)}-{MessageDeKick}"
+                                                    ChaineMessage = ChaineMessage.encode('utf-8')
+                                                    Résultat.send(bytes(ChaineMessage))
+                                                    #On indique au banni qu'il a été banni
+
+                                                    Déconnexion(Résultat, Silencieux = True)
+
+                                                    Annonce = f"[{time.strftime('%H:%M:%S')}] {NomDuKické} a été kické par {Nom[client]}"
                                                     print(Annonce)
                                                     Envoi(Annonce, "Annonce")
 
