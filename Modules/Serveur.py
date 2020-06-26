@@ -10,37 +10,90 @@ from tkinter import messagebox
 from Modules import ChiffrementRSA
 
 
-Débug = True
 
-def log(message):
+def ArrêtServeur():
 
-    """ Fonction qui logge dans un fichier "logs.txt" """
-
-    if Débug:
-
-        fichier = open("logs.txt", "a", encoding="utf-8")
-        fichier.write(str(message) + "\n")
-        fichier.close()
-    return
+    ConnexionSocket.close()
+    # Fermeture de la connexion
+    sys.exit()
 
 
 def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
-    global Module, CléPublique, CléPrivée, ClientsMax, listeClient, listeDesPseudos, HoteConnecté, nomClient, RoleClient, CléPubliqueClient, ModuleClient, nombreErreurs, MDP, PrésenceMDP, Statut
+    def Déconnexion(Client, Silencieux = False):
+
+        """ Fonction qui supprimme des variables du serveur les infos d'un client qui vient de se déconnecter. Quand le paramètre 
+        silencieux est égal à true, aucune annonce n'est faite """
+
+        #global ListeDesClientsConnectés, ListeDesPseudos, Nom, CléPublique, ModuleDeChiffrement, Rôle, Statut
+
+        if Rôle[Client] == "Hôte": HôteVientDePartir = True
+        else: HôteVientDePartir = False
+
+        if Rôle[Client] == "Client" and Silencieux == False:
+            annonce = f"[{time.strftime('%H:%M:%S')}] {Nom[Client]} vient de se déconnecter"
+            print(annonce)
+
+        elif Silencieux == False:
+            annonce = f"[{time.strftime('%H:%M:%S')}] {Nom[Client]} vient d'arrêter le serveur."
+
+        ListeDesClientsConnectés.remove(Client)
+        ListeDesPseudos.remove(Nom[Client])
+        del Nom[Client]
+        del CléPublique[Client]
+        del ModuleDeChiffrement[Client]
+        del Rôle[Client]
+        del Statut[Client]
+        #On supprime les informations du client déconnecté
+        #On utilise le mot clé del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
+
+        if Silencieux == False: Envoi(annonce, "Annonce")
+        #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
+
+        if HôteVientDePartir: ArrêtServeur()
+
+
+    def Envoi(message, type, Envoyeur = None):
+        #On rend l'argument Envoyeur facultatif pour que les annonces soit envoyées à tout le monde
+
+        """ Cette fonction sert à envoyer des messages au clients connectés"""
+
+        global ListeDesClientsConnectés
+        #On récupere la liste de toute les clients connectés
+
+        for destinataire in ListeDesClientsConnectés:
+        #On désigne les destinaires du message, à savoir tout les clients connectés
+
+            if destinataire != Envoyeur:
+            #Si le destinaire n'est pas l'expéditeur
+
+                messageEnvoi = ChiffrementRSA.chiffrement(message, CléPublique[destinataire], ModuleDeChiffrement[destinataire])
+                #On transforme les caractéres du message en chiffre selon leur ID Unicode, puis ensuite on chiffre le message
+                #Avec la clé publiq ue et le module de chaque client
+
+                ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
+                messageEnvoi = ChaineMessage.encode('utf-8')
+                destinataire.send(bytes(messageEnvoi))
+                #On encode le tout en UTF8 et on l'envoi au client
+
+    #Début du code de la fonction démarrer serveur
+    global Module, CléPubliqueServeur, CléPrivée, ClientsMax, ListeDesClientsConnectés, ListeDesPseudos, HôteConnecté, Nom, Rôle, CléPublique, ModuleDeChiffrement, MDP, PrésenceMDP, Statut, ConnexionSocket
 
     fen = Tk()
     fen.withdraw()
     #On crée une fenêtre qu'on affiche pas pour éviter qu'une fenêtre se génère lors de message d'erreurs
 
-    Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
+    Module, CléPubliqueServeur, CléPrivée = ChiffrementRSA.génération(16)
     #On génère notre jeu de clés Privée et Publique, ainsi que notre module de chiffrement
 
     if NombreClientsMax == "0" or NombreClientsMax == "Inconnu":
         ClientsMax = inf
-        #On utilise l'infini car si on cherche à vérifier si la limite à été dépassée, le résultat sera toujours false
-    else:
-        ClientsMax = int(NombreClientsMax)
+        #On utilise l'infini car si on cherche à vérifier si la limite à été dépassée, le résultat sera toujours 
+        
+    else: ClientsMax = int(NombreClientsMax)
     # On passe par une variable intérmédiaire car on ne peut modifier la portée d'un paramètre
+
+    HôteConnecté = False
 
     if MotDePasse != "Inconnu":  
         PrésenceMDP = True     
@@ -51,198 +104,114 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
         MDP = None
 
 
-    listeClient = []
-    listeDesPseudos = []
+    ListeDesClientsConnectés = []
+    ListeDesPseudos = []
     #On initialise la liste qui contient les objets clients, ainsi que la liste de tous les pseudos de
-    # tous les clients connectés pour éviter les doublons
+    #tous les clients connectés pour éviter les doublons
 
-    HoteConnecté = False
-
-    nomClient = {}
-    RoleClient= {}
-    CléPubliqueClient = {}
-    ModuleClient = {}
-    nombreErreurs = {}
+    Nom = {} #Le nom d'utilisateur
+    Rôle= {} #Hôte ou admin
+    CléPublique = {} #Sa clé de chiffrement RSA
+    ModuleDeChiffrement = {}
     Statut = {}
     #On initialise des dictionnaires vides qui serviront à récuperer les informations de chaque objet client.
-    #Exemple, Marc est un objet client, quand veut récuperer son nom d'utilisateur, on utilise la syntaxe "nomClient[Marc}"
-
-    def arretServeur():
-
-        Serveur.close()
-        # Fermeture de la connexion
-
-        sys.exit()
+    #Exemple, Marc est un objet client, quand veut récuperer son nom d'utilisateur, on utilise la syntaxe "Nom[Marc}"
 
 
-    def envoi(message, type, Envoyeur=None):
-    #On rend l'argument Envoyeur facultatif
-
-        """ Cette fonction sert à envoyer des messages au clients connectés"""
-
-        global listeClient
-        #On récupere la liste de toute les clients connectés
-
-        for destinataire in listeClient:
-        #On désigne les destinaires du message, à savoir tout les clients connectés
-
-            if destinataire != Envoyeur:
-            #Si le destinaire n'est pas l'expéditeur
-
-                messageEnvoi = ChiffrementRSA.chiffrement(message, CléPubliqueClient[destinataire], ModuleClient[destinataire])
-                #On transforme les caractéres du message en chiffre selon leur ID Unicode, puis ensuite on chiffre le message
-                #Avec la clé publiq ue et le module de chaque client
-
-                ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
-                messageEnvoi = ChaineMessage.encode('utf-8')
-                destinataire.send(bytes(messageEnvoi))
-                #On encode le tout en UTF8 et on l'envoi au client
-
-
-    def Déconnexion(Client):
-
-        """ Fonction qui supprimme des variables du serveur les infos d'un client qui vient de se déconnecter """
-
-        if RoleClient[Client] == "Client":
-            annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient de se déconnecter"
-            print(annonce)
-            log(annonce)
-
-            listeClient.remove(Client)
-            listeDesPseudos.remove(nomClient[Client])
-            del nomClient[Client]
-            del CléPubliqueClient[Client]
-            del RoleClient[Client]
-            del Statut[Client]
-            #On supprime les informations du client déconnecté
-            #On utilise le mot clé del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
-
-            envoi(annonce, "Annonce")
-            #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
-        else:
-            annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[Client]} vient d'arrêter le serveur."
-            log(annonce)
-
-            listeClient.remove(Client)
-            listeDesPseudos.remove(nomClient[Client])
-            del nomClient[Client]
-            del CléPubliqueClient[Client]
-            del RoleClient[Client]
-            del nombreErreurs[Client]
-            del Statut[Client]
-            #On vide tout les données de l'hôte
-
-            envoi(annonce, "Annonce")
-
-            arretServeur()
-
-
-
-    Serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ConnexionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #On défini les paramêtres du socket
 
-    try:
-        Serveur.bind((IP, Port))
+    try: ConnexionSocket.bind((IP, Port))
     except OSError:
     #Si jamais le lancement du serveur échoue (IP Invalide), on affiche un message d'erreur
         tkinter.messagebox.showerror(title="Aïe...", message="IL semblerait que votre IP ne soit pas valide. Réferez vous à l'aide pour régler ce problème.")
-        log("Erreur - IP invalide")
+
     else:
         #On configure le serveur en mode non-bloquant : Au lieu d'attendre une réponse et de bloquer le programme, l'instruction retourne
-        #une exeception si jamais aucune données n'est envoyée, ce qui empecherait la gestion de plusieurs clients
-        Serveur.setblocking(0)
+        #une exeception si jamais aucune DonnéesDuClient n'est envoyée, ce qui empecherait la gestion de plusieurs clients
+        ConnexionSocket.setblocking(0)
 
         #Démarrage du serveur
-        Serveur.listen()
-        annonce = "Serveur démarré à " + time.strftime("%H:%M:%S") + " sur le port " + str(Port)
-        print(annonce)
-        log(annonce)
-        
+        ConnexionSocket.listen()
+        print("ConnexionSocket démarré à " + time.strftime("%H:%M:%S") + " sur le port " + str(Port))        
 
         def FonctionServeur():
+        #La fonction qui tourne en boucle tant que le serveur est démarré
 
-            global HoteConnecté, listeClient, listeDesPseudos, nomClient, RoleClient, CléPubliqueClient, ModuleClient, nombreErreurs, ClientsMax, MDP, PrésenceMDP, Statut
+            global HôteConnecté, ListeDesClientsConnectés, ListeDesPseudos, Nom, Rôle, CléPublique, ModuleDeChiffrement, ClientsMax, MDP, PrésenceMDP, Statut
             
             while True:
-                try:
-                    objetClient, IPClient = Serveur.accept()
-                    #On accepte chaque connexion et on récupere les infos du client dans "objetClient"
-                    #Et son IP et son port dans IPClient
 
-                    données = objetClient.recv(32768)
-                    données = données.decode("utf-8")
+                try: objetClient, IPClient = ConnexionSocket.accept()
+                #On accepte chaque connexion et on récupere les infos du client dans "objetClient"
+                #Et son IP et son port dans IPClient
+
+                except IOError:
+                #Si personne n'essaie de se connecter, on ne fait rien
+                    pass
+                
+                else:
+                #Connexion d'un client
+
+                    DonnéesDuClient = objetClient.recv(32768)
+                    DonnéesDuClient = DonnéesDuClient.decode("utf-8")
                     #On recoit et on convertir les données du client
-                    log("Données recues ==> " + données)
 
-                    données = données.split("|")
+                    DonnéesDuClient = DonnéesDuClient.split("|")
                     #On transforme ces données en liste
 
-                    if données[0] not in listeDesPseudos and ClientsMax >= len(listeClient) +1:
+                    if DonnéesDuClient[0] not in ListeDesPseudos and ClientsMax >= len(ListeDesClientsConnectés) + 1:
+                    #Si le pseudo n'est pas utilité et qu'il reste de la place dans le serveur
                         
-                        objetClient.send(bytes(f"{str(CléPublique)}|{str(Module)}|{str(PrésenceMDP)}", "utf-8"))
+                        objetClient.send(bytes(f"{str(CléPubliqueServeur)}|{str(Module)}|{str(PrésenceMDP)}", "utf-8"))
                         #On envoi au client les informations de chiffremment du serveur
 
-                        nomClient[objetClient] = données[0]
-                        CléPubliqueClient[objetClient] = int(données[1])
-                        ModuleClient[objetClient] = int(données[2])
-                        #On récupere les informations du client dans les dictionnaires adéquats
+                        Nom[objetClient] = DonnéesDuClient[0]
+                        CléPublique[objetClient] = int(DonnéesDuClient[1])
+                        ModuleDeChiffrement[objetClient] = int(DonnéesDuClient[2])
 
-                        nombreErreurs[objetClient] = 0
-                        #On initialise le nombre d'erreurs
+                        ListeDesPseudos.append(DonnéesDuClient[0])
 
-                        listeDesPseudos.append(données[0])
-                        #On ajoute son pseudo à la liste
+                        if PrésenceMDP == False: Statut[objetClient] = "Connecté"
 
-                        if PrésenceMDP == False:
-                            Statut[objetClient] = "Connecté"
+                        else: Statut[objetClient] = "Attente"
 
-                        else:
-                            Statut[objetClient] = "Attente"
+                        if HôteConnecté == False:
+                        #Si c'est la première connexion, on précise que c'est l'hôte
 
-
-                        if HoteConnecté == False:
-                        #Si c'est la première connexion, on précise que c,'est l'hôte
-
-                            RoleClient[objetClient] = "Hôte"
-                            Statut[objetClient] = "Connecté" #L'hôte est toujours connecté, pas bessoin de mot de passe
-                            print(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
-                            log(f"[{time.strftime('%H:%M:%S')}] L'hôte vient de se connecter")
-                            HoteConnecté = True
-
+                            HôteConnecté = True
+                            Rôle[objetClient] = "Hôte"
+                            Statut[objetClient] = "Connecté" #L'hôte est toujours connecté, pas besoin de mot de passe
+                            print(f"[{time.strftime('%H:%M:%S')}] L'hôte {Nom[objetClient]} vient de se connecter")
+                            
                         else:
                         #Sinon c'est un client
 
-                            RoleClient[objetClient] = "Client"
+                            Rôle[objetClient] = "Client"
 
                             if PrésenceMDP == False:
 
-                                annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[objetClient]} vient de rejoindre le chat"
-                                log(annonce)
+                                annonce = f"[{time.strftime('%H:%M:%S')}] {Nom[objetClient]} vient de rejoindre le chat"
                                 print(annonce)
-                                envoi(annonce, "Annonce")
+                                Envoi(annonce, "Annonce")
 
-                        listeClient.append(objetClient)
+                        ListeDesClientsConnectés.append(objetClient)
 
-                    elif données[0] in listeDesPseudos:
+                    elif DonnéesDuClient[0] in ListeDesPseudos:
                     #Si le nom est déja pris
 
                         objetClient.send(bytes("False", "utf-8"))
                         time.sleep(0.5) #Le délai évite que les paquets se mélangent
                         objetClient.send(bytes("Votre nom d'utilisateur est déja utilisé dans ce serveur, veuillez en changer.", "utf-8"))
   
-                    elif ClientsMax < len(listeClient) + 1:
+                    elif ClientsMax < len(ListeDesClientsConnectés) + 1:
                     #Si le serveur est complet
 
                         objetClient.send(bytes("False", "utf-8"))
                         time.sleep(0.4)
                         objetClient.send(bytes("Le serveur a atteint sa capacité maximale", "utf-8"))
 
-
-                except IOError:
-                #Si personne n'essaie de se connecter, on ne fait rien
-                    pass
-
-                for client in listeClient:
+                for client in ListeDesClientsConnectés:
                 #On récupere chaque client dans la liste des clients connectés
 
                     try:
@@ -253,98 +222,100 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                             message = client.recv(32768) #L'argument dans la fonction recv définit combien de caractères on reçoit
                             message = message.decode("utf-8")
                             #On recoit le message et on le décode
-                            log("Message recu ==> " + message)
 
-                            message = message.split("-")
-                            #Le message comporte un petit entête
-                            #Exemple = 564-6646464/65656/4564564654, 564 est içi la longueur totale du message. Cela peut arriver que les très long messages (Fichiers) fassent plus
-                            #de 2048 la taille taille du buffer
+                    except BlockingIOError:
+                    # Si aucun message n'a été envoyé, on temporise pour éviter de trop consommer des ressources
+                    # Exemple, sans temporisation, 38% du processeur, on passe à peine 1% avec un délai non ressenti
+                
+                        time.sleep(0.1)
 
+                    except ConnectionResetError:
+                    #Si jamais un des clients s'est déconnecté
+                        Déconnexion(client)
 
-                            LongeurMessage = int(message[0])
+                    else:
+                    #Le serveur a recu un mesage
 
-                            while len(message[1]) < LongeurMessage:
-                            #Tant que le message recu est plus petit que la longueur totale du message
+                            if Statut[client] == "Connecté":
 
-                                suite = client.recv(32768)
-                                suite = suite.decode("utf-8")
+                                message = message.split("-")
+                                #Le message comporte un petit entête
+                                #Exemple = 564-6646464/65656/4564564654, 564 est içi la longueur totale du message. Cela peut arriver que les très long messages (Fichiers) fassent plus
+                                #de 2048 la taille taille du buffer
 
-                                message[1] += suite
-                                #On ajoute la suite du message recu
-
-                            #A ce stade le message est complet
-
-                            message = ChiffrementRSA.déchiffrement(message[1], CléPrivée, Module)
-                            #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
-                            #0 étant la longueur de ce message
-                            log("Message déchiffré = " + message)
-
-                            if message == "":
-                            #Le message recu vide, la connexion à été temporairement perdue
-                            #Au bout d'un nombre défini d'exceptions, on déconnecte le client
-
-                                if nombreErreurs[client] < 5:
-                                    log("Une erreur pour " + nomClient[client])
-                                    nombreErreurs[client] += 1
-                                else:
-                                    log("Lancement de la procédure de déconnexion pour " + nomClient[client])
+                                if message[0] == "":
+                                #Si le message recu  est vide la connexion a été  perdue
                                     Déconnexion(client)
 
-                            else:
-                            #Si le message n'est pas vide
-
-                                nombreErreurs[client] = 0
-                                #On remet à zéro le nombre d'erreurs
-
-                                MessageListe = message.split("|")
-                                Type = MessageListe[0]
-                                #On récupere le message sous forme de liste afin de déterminer son type
-
-                                if Type == "Message":
-                                        HeureMessage = MessageListe[1]
-                                        Contenu = MessageListe[2]
-                                        #On récupere les information du message
-
-                                        messageFormaté = f"[{HeureMessage}] {nomClient[client]} → {Contenu}"
-                                        print(messageFormaté)
-                                        envoi(messageFormaté, "Message", client)
-
-                                elif Type == "Commande":
-
-                                    HeureCommande = MessageListe[1]
-                                    Commande = MessageListe[2]
-
-                                    if Commande == "stop":
-
-                                        if RoleClient[client] == "Hôte":
-                                            
-                                            Confirmation = messagebox.askquestion (f"Vous partez déja {nomClient[client]} ?","Vous voulez vraiment arrêter le serveur ?",icon = 'warning')
-
-                                            if Confirmation == "yes":
-                                                envoi(f"[{HeureCommande}] {nomClient[client]} vient d'arrêter le serveur", "Annonce")
-                                                arretServeur()
-
                                 else:
-                                #Si le message recu ne respecte aucune forme de message, il est invalide
-                                #Cela peut être du a un client pas à jour, ou bien une tentative de connexion frauduleuse
-
-                                    print(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
-                                    log(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
-
-                        else:
-                        #Si le client doit rentrer le mot de passe du serveur
+                                #Si le message n'est pas vide
                         
-                            MotDePasseClient = client.recv(4096)
+                                    LongeurMessage = int(message[0])
+
+                                    while len(message[1]) < LongeurMessage:
+                                    #Tant que le message recu est plus petit que la longueur totale du message
+
+                                        suite = client.recv(32768)
+                                        suite = suite.decode("utf-8")
+
+                                        message[1] += suite
+                                        #On ajoute la suite du message recu
+
+                                    #A ce stade le message est complet
+
+                                    message = ChiffrementRSA.déchiffrement(message[1], CléPrivée, Module)
+                                    #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
+                                    #0 étant la longueur de ce message
+     
+                                    MessageListe = message.split("|")
+                                    Type = MessageListe[0]
+                                    #On récupere le message sous forme de liste afin de déterminer son type
+
+                                    if Type == "Message":
+
+                                            HeureMessage = MessageListe[1]
+                                            Contenu = MessageListe[2]
+
+                                            messageFormaté = f"[{HeureMessage}] {Nom[client]} → {Contenu}"
+                                            print(messageFormaté)
+                                            Envoi(messageFormaté, "Message", client)
+
+                                    elif Type == "Commande":
+
+                                        HeureCommande = MessageListe[1]
+                                        Commande = MessageListe[2]
+
+                                        if Commande == "stop":
+
+                                            if Rôle[client] == "Hôte":
+                                                
+                                                Envoi(f"[{HeureCommande}] {Nom[client]} vient d'arrêter le serveur", "Annonce")
+                                                ArrêtServeur()
+
+                                    else:
+                                    #Si le message recu ne respecte aucune forme de message, il est invalide
+                                    #Cela peut être du a un client pas à jour, ou bien une tentative de connexion frauduleuse
+
+                                        print(f"Message invalide recu ! => {message} - Expéditeur => {IPClient[0]} ")
+
+                    try:
+                        if Statut[client] == "Attente":
+                        #Si le client doit rentrer le mot de passe du serveur
+
+                         MotDePasseClient = client.recv(4096)
+
+                    except BlockingIOError: pass
+                    except ConnectionResetError:
+                    #Si jamais un des clients s'est déconnecté
+
+                        Déconnexion(client, Silencieux = True)
+
+                    else:
+                        if Statut[client] == "Attente":
+                        #Si on recoit un mot de passe
+
                             MotDePasseClient = MotDePasseClient.decode("utf-8")
-
-                            if MotDePasseClient == "":
-
-                                listeClient.remove(client)
-                                listeDesPseudos.remove(nomClient[client])
-                                del nomClient[client]
-                                del CléPubliqueClient[client]
-                                del RoleClient[client]
-                                del Statut[client]
+                            if MotDePasseClient == "": Déconnexion(client, Silencieux = True)
 
                             else:
 
@@ -355,26 +326,13 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                     client.send(bytes("OK", "utf-8"))         
                                     Statut[client] = "Connecté"
 
-                                    annonce = f"[{time.strftime('%H:%M:%S')}] {nomClient[client]} vient de rejoindre le chat"
-                                    log(annonce)
+                                    annonce = f"[{time.strftime('%H:%M:%S')}] {Nom[client]} vient de rejoindre le chat"
                                     print(annonce)
-                                    envoi(annonce, "Annonce")
+                                    Envoi(annonce, "Annonce")
 
                                 else:
-                                    client.send(bytes("Nan", "utf-8")) 
+                                    client.send(bytes("Nan", "utf-8"))
                                 
-
-                    except BlockingIOError:
-                    # Si aucun message n'a été envoyé, on temporise pour éviter de trop consommer des ressources
-                    # Exemple, sans temporisation, 38% du processeur, on passe à peine 1% avec un délai non ressenti
-                
-                        time.sleep(0.1)
-
-                    except ConnectionResetError:
-                    #Si jamais un des clients s'est déconnecté
-                        log("Déconnexion de " + nomClient[client])
-                        Déconnexion(client)
-
                 
         threadServeur = threading.Thread(target=FonctionServeur)
         threadServeur.daemon = True #Ce flag signifie que quand il ne reste que ce thread, le programme s'arrête.

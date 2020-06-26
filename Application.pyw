@@ -1,9 +1,10 @@
 # coding: utf8
-import sys, platform
+import sys
 import time
 import socket
 import tkinter
 import winsound
+import platform
 import threading
 from tkinter import *
 import tkinter.simpledialog
