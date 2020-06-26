@@ -538,6 +538,10 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
         elif message == "/stop" and ModeManuel == False and Rôle == "Client":
 
             tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas arrêter le serveur, vous n'êtes pas l'hôte de la disscusion")
+        
+        elif message == "/lock" and Rôle == "Client" or message == "/unlock" and Rôle == "Client":
+
+            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas déverrouiler le serveur, vous n'êtes pas l'hôte de la disscusion")
 
 
         if RéponseUser == True and Rôle == "Hôte" or ModeManuel == True or message != "/stop":
@@ -563,6 +567,8 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
                     RetournerMenu(DemandeConfirmation = False, ConversationEnCours = True)
 
             if stop == True: RetournerMenu(DemandeConfirmation = None, ConversationEnCours = True, DemandeArrêt = False)
+
+            SaisieMessage.delete(0, 'end')
 
     elif len(message) != 0 and EnvoiPossible:
 
@@ -626,7 +632,6 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
                     winsound.PlaySound("Sons/Pop.wav", winsound.SND_ASYNC)
 
             SaisieMessage.delete(0, 'end')
-            #On vide la zone de saisie du message
 
             def RéactivationEnvoi():
 

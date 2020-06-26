@@ -77,7 +77,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                 #On encode le tout en UTF8 et on l'envoi au client
 
     #Début du code de la fonction démarrer serveur
-    global Module, CléPubliqueServeur, CléPrivée, ClientsMax, ListeDesClientsConnectés, ListeDesPseudos, HôteConnecté, Nom, Rôle, CléPublique, ModuleDeChiffrement, MDP, PrésenceMDP, Statut, ConnexionSocket
+    global Module, CléPubliqueServeur, CléPrivée, ClientsMax, ListeDesClientsConnectés, ListeDesPseudos, HôteConnecté, Nom, Rôle
+    global CléPublique, ModuleDeChiffrement, MDP, PrésenceMDP, Statut, ConnexionSocket, ServeurVerrouilé
 
     fen = Tk()
     fen.withdraw()
@@ -94,6 +95,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
     # On passe par une variable intérmédiaire car on ne peut modifier la portée d'un paramètre
 
     HôteConnecté = False
+    ServeurVerrouilé = False
 
     if MotDePasse != "Inconnu":  
         PrésenceMDP = True     
@@ -138,7 +140,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
         def FonctionServeur():
         #La fonction qui tourne en boucle tant que le serveur est démarré
 
-            global HôteConnecté, ListeDesClientsConnectés, ListeDesPseudos, Nom, Rôle, CléPublique, ModuleDeChiffrement, ClientsMax, MDP, PrésenceMDP, Statut
+            global HôteConnecté, ListeDesClientsConnectés, ListeDesPseudos, Nom, Rôle, CléPublique, ModuleDeChiffrement
+            global ClientsMax, MDP, PrésenceMDP, Statut, ServeurVerrouilé
             
             while True:
 
@@ -160,7 +163,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                     DonnéesDuClient = DonnéesDuClient.split("|")
                     #On transforme ces données en liste
 
-                    if DonnéesDuClient[0] not in ListeDesPseudos and ClientsMax >= len(ListeDesClientsConnectés) + 1:
+                    if DonnéesDuClient[0] not in ListeDesPseudos and ClientsMax >= len(ListeDesClientsConnectés) + 1 and ServeurVerrouilé == False:
                     #Si le pseudo n'est pas utilité et qu'il reste de la place dans le serveur
                         
                         objetClient.send(bytes(f"{str(CléPubliqueServeur)}|{str(Module)}|{str(PrésenceMDP)}", "utf-8"))
@@ -210,6 +213,11 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                         objetClient.send(bytes("False", "utf-8"))
                         time.sleep(0.4)
                         objetClient.send(bytes("Le serveur a atteint sa capacité maximale", "utf-8"))
+
+                    elif ServeurVerrouilé:
+                        objetClient.send(bytes("False", "utf-8"))
+                        time.sleep(0.4)
+                        objetClient.send(bytes("Le serveur est verrouilé", "utf-8"))
 
                 for client in ListeDesClientsConnectés:
                 #On récupere chaque client dans la liste des clients connectés
@@ -290,6 +298,20 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                 
                                                 Envoi(f"[{HeureCommande}] {Nom[client]} vient d'arrêter le serveur", "Annonce")
                                                 ArrêtServeur()
+
+                                        elif Commande == "lock":
+
+                                            if Rôle[client] == "Hôte":
+                                                
+                                                Envoi(f"[{HeureCommande}] {Nom[client]} vient de verrouiler le serveur", "Annonce")
+                                                ServeurVerrouilé = True
+
+                                        elif Commande == "unlock":
+
+                                            if Rôle[client] == "Hôte":
+                                                
+                                                Envoi(f"[{HeureCommande}] {Nom[client]} vient de déverrouiler le serveur", "Annonce")
+                                                ServeurVerrouilé = False
 
                                     else:
                                     #Si le message recu ne respecte aucune forme de message, il est invalide
