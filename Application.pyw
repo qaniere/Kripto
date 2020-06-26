@@ -253,7 +253,21 @@ def DémarrerServeur():
         if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
 
             MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="•")
+
+            if MotDePasse == None or MotDePasse == "":
+                    #Si l'utilisateur annule la connexion, il faut se déconnecter du serveur
+
+                Envoyer(ModeManuel = True, MessageManuel = "/stop")
+                ConnexionSocket.close()
+                return False
+
             ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show="•")
+
+            if ConfirmationMotDePasse == None or ConfirmationMotDePasse == "":
+
+                Envoyer(ModeManuel = True, MessageManuel = "/stop")
+                ConnexionSocket.close()
+                return False
 
             while ConfirmationMotDePasse != MotDePasse:
 
@@ -420,19 +434,37 @@ def SeConnecter():
     global InputIp, IP, InputPort, Port, Rôle, FichierSauvegarde, MotDePasse
 
     Rôle = "Client"
-    Port = int(InputPort.get())
     IP = InputIp.get()
+
+    try: Port = int(InputPort.get())
+    except ValueError:
+
+        tkinter.messagebox.showerror(title="Problème de port", message="Le port doit être un nombre entier entre 1 et 65535")
+        return False
 
     if Connexion() == True:
 
         if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
 
-            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show='*')
-            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show='*')
+            MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="•")
+
+            if MotDePasse == None or MotDePasse == "":
+            #Si l'utilisateur annule la connexion, il faut se déconnecter du serveur
+
+                ConnexionSocket.close()
+                return False
+
+            ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Veuillez confirmer le mot de passe", show="•")
+
+            if ConfirmationMotDePasse == None or ConfirmationMotDePasse == "":
+            #Si l'utilisateur annule la connexion, il faut se déconnecter du serveur
+
+                ConnexionSocket.close()
+                return False
 
             while ConfirmationMotDePasse != MotDePasse:
 
-                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show='*')
+                ConfirmationMotDePasse = tkinter.simpledialog.askstring("Confirmation", "Confirmation erronée. Veuillez confirmer le mot de passe", show="•")
 
             FichierSauvegarde = Sauvegarde.InitialisationSauvegarde(MotDePasse)
 

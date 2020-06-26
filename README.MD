@@ -23,8 +23,6 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 
 ## Liste de fonctionnalités à implémenter 
 
-- Pouvoir annuler la connexion si pas de mot de passe sauvegarde
-
 - Ajouter des commandes :
   
     - /lock - /unlock : Commande pour empêcher l'arrivé de nouveaux utilisateurs
