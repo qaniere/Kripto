@@ -23,11 +23,7 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 
 ## Liste de fonctionnalités à implémenter 
 
-- Nettoyer et refactor le code (En cours)
-
 - Pouvoir annuler la connexion si pas de mot de passe sauvegarde
-
-- Régler le bug de la sauvegarde ! (Encoder en Base64)
 
 - Ajouter des commandes :
   
@@ -38,4 +34,4 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 
 - Afficher nombres d'utilisateurs connectés
 
- - Remettre à jour les lignes de l'index
+- Remettre à jour les lignes de l'index
