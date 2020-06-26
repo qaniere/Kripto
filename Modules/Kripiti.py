@@ -22,7 +22,7 @@ def CréerUneIssue(Titre, Message, Plateforme):
 
     Issue = {"title": Titre,
              "body": Message + "\r\n" + Plateforme ,
-             "labels": ""}
+             "labels": [""]}
 
     Requête = session.post(url, json.dumps(Issue))
 
