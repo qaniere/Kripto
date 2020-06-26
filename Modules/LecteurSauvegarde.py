@@ -4,7 +4,6 @@ from tkinter import *
 import tkinter.simpledialog
 from Modules import Sauvegarde
 
-
 def LecteurSauvegarde():
 
     fen = Tk()
@@ -25,7 +24,7 @@ def LecteurSauvegarde():
             return
             # On stoppe la fonction
 
-        MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="*")
+        MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="•")
 
         if MotDePasse == "":
         # Aucun mot de passe rentré, on anule tout
@@ -39,7 +38,7 @@ def LecteurSauvegarde():
         Interface.delete(0,"end")
         # On supprime tout les fichiers dans l'interface
 
-        Disscusion = Sauvegarde.lectureSauvegarde(Fichier, MotDePasse)
+        Disscusion = Sauvegarde.LectureSauvegarde(Fichier, MotDePasse)
         # On lis la sauvegarde et on récupere sous forme de liste tout les messages
 
         for message in Disscusion:
@@ -92,7 +91,3 @@ def LecteurSauvegarde():
     Terminer.pack(side=LEFT, padx=7)
 
     fen.mainloop()
-
-if __name__ == "__main__":
-# Si le fichier est executé et non importé comme un module
-    LecteurSauvegarde()
