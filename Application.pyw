@@ -263,7 +263,7 @@ def DémarrerServeur():
         AffichageConversations()
 
 
-def DevenirClient():
+def Connexion():
 
     """ Cette fonction sert à se connecter au serveur et à Envoyer le nom d'utilisateur, la clé publique, le module de chiffrement au serveur,
     et on recoit les informations de chiffrement du serveur, la clé publique et le module de chiffrement. Si le serveur demande un mot de passe,
@@ -364,7 +364,7 @@ def DevenirClient():
             tkinter.messagebox.showerror(title="Connexion refusée par le serveur", message=motif.decode("utf-8"))
             return False
 
-def SeConnecter():
+def DevenirClient():
 
     """ Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter"""
 
@@ -412,7 +412,7 @@ def SeConnecter():
     Button(CadreParamètres, text="Se connecter",  command=SeConnecter).pack(pady=20)
 
 
-def Connexion():
+def SeConnecter():
 
     """ Fonction qui affiche l'interface de discusion si la connexion au serveur est une réussite"""
 
@@ -442,7 +442,7 @@ def AffichageConversations():
 
     """ Cette fonction sert à générer l'interface de la conversation"""
 
-    global CadreParamètres, SaisieMessage, NomUser, FilsMessages, BouttonEnvoyer, Connexion, ThreadRéception
+    global CadreParamètres, SaisieMessage, NomUser, FilsMessages, BouttonEnvoyer, ConnexionEnCours, ThreadRéception
 
     Logo.pack_forget()
     CadreParamètres.pack_forget()
@@ -469,7 +469,7 @@ def AffichageConversations():
     fen.bind_all('<Return>', lambda c: Envoyer())
     #On associe l'appui a a fonction Envoyer avec une fonction lambda afin de pouvoir Envoyer aucun argument
 
-    Connexion = True #Tant que cette variable est égale à True, le thread tournera
+    ConnexionEnCours = True #Tant que cette variable est égale à True, le thread tournera
 
     ThreadRéception = threading.Thread(target=Réception)
     ThreadRéception.daemon = True #Cet attribut signifie que quand il ne reste que ce thread, le programme s'arrête.
@@ -609,9 +609,9 @@ def Réception():
     """Cette fonction est un thread (Suite d'instructions qui s'exécutent arrière plan de l'application). Il permet de recevoir 
     des messages du serveur."""
 
-    global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, Connexion
+    global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, ConnexionEnCours
 
-    while Connexion == True:
+    while ConnexionEnCours == True:
     #Quand Connexion est égal à False, le Thread s'arrête
 
         try: MessageReçu = ConnexionSocket.recv(32768)
@@ -686,7 +686,7 @@ def Réception():
 
 def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, DepuisMenu = None, DemandeArrêt = True):
 
-    global FilsMessages, SaisieMessage, BouttonEnvoyer, SousMenuCliqué, Connexion
+    global FilsMessages, SaisieMessage, BouttonEnvoyer, SousMenuCliqué, ConnexionEnCours
 
     Confirmation = None
 
@@ -719,7 +719,7 @@ def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
             BarreMenu.delete(3)
             #On efface les commandes "Couper Son" et "Infos Serveur" du menu
 
-            Connexion = False #Le thread de réception est arrêté
+            ConnexionEnCours = False #Le thread de réception est arrêté
             ConnexionSocket.close()
 
         if DepuisMenu:

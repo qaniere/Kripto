@@ -1,17 +1,27 @@
 # Kripto
 
-*Descripton en cours de rédaction*
+Kripto est un chat chiffré peer to peer. Tout les messages sont chiffré avec l'algorithe RSA, ce qui le rend sécurisé. Les message peuvent être
+échangé au sein d'un réseau local mais également à travers Internet, à l'aide des redirections NAT.
+
+Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre de l'enseignement de spécialité "Numérique et Sciences Informatiques". Il est sous license MIT. Toute contribution est la bienvenue.
 
 ## Fonctionalités
 
-*En cours de rédaction*
+ - Discussion peer to peer chiffrée : Seul les participants de la conversations peuvent voir les messages
+ - Protection du serveur avec un mot de passe : Seules les personnes qui ont le mot de passe peuvent accéder au serveur
+ - Panel de commandes pour les hôtes :
+    
+    - /stop pour arrêter le serveur
+    - En cours d'ajout
+
+ - Sauvegarde des messages
+ - Report de bug
 
 ## Fonctionnement
 
 *En cours de rédaction*
 
 ## Liste de fonctionnalités à implémenter 
-
 
 - Nettoyer et refactor le code (En cours)
 
@@ -27,19 +37,5 @@
     - /op : Commande qui permet de changer le rôle (Hôte à client, client à hôte)
 
 - Afficher nombres d'utilisateurs connectés
-
-- Voir si c'est possible de passer le thread de reception en bloquant
-
-- Envoyer des fichiers :
-
-    - Mettre en place des threads pour gérer les fichiers
-    - Chiffrer les fichiers plus rapidement avec des Threads
-    - Télécharger fichier coté serveur
-    - Serveur qui propose fichier => "PhotoChat.jpg est dispo, (1.3mo), faite /fichier 1 pour télécharger
-    - Téléchargement du fichier (Avec une connexion parallèle)
-    - Suppresion des fichiers à l'arrêt du serveur
-
- - Enlever toutes les fast string pour des raisons de compatibilité
-
 
  - Remettre à jour les lignes de l'index
