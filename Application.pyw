@@ -854,7 +854,7 @@ def Contact():
         Message = InputMessage.get("1.0", tkinter.END)
         Plateforme = platform.system() + " " + platform.release() + " " + platform.version()
 
-        if Kripti.CréerUneIssue(TitreIssue, Message, Plateforme) == True:
+        if Kripiti.CréerUneIssue(TitreIssue, Message, Plateforme) == True:
             tkinter.messagebox.showinfo(
 
                 title = "Succès !", 
