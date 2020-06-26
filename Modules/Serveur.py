@@ -160,7 +160,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                     DonnéesDuClient = DonnéesDuClient.decode("utf-8")
                     #On recoit et on convertir les données du client
 
-                    DonnéesDuClient = DonnéesDuClient.split("|")
+                    DonnéesDuClient = DonnéesDuClient.split("\n")
                     #On transforme ces données en liste
 
                     if DonnéesDuClient[0] not in ListeDesPseudos and ClientsMax >= len(ListeDesClientsConnectés) + 1 and ServeurVerrouilé == False:

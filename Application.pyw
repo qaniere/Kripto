@@ -307,13 +307,13 @@ def Connexion():
         #Si c'est l'hôte, il a déja recu l'erreur de la part du serveur donc affiche rien
 
             MessageErreur = "IL semblerait que les coordonées du serveur ne soit pas valides. Réferez vous à l'Aide pour régler ce problème."
-            tkinter.messagebox.showerror(title="Aïe...", message=MessageErreur)
+            tkinter.messagebox.showerror(title = "Problème de coordonnées", message = MessageErreur)
     
         return False
     
     else:
 
-        InfosChiffrement = f"{NomUser}|{CléPublique}|{Module}"
+        InfosChiffrement = f"{NomUser}\n{CléPublique}\n{Module}"
         InfosChiffrement = InfosChiffrement.encode('utf-8')
 
         ConnexionSocket.send(bytes(InfosChiffrement))
