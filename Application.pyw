@@ -11,54 +11,55 @@ import tkinter.font as tkFont
 from tkinter import messagebox
 from random import randint, choices
 from tkinter.scrolledtext import ScrolledText
-from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde, Serveur, Kripti
+from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, Sauvegarde, Serveur, Kripiti
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
                                           Index
 
-I. Définition de AfficherMenu()........................................................84
+I. Définition de AfficherMenu().......................................................128
 
     La fonction qui affiche le menu principal de l'application. Elle est appellée au 
     démarrage de l'application et quand l'utilisateur retourne au menu.
 
-II. Hôte et clients...................................................................105
+II. Hôte et clients...................................................................150
 
     Les fonctions qui servent à afficher le menus de connexion pour le client et celles 
     qui servent à démarrer le serveur.
 
-    A. Travail spécifique à l'hôte....................................................105
+    A. Travail spécifique à l'hôte....................................................150
 
-        1. Définition de DevenirHôte()................................................105
+        1. Définition de DevenirHôte()................................................150
 
             Cette fonction affiche le menu qui permet à l'hôte de configurer le mode de 
             connexion au serveur (Ip, Port et nom d'utilisateur)
 
-        2. Définition de DémarrerServeur()............................................176
+        2. Définition de DémarrerServeur()............................................222
 
             Cette fonction lance le thread du serveur, en récupérant les informations
             données sur l'interface de connexion.
 
-    B. Fonctions spécifiques au client
+    B. Fonctions spécifiques au client................................................266
 
-        1. Définition de DevenirClient()..................................................220
+        1. Définition de DevenirClient()..............................................266
 
-            Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter 
+            Cette fonction affiche l'interface qui permet choisir à quel serveur se 
+            connecter 
 
-        2. Définition de SeConnecter()..................................................220
+        2. Définition de SeConnecter()................................................367
 
-            Fonction qui récupere les informations saisies par l'utilisateur dans la fonction
-            DevenirClient() et qui initie une connexion avec le serveur.
+            Fonction qui récupere les informations saisies par l'utilisateur dans la 
+            fonction DevenirClient() et qui initie une connexion avec le serveur.
     
 
-III. Connexion et envoi de messages...................................................271
+III. Connexion et envoi de messages...................................................314
 
     Les fonctions dédiées à l'envoi et à la réception de messages au serveur
 
-    A. Connexion.......................................................271
+    A. Connexion......................................................................314
 
-        1. Définition de Connexion()..................................................271
+        1. Définition de Connexion()..................................................314
 
             Cette fonction sert à se connecter au serveur et à Envoyer le nom 
             d'utilisateur, la clé publique, le module de chiffrement au serveur, et on 
@@ -67,58 +68,59 @@ III. Connexion et envoi de messages.............................................
             fonction qui le récupére auprès de l'utilisateur, le chiffre et l'envoi au 
             serveur.
 
-    B. Définition de AffichageConversations().......................................381
+    B. Définition de AffichageConversations().........................................381
 
         Cette fonction sert à générer l'interface de la conversation
    
-    C.Envoyer et Recevoir.............................................................450
+    C.Envoyer et Recevoir.............................................................481
 
-        1. Définition de Envoyer().....................................................450
+        1. Définition de Envoyer()....................................................481
 
             Fonctions qui fonctionne avec deux mode :
 
-                - Le mode "automatique": La fonction récupere la valeur du champ de saisie
-                et l'envoi au serveur
+                - Le mode "automatique": La fonction récupere la valeur du champ de 
+                saisie et l'envoi au serveur
                 
-                - Le mode "manuel": La fonction est appellée et envoie le message au serveur
+                - Le mode "manuel": La fonction est appellée et envoie le message au 
+                serveur
 
-        2. Définition de Réception()....................................................593
+        2. Définition de Réception()..................................................607
 
-            Cette fonction est un thread (Suite d'instructions qui s'exécutent arrière plan de l'application). Il permet de recevoir 
-            des messages du serveur.
+            Cette fonction est un thread (Suite d'instructions qui s'exécutent arrière 
+            plan de l'application). Il permet de recevoir des messages du serveur.
 
-IV. Barre d'application................................................................676
+IV. Barre d'application...............................................................687
 
-    A. Définition de RetournerMenu()...................................................676
+    A. Définition de RetournerMenu()..................................................687
 
         Fonction qui efface le contenu de la fenêtre et affiche le menuPrincipal
 
-    B. Définition de InfosServeur()....................................................732
+    B. Définition de InfosServeur()...................................................743
 
         La fenêtre qui affiche les informations sur le serveur
 
-    C. Définition de Aide()............................................................777
+    C. Définition de Aide()...........................................................787
 
         Fenêtre qui affiche de l'aide
 
-    D. Activer et désactiver le son....................................................817
+    D. Activer et désactiver le son...................................................828
 
         Fonctions triviales
 
-        1. Définition de ActiverSon()..................................................817
+        1. Définition de ActiverSon().................................................828
 
-        2. Définition de CouperSon()...................................................826
+        2. Définition de CouperSon()..................................................837
 
-    E. Définition de Contact().........................................................836
+    E. Définition de Contact()........................................................847
 
-        Fonction qui permet à l'utilisateur de reporter un bug via les Issues GitHub avec notre
-        bot "Kripiti"
+        Fonction qui permet à l'utilisateur de reporter un bug via les Issues GitHub 
+        avec notre bot "Kripiti"
 
-V. Définition de fermeture()...........................................................891
+V. Définition de fermeture()..........................................................900
     
     Fonctions appelée quand l'utilisateur ferme la fenêtre
 
-VI.Lancement du programme.............................................................902
+VI.Lancement du programme.............................................................912
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -263,54 +265,6 @@ def DémarrerServeur():
 
 def DevenirClient():
 
-    """ Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter"""
-
-    global InputIp, InputPort, InputNom, CadreParamètres, SousMenuCliqué
-
-    SousMenuCliqué = True
-    #Si l"utilisateur veut retourner au menu, on sait qu'il est dans un sous-menu
-
-    MessageBienvenue.pack_forget()
-    CadreBouttons.pack_forget()
-
-    CadreParamètres = Frame(fen, bg="grey")
-    CadreParamètres.pack()
-
-    #Label Adresse ip du serveur
-    Label(CadreParamètres, text="Adresse IP du serveur", bg="Grey").pack(anchor=CENTER, pady=7)
-
-    InputIp = Entry(CadreParamètres)
-    InputIp.insert("end", "192.168.1.")
-    InputIp.pack(anchor=CENTER)
-
-    PortduServeur = Label(CadreParamètres, text="Port du serveur", bg="Grey")
-    PortduServeur.pack(anchor=CENTER, pady=7)
-
-    InputPort = Entry(CadreParamètres)
-    InputPort.pack(anchor=CENTER)
-
-    #Label de nom
-    Label(CadreParamètres, text="Votre nom d'utilisateur", bg="Grey").pack(anchor=CENTER, pady=7)
-
-    InputNom = Entry(CadreParamètres)
-    InputNom.pack(anchor=CENTER)
-
-    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
-    # Si l'utilisateur a définit un nom d'utilisateur par défaut
-        Fonctions.placeholder(InputNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
-
-    else:
-        SuggestionDeNom = choices(ListeNoms)
-        Fonctions.placeholder(InputNom, SuggestionDeNom[0], True)
-
-    InputNom.bind("<Button-1>", lambda b: Fonctions.placeholder(InputNom, "", False))
-    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
-
-    Button(CadreParamètres, text="Se connecter",  command=SeConnecter).pack(pady=20)
-
-
-def Connexion():
-
     """ Cette fonction sert à se connecter au serveur et à Envoyer le nom d'utilisateur, la clé publique, le module de chiffrement au serveur,
     et on recoit les informations de chiffrement du serveur, la clé publique et le module de chiffrement. Si le serveur demande un mot de passe,
     c'est cette fonction qui le récupére auprès de l'utilisateur, le chiffre l'envoi au serveur."
@@ -410,8 +364,55 @@ def Connexion():
             tkinter.messagebox.showerror(title="Connexion refusée par le serveur", message=motif.decode("utf-8"))
             return False
 
-
 def SeConnecter():
+
+    """ Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter"""
+
+    global InputIp, InputPort, InputNom, CadreParamètres, SousMenuCliqué
+
+    SousMenuCliqué = True
+    #Si l"utilisateur veut retourner au menu, on sait qu'il est dans un sous-menu
+
+    MessageBienvenue.pack_forget()
+    CadreBouttons.pack_forget()
+
+    CadreParamètres = Frame(fen, bg="grey")
+    CadreParamètres.pack()
+
+    #Label Adresse ip du serveur
+    Label(CadreParamètres, text="Adresse IP du serveur", bg="Grey").pack(anchor=CENTER, pady=7)
+
+    InputIp = Entry(CadreParamètres)
+    InputIp.insert("end", "192.168.1.")
+    InputIp.pack(anchor=CENTER)
+
+    PortduServeur = Label(CadreParamètres, text="Port du serveur", bg="Grey")
+    PortduServeur.pack(anchor=CENTER, pady=7)
+
+    InputPort = Entry(CadreParamètres)
+    InputPort.pack(anchor=CENTER)
+
+    #Label de nom
+    Label(CadreParamètres, text="Votre nom d'utilisateur", bg="Grey").pack(anchor=CENTER, pady=7)
+
+    InputNom = Entry(CadreParamètres)
+    InputNom.pack(anchor=CENTER)
+
+    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
+    # Si l'utilisateur a définit un nom d'utilisateur par défaut
+        Fonctions.placeholder(InputNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
+
+    else:
+        SuggestionDeNom = choices(ListeNoms)
+        Fonctions.placeholder(InputNom, SuggestionDeNom[0], True)
+
+    InputNom.bind("<Button-1>", lambda b: Fonctions.placeholder(InputNom, "", False))
+    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
+
+    Button(CadreParamètres, text="Se connecter",  command=SeConnecter).pack(pady=20)
+
+
+def Connexion():
 
     """ Fonction qui affiche l'interface de discusion si la connexion au serveur est une réussite"""
 
@@ -906,6 +907,7 @@ def fermeture():
 
         sys.exit()
         #On utilise sys.exit() plutôt que exit() car cela éviter au threads de tourner en arrière plan
+
 
 #Code exécuté au démarage de l'application
 
