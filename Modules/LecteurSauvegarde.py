@@ -71,7 +71,7 @@ def LecteurSauvegarde():
         fen.withdraw()
         tkinter.messagebox.showerror(title="Aïe...", message="Vous n'avez pas de sauvegardes")
         # On cache la fenêtre et on affiche un message d'erreur
-        exit()
+        return
 
     Interface = Listbox(fen, width="70", height="20")
     Interface.pack(pady=15)
