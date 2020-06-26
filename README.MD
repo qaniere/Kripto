@@ -25,7 +25,6 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 
 - Ajouter des commandes :
   
-    - /ban : Commande pour bannir un utilisateur 
     - /kick : Commande pour jeter l'utilisateur dehors 
     - /op : Commande qui permet de changer le rôle (Hôte à client, client à hôte)
 

@@ -44,6 +44,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
         del ModuleDeChiffrement[Client]
         del Rôle[Client]
         del Statut[Client]
+        del AdresseIp[Client]
         #On supprime les informations du client déconnecté
         #On utilise le mot clé del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
 
@@ -108,14 +109,16 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
     ListeDesClientsConnectés = []
     ListeDesPseudos = []
+    ListeDesIpBannies = []
     #On initialise la liste qui contient les objets clients, ainsi que la liste de tous les pseudos de
     #tous les clients connectés pour éviter les doublons
 
     Nom = {} #Le nom d'utilisateur
     Rôle= {} #Hôte ou admin
     CléPublique = {} #Sa clé de chiffrement RSA
-    ModuleDeChiffrement = {}
-    Statut = {}
+    ModuleDeChiffrement = {} #Son module de chiffrement
+    Statut = {} #Si l'utilisateur est connecté (Si il a rentré le mot de passe)
+    AdresseIp = {}
     #On initialise des dictionnaires vides qui serviront à récuperer les informations de chaque objet client.
     #Exemple, Marc est un objet client, quand veut récuperer son nom d'utilisateur, on utilise la syntaxe "Nom[Marc}"
 
@@ -145,7 +148,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
             
             while True:
 
-                try: objetClient, IPClient = ConnexionSocket.accept()
+                try: objetClient, CoordonnéesClient = ConnexionSocket.accept()
                 #On accepte chaque connexion et on récupere les infos du client dans "objetClient"
                 #Et son IP et son port dans IPClient
 
@@ -163,7 +166,9 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                     DonnéesDuClient = DonnéesDuClient.split("\n")
                     #On transforme ces données en liste
 
-                    if DonnéesDuClient[0] not in ListeDesPseudos and ClientsMax >= len(ListeDesClientsConnectés) + 1 and ServeurVerrouilé == False:
+                    AdresseIp[objetClient] = CoordonnéesClient[0]
+
+                    if DonnéesDuClient[0] not in ListeDesPseudos and ClientsMax >= len(ListeDesClientsConnectés) + 1 and ServeurVerrouilé == False and AdresseIp[objetClient] not in ListeDesIpBannies:
                     #Si le pseudo n'est pas utilité et qu'il reste de la place dans le serveur
                         
                         objetClient.send(bytes(f"{str(CléPubliqueServeur)}|{str(Module)}|{str(PrésenceMDP)}", "utf-8"))
@@ -215,9 +220,17 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                         objetClient.send(bytes("Le serveur a atteint sa capacité maximale", "utf-8"))
 
                     elif ServeurVerrouilé:
+
                         objetClient.send(bytes("False", "utf-8"))
                         time.sleep(0.4)
                         objetClient.send(bytes("Le serveur est verrouilé", "utf-8"))
+
+                    elif AdresseIp[objetClient] in ListeDesIpBannies:
+
+                        objetClient.send(bytes("False", "utf-8"))
+                        time.sleep(0.4)
+                        objetClient.send(bytes("Vous avez été banni de ce serveur", "utf-8"))
+
 
                 for client in ListeDesClientsConnectés:
                 #On récupere chaque client dans la liste des clients connectés
@@ -312,6 +325,47 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                 
                                                 Envoi(f"[{HeureCommande}] {Nom[client]} vient de déverrouiler le serveur", "Annonce")
                                                 ServeurVerrouilé = False
+
+                                        elif "ban" in Commande:
+
+                                            if Rôle[client] == "Hôte":
+                                            
+                                                NomDuBanni = Commande.replace("ban ", "")
+
+                                                Résultat = None
+
+                                                for ClientDuDico, Pseudo in Nom.items():
+                                                #On itére sur chaque pseudo du dictonnaire pour trouver l'ip du client à bannir
+                                                
+                                                    if Pseudo == NomDuBanni:
+                                                        Résultat = ClientDuDico
+
+                                                if Résultat == None: 
+
+                                                    Annonce = f'[{time.strftime("%H:%M:%S")}] Impossible de trouver "{NomDuBanni}"'
+                                                    print(Annonce)
+
+                                                    messageEnvoi = ChiffrementRSA.chiffrement(Annonce, CléPublique[client], ModuleDeChiffrement[client])
+                                                    ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
+                                                    messageEnvoi = ChaineMessage.encode('utf-8')
+                                                    client.send(bytes(messageEnvoi))
+                                                    #On envoi le message d'échec à l'exécuteur de la commande
+                                                    
+                                                else: 
+
+                                                    ListeDesIpBannies.append(AdresseIp[Résultat])
+
+                                                    MessageDeBan = ChiffrementRSA.chiffrement("ban", CléPublique[Résultat], ModuleDeChiffrement[Résultat])
+                                                    ChaineMessage = f"{len(MessageDeBan)}-{MessageDeBan}"
+                                                    ChaineMessage = ChaineMessage.encode('utf-8')
+                                                    Résultat.send(bytes(ChaineMessage))
+                                                    #On indique au banni qu'il a été banni
+
+                                                    Déconnexion(Résultat, Silencieux = True)
+
+                                                    Annonce = f"[{time.strftime('%H:%M:%S')}] {NomDuBanni} a été banni par {Nom[client]}"
+                                                    print(Annonce)
+                                                    Envoi(Annonce, "Annonce")
 
                                     else:
                                     #Si le message recu ne respecte aucune forme de message, il est invalide

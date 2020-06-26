@@ -541,8 +541,12 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
         
         elif message == "/lock" and Rôle == "Client" or message == "/unlock" and Rôle == "Client":
 
-            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas déverrouiler le serveur, vous n'êtes pas l'hôte de la disscusion")
+            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas verrouiler/déverrouiller le serveur, vous n'êtes pas l'hôte de la disscusion")
 
+        elif "ban" in message and Rôle == "Client":
+
+            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas bannir un client, vous n'êtes pas l'hôte de la disscusion")
+            
 
         if RéponseUser == True and Rôle == "Hôte" or ModeManuel == True or message != "/stop":
 
@@ -692,6 +696,12 @@ def Réception():
                 MessageReçu = ChiffrementRSA.déchiffrement(MessageReçu[1], CléPrivée, Module)
                 #On ne déchiffre que l'index 1 du message, qui est le messge en lui même
                 #0 étant la longueur de ce message
+
+                if MessageReçu == "ban":
+                    
+                    tkinter.messagebox.showinfo(title = "Vous avez été banni", message = "Vous avez été banni du serveur, vous ne pouvez plus vous reconnecter.")
+                    ConnexionEnCours = False
+                    RetournerMenu(ConversationEnCours = True)
 
                 if len(MessageReçu) > 70:
                 #Si le message à afficher fait plus de 70 caratères
