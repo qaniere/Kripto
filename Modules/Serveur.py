@@ -133,7 +133,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
         #Démarrage du serveur
         ConnexionSocket.listen()
-        print("ConnexionSocket démarré à " + time.strftime("%H:%M:%S") + " sur le port " + str(Port))        
+        print("Serveur démarré à " + time.strftime("%H:%M:%S") + " sur le port " + str(Port))        
 
         def FonctionServeur():
         #La fonction qui tourne en boucle tant que le serveur est démarré
@@ -232,7 +232,6 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                     except ConnectionResetError:
                     #Si jamais un des clients s'est déconnecté
                         Déconnexion(client)
-
                     else:
                     #Le serveur a recu un mesage
 
@@ -301,21 +300,25 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                     try:
                         if Statut[client] == "Attente":
                         #Si le client doit rentrer le mot de passe du serveur
-
-                         MotDePasseClient = client.recv(4096)
+                            MotDePasseClient = client.recv(4096)
 
                     except BlockingIOError: pass
-                    except ConnectionResetError:
+                    except ConnectionResetError: Déconnexion(client, Silencieux = True)
                     #Si jamais un des clients s'est déconnecté
-
-                        Déconnexion(client, Silencieux = True)
-
+        
+                    except KeyError: pass
+                    #Cette erreur se produit une seule fois, quand un client se déconnecte ses informations sont supprimées
+                    #mais avec un délai, donc cela génére une erreur une fois par déconnexion
+            
                     else:
                         if Statut[client] == "Attente":
                         #Si on recoit un mot de passe
 
                             MotDePasseClient = MotDePasseClient.decode("utf-8")
-                            if MotDePasseClient == "": Déconnexion(client, Silencieux = True)
+
+                            if MotDePasseClient == "": 
+                            #Le client s'est déconnecté avant d'envoyer son mot d passe
+                                Déconnexion(client, Silencieux = True)
 
                             else:
 
