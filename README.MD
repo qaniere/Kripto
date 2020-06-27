@@ -25,8 +25,6 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 
 - Faire un rôle Admin pour le /op
 
-- Traduire la date des fichiers de sauvegarde
-
 - Afficher nombres d'utilisateurs connectés
 
 - Remettre à jour les lignes de l'index
