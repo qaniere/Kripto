@@ -19,7 +19,7 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
     - /kick pour jeter un client hors du serveur
 
  - Sauvegarde des messages
- - Report de bug
+ - Report de bug (Disponible si le module requests est installé)
 
 ## Fonctionnement
 
