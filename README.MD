@@ -23,11 +23,6 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 
 ## Liste de fonctionnalités à implémenter 
 
-- Ajouter des commandes :
-  
-    - /kick : Commande pour jeter l'utilisateur dehors 
-    - /op : Commande qui permet de changer le rôle (Hôte à client, client à hôte)
-
 - Afficher nombres d'utilisateurs connectés
 
 - Remettre à jour les lignes de l'index
