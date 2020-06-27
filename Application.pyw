@@ -835,7 +835,7 @@ def InfosServeur():
     TitreUtilisateursCo.pack(pady=10)
 
     if Rôle == "Hôte":
-        NombresUtilisateursConnectés = str(len(Serveur.ListeDesClientsConnectés) + 1)
+        NombresUtilisateursConnectés = str(len(Serveur.ListeDesClientsConnectés))
     
     else:
         NombresUtilisateursConnectés = "N/C"
