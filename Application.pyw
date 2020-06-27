@@ -543,24 +543,29 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
             RéponseUser = tkinter.messagebox.askokcancel("Kripto","Voulez vraiment arrêter le serveur ?")
             stop = True
 
-        elif message == "/stop" and ModeManuel == False and Rôle == "Client":
+        elif message == "/stop" and ModeManuel == False and Rôle != "Hôte":
 
             tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas arrêter le serveur, vous n'êtes pas l'hôte de la disscusion")
             Permission = False
 
         elif message == "/lock" and Rôle == "Client" or message == "/unlock" and Rôle == "Client":
 
-            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas verrouiler/déverrouiller le serveur, vous n'êtes pas l'hôte de la disscusion")
+            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas verrouiler/déverrouiller le serveur, vous n'êtes pas admin de la disscusion")
             Permission = False
 
         elif "ban" in message and Rôle == "Client":
 
-            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas bannir un client, vous n'êtes pas l'hôte de la disscusion")
+            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas bannir un client, vous n'êtes pas admin de la disscusion")
             Permission = False
 
         elif "kick" in message and Rôle == "Client":
 
-            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas kicker un client, vous n'êtes pas l'hôte de la disscusion")
+            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas kicker un client, vous n'êtes pas admin de la disscusion")
+            Permission = False
+
+        elif "op" in message and Rôle != "Hôte":
+
+            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas utiliser cette commande, vous n'êtes pas l'hôte de la disscusion")
             Permission = False
 
         if RéponseUser == True and Rôle == "Hôte" or ModeManuel == True or message != "/stop" and Permission == True:
@@ -666,7 +671,7 @@ def Réception():
     """Cette fonction est un thread (Suite d'instructions qui s'exécutent arrière plan de l'application). Il permet de recevoir 
     des messages du serveur."""
 
-    global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, ConnexionEnCours, NombreConnectés
+    global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, ConnexionEnCours, NombreConnectés, Rôle
 
     while ConnexionEnCours == True:
     #Quand Connexion est égal à False, le Thread s'arrête
@@ -682,8 +687,8 @@ def Réception():
         except (ConnectionAbortedError, ConnectionResetError):
         #Le serveur a crashé
 
-            tkinter.messagebox.showerror(title="Aïe...", message="Le serveur a crashé...")
-            exit()
+            tkinter.messagebox.showerror(title="Problème de serveur", message="Le serveur a crashé...")
+            RetournerMenu(ConversationEnCours = True)
             #32768 est la limite d'octets recevables
 
         else:
@@ -731,6 +736,14 @@ def Réception():
                 elif MessageReçu == "déconnexion":
 
                     NombreConnectés -= 1
+
+                elif MessageReçu == "promotion":
+
+                    Rôle = "Admin"
+
+                elif MessageReçu == "rétrogradé":
+
+                    Rôle = "Client"
 
                 elif len(MessageReçu) > 70:
                 #Si le message à afficher fait plus de 70 caratères

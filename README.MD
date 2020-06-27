@@ -41,7 +41,3 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 ## Fonctionnement
 
 *En cours de rédaction*
-
-## Liste de fonctionnalités à implémenter 
-
-- Faire le /op pour le rôle admin

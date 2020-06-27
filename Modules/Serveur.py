@@ -338,7 +338,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                         elif Commande == "lock":
 
-                                            if Rôle[client] == "Hôte":
+                                            if Rôle[client] == "Hôte" or Rôle[client] == "Admin":
                                                 
                                                 Annonce = f"[{HeureCommande}] {Nom[client]} vient de verrouiler le serveur"
                                                 Envoi(Annonce, "Annonce")
@@ -346,7 +346,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                         elif Commande == "unlock":
 
-                                            if Rôle[client] == "Hôte":
+                                            if Rôle[client] == "Hôte" or Rôle[client] == "Admin":
                                                 
                                                 Annonce = f"[{HeureCommande}] {Nom[client]} vient de déverrouiler le serveur"
                                                 Envoi(Annonce, "Annonce")
@@ -354,7 +354,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                         elif "ban" in Commande:
 
-                                            if Rôle[client] == "Hôte":
+                                            if Rôle[client] == "Hôte" or Rôle[client] == "Admin":
                                             
                                                 NomDuBanni = Commande.replace("ban ", "")
 
@@ -371,7 +371,17 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                     messageEnvoi = ChaineMessage.encode('utf-8')
                                                     client.send(bytes(messageEnvoi))
                                                     #On envoi le message d'échec à l'exécuteur de la commande
+
+                                                elif Rôle[Résultat] == "Hôte":
                                                     
+                                                    Annonce = f'[{time.strftime("%H:%M:%S", time.localtime())}] Impossible de bannir l\'hôte'
+                                                    print(Annonce)
+
+                                                    messageEnvoi = ChiffrementRSA.chiffrement(Annonce, CléPublique[client], ModuleDeChiffrement[client])
+                                                    ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
+                                                    messageEnvoi = ChaineMessage.encode('utf-8')
+                                                    client.send(bytes(messageEnvoi))
+                                                    #On envoi le message d'échec à l'exécuteur de la commande
                                                 else: 
 
                                                     ListeDesIpBannies.append(AdresseIp[Résultat])
@@ -392,7 +402,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                         elif "kick" in Commande:
 
-                                            if Rôle[client] == "Hôte":
+                                            if Rôle[client] == "Hôte" or Rôle[client] == "Admin":
                                             
                                                 NomDuKické = Commande.replace("kick ", "")
 
@@ -402,6 +412,17 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                 if Résultat == None: 
 
                                                     Annonce = f'[{time.strftime("%H:%M:%S", time.localtime())}] Impossible de trouver "{NomDuKické}"'
+                                                    print(Annonce)
+
+                                                    messageEnvoi = ChiffrementRSA.chiffrement(Annonce, CléPublique[client], ModuleDeChiffrement[client])
+                                                    ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
+                                                    messageEnvoi = ChaineMessage.encode('utf-8')
+                                                    client.send(bytes(messageEnvoi))
+                                                    #On envoi le message d'échec à l'exécuteur de la commande
+
+                                                elif Rôle[Résultat] == "Hôte":
+                                                    
+                                                    Annonce = f'[{time.strftime("%H:%M:%S", time.localtime())}] Impossible de kicker l\'hôte'
                                                     print(Annonce)
 
                                                     messageEnvoi = ChiffrementRSA.chiffrement(Annonce, CléPublique[client], ModuleDeChiffrement[client])
@@ -426,12 +447,57 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                     time.sleep(0.3)
                                                     Envoi("déconnexion", "Annonce") #On met à jour le compteur des clients
 
+                                        elif "op" in Commande:
+
+                                            if Rôle[client] == "Hôte":
+                                            
+                                                NomDuPromu = Commande.replace("op ", "")
+
+                                                Résultat = TrouverClient(NomDuPromu, Nom)
+                                                #On cherche l'objet client associé au pseudo
+
+                                                if Résultat == None or Résultat == client: 
+
+                                                    Annonce = f'[{time.strftime("%H:%M:%S", time.localtime())}] Impossible de trouver "{NomDuPromu}"'
+                                                    print(Annonce)
+
+                                                    messageEnvoi = ChiffrementRSA.chiffrement(Annonce, CléPublique[client], ModuleDeChiffrement[client])
+                                                    ChaineMessage = f"{len(messageEnvoi)}-{messageEnvoi}"
+                                                    messageEnvoi = ChaineMessage.encode('utf-8')
+                                                    client.send(bytes(messageEnvoi))
+                                                    #On envoi le message d'échec à l'exécuteur de la commande
+                                                    
+                                                else: 
+
+                                                    if Rôle[Résultat] == "Client": 
+                                                        Action = "promotion"
+                                                        Rôle[Résultat] = "Admin"
+                                                        print(Rôle[Résultat] )
+                                                        Annonce = f"[{time.strftime('%H:%M:%S')}] {NomDuPromu} a été promu au rang d'admin par {Nom[client]}"
+
+                                                    else:
+                                                        Rôle[Résultat] = "Client"
+                                                        Action = "rétrogradé"
+                                                        Annonce = f"[{time.strftime('%H:%M:%S')}] {NomDuPromu} a été rétrogradé au rand de client par {Nom[client]}"
+                                                
+                                                    Message = ChiffrementRSA.chiffrement(Action, CléPublique[Résultat], ModuleDeChiffrement[Résultat])
+                                                    ChaineMessage = f"{len(Message)}-{Message}"
+                                                    ChaineMessage = ChaineMessage.encode('utf-8')
+                                                    Résultat.send(bytes(ChaineMessage))
+                                                    #On indique au banni qu'il a été promu / rétrogradé
+
+                                                    time.sleep(0.2)
+
+                                                    print(Annonce)
+                                                    Envoi(Annonce, "Annonce")
+                    
+
                                         elif Commande == "fact":
 
                                             ThreadEasterEgg = threading.Thread(target=EasterEgg)
                                             ThreadEasterEgg.daemon = True
                                             ThreadEasterEgg.start()
-                                            #On lance l'easter egg dans un thread pour poursuivre l'exécution du programme                                        
+                                            #On lance l'easter egg dans un thread pour ne pas bloquer l'exécution du programme                               
 
                                     else:
                                     #Si le message recu ne respecte aucune forme de message, il est invalide
