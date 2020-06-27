@@ -7,7 +7,7 @@ import threading
 from math import inf
 from tkinter import *
 from tkinter import messagebox
-from Modules import ChiffrementRSA
+from Modules import ChiffrementRSA, Kripiti
 
 
 
@@ -69,6 +69,11 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
         #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
 
         if HôteVientDePartir: ArrêtServeur()
+
+    def EasterEgg():
+
+        Fact = Kripiti.ChuckNorrisFacts()
+        Envoi(f"[{time.strftime('%H:%M:%S', time.localtime())}] {Fact}", "Annonce")
 
 
     def Envoi(message, type, Envoyeur = None):
@@ -420,6 +425,13 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                     Envoi(Annonce, "Annonce")
                                                     time.sleep(0.3)
                                                     Envoi("déconnexion", "Annonce") #On met à jour le compteur des clients
+
+                                        elif Commande == "fact":
+
+                                            ThreadEasterEgg = threading.Thread(target=EasterEgg)
+                                            ThreadEasterEgg.daemon = True
+                                            ThreadEasterEgg.start()
+                                            #On lance l'easter egg dans un thread pour poursuivre l'exécution du programme                                        
 
                                     else:
                                     #Si le message recu ne respecte aucune forme de message, il est invalide
