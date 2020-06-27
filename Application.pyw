@@ -834,7 +834,13 @@ def InfosServeur():
     TitreUtilisateursCo = Label(fenInfos, text="Utiliseurs connectées", bg="Grey", font=PoliceTitre)
     TitreUtilisateursCo.pack(pady=10)
 
-    UtilisateurCo = Label(fenInfos, text="N/C", bg="Grey", font=PoliceSousTitre)
+    if Rôle == "Hôte":
+        NombresUtilisateursConnectés = str(len(Serveur.ListeDesClientsConnectés) + 1)
+    
+    else:
+        NombresUtilisateursConnectés = "N/C"
+
+    UtilisateurCo = Label(fenInfos, text=NombresUtilisateursConnectés, bg="Grey", font=PoliceSousTitre)
     UtilisateurCo.pack()
 
     BouttonFermer = Button(fenInfos, text="Fermer", command = lambda: fenInfos.destroy())
