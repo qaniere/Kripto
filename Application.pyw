@@ -673,6 +673,9 @@ def Réception():
 
     global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, ConnexionEnCours, NombreConnectés, Rôle
 
+    NotifSilencieuse = False
+    #Est égal à true si le client recoit un messsage qui ne doit pas s'afficher (connexion/déconnexion par exemple)
+
     while ConnexionEnCours == True:
     #Quand Connexion est égal à False, le Thread s'arrête
 
@@ -722,28 +725,34 @@ def Réception():
                     tkinter.messagebox.showinfo(title = "Vous avez été banni", message = "Vous avez été banni du serveur, vous ne pouvez plus vous reconnecter.")
                     ConnexionEnCours = False
                     RetournerMenu(ConversationEnCours = True)
+                    NotifSilencieuse = True
 
                 elif MessageReçu == "kick":
 
                     tkinter.messagebox.showinfo(title = "Vous avez été kické", message = "Vous avez été kické du serveur.")
                     ConnexionEnCours = False
                     RetournerMenu(ConversationEnCours = True)
+                    NotifSilencieuse = True
 
                 if MessageReçu == "connexion":
 
                     NombreConnectés += 1
+                    NotifSilencieuse = True
 
                 elif MessageReçu == "déconnexion":
 
                     NombreConnectés -= 1
+                    NotifSilencieuse = True
 
                 elif MessageReçu == "promotion":
 
                     Rôle = "Admin"
+                    NotifSilencieuse = True
 
                 elif MessageReçu == "rétrogradé":
 
                     Rôle = "Client"
+                    NotifSilencieuse = True
 
                 elif len(MessageReçu) > 70:
                 #Si le message à afficher fait plus de 70 caratères
@@ -767,7 +776,13 @@ def Réception():
                 FilsMessages.yview(END)
                 #On force le défilement tout en bas de cette dernière
 
-                if SonActivé == True:
+                if FenêtreALeFocus == False and NotifSilencieuse == False and Paramètres.DicoParamètres["Notification"] == "Activée":
+
+                    try: Fonctions.AfficherNotification("Kripto", MessageReçu)
+                    except: pass
+                    #Les notifcations ne sont disponibles que sur Windows 10
+
+                if SonActivé == True and NotifSilencieuse == False:
                     if Paramètres.DicoParamètres["SonRéception"] != "Inconnu":
                         winsound.PlaySound("Sons/" + Paramètres.DicoParamètres["SonRéception"], winsound.SND_ASYNC)
                     else:
@@ -994,12 +1009,22 @@ def fermeture():
         sys.exit()
         #On utilise sys.exit() plutôt que exit() car cela éviter au threads de tourner en arrière plan
 
+def PasserEnTrue():
+
+    global FenêtreALeFocus
+    FenêtreALeFocus = True
+
+def PasserEnFalse():
+
+    global FenêtreALeFocus
+    FenêtreALeFocus = False
+
 
 #Code exécuté au démarage de l'application
 
 Paramètres.LectureParamètres()
 
-ListeNoms = ["Autruche", "Bob", "AmiralBenson", "TomNook", "Karamazov", "OdileDeray", "PatéEnCroute", "Risitas", "Clown"]
+ListeNoms = ["Autruche", "Bob", "AmiralBenson", "TomNook", "Karamazov", "PatéEnCroute", "Risitas", "Clown"]
 #La liste des noms qui seront suggérés à l'utilisateur.
 
 FichierSauvegarde = None
@@ -1015,6 +1040,8 @@ NombreConnectés = 1 #On se compte
 EnvoiPossible = True
 SonActivé = True
 SousMenuCliqué = False
+FenêtreALeFocus = True
+#Permet d'envoyer des notifcations uniquement quand la fenêtre est en arrière plan
 
 fen = Tk()
 fen.geometry("550x460")
@@ -1022,10 +1049,12 @@ fen.title("Kripto - Un chat chiffré")
 fen.configure(bg="grey")
 fen.resizable(width=False, height=False)
 fen.iconbitmap(bitmap="Médias/icone.ico")
+fen.bind("<FocusIn>", lambda x: PasserEnTrue())
+fen.bind("<FocusOut>", lambda x: PasserEnFalse())
 fen.protocol("WM_DELETE_WINDOW", fermeture)
 
 BarreMenu = Menu(fen)
-BarreMenu.add_command(label="Menu", command= lambda : RetournerMenu(DepuisMenu = True))
+BarreMenu.add_command(label="Menu", command= lambda: RetournerMenu(DepuisMenu = True))
 BarreMenu.add_command(label="Aide", command=Aide)
 BarreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde.LecteurSauvegarde)
 BarreMenu.add_command(label="Paramètres", command=Paramètres.InterfaceParamètres)

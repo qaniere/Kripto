@@ -1,10 +1,10 @@
 # coding: utf8
 import time
 import tkinter
-import subprocess
 import webbrowser
 from tkinter import *
 from tkinter import messagebox
+from win10toast import ToastNotifier
 
 
 """ Certains fonctions sont définies ici pour alléger le code de l'application """
@@ -30,6 +30,7 @@ def formaterPaquet(TypePaquet, Contenu):
         Paquet = f"Commande|{time.strftime('%H:%M:%S')}|{Contenu}"
 
     return Paquet
+
 
 def traitementPhrase(chaine):
     
@@ -77,7 +78,6 @@ def traitementPhrase(chaine):
             MotsRestants += " " + listeMots.pop(0)
  
     return chaine, MotsRestants
-
 
 
 def couperPhrases(chaine):
@@ -157,18 +157,20 @@ def placeholder(zone, nouveauTexte, premiereFois):
             #On supprime le bind de la zone d'entrée afin que l'utilisateur puisse saisir le texte initial du placeholder
             #si il le souhaite
 
-def pasCode():
-        """ Fonction qui affiche un message come quoi j'ai eu la flemme de coder la fonction pour le moment"""
-        tkinter.messagebox.showwarning(title="Aïe...", message="Cette fonction n'a pas encore été codée")
+def callback(url):
+    """ Fonction qui permet de suivre un url """
+    webbrowser.open_new(url)
 
+
+def AfficherNotification(Titre, Message):
+
+    toaster.show_toast(Titre,
+    Message,
+    icon_path = "Médias/icone.ico",
+    duration = 6,
+    threaded = True) #Non bloquant
 
 texteDeBase = {}
 #Initialision du dico néccessaire pour la fonction placeholder
 
-if __name__ == "__main__":
-
-    formaterPaquet("Commande", "/stop")
-    
-def callback(url):
-    """ Fonction qui permet de suivre un url """
-    webbrowser.open_new(url)
+toaster = ToastNotifier()

@@ -10,7 +10,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 
 
-ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi", "SonRéception", "NombreUsersMax", "MotDePasse"]
+ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi", "SonRéception", "NombreUsersMax", "MotDePasse", "Notification"]
 DicoParamètres = {}
 
 
@@ -19,7 +19,7 @@ def EnregistrerParamètres():
     """ Fonction qui récupére les paramètres dans l'interface et les enregistre dans 
     un fichier """
 
-    global DicoParamètres, fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax, MotDePasse
+    global DicoParamètres, fen, NomUser, ValeurCaseSauvegarde, EntréPort, Sélection, SélectionRéception, NombreUsersMax, MotDePasse
 
     # Récupération du nom d'utilisateur
     
@@ -34,7 +34,7 @@ def EnregistrerParamètres():
 
     # Récupération de l'activation de la sauvegarde
 
-    if ValeurCase.get() == True:
+    if ValeurCaseSauvegarde.get() == True:
 
         DicoParamètres["Sauvegarde"] = "Activée"
     
@@ -87,6 +87,14 @@ def EnregistrerParamètres():
     else:
         DicoParamètres["MotDePasse"] = "Inconnu"
 
+        
+    if NotifActivées == True:
+
+        DicoParamètres["Notification"] = "Activée"
+    
+    else: 
+        DicoParamètres["Notification"] = "Inconnu"
+
     for Paramètre in ListeParamètres:
     # On récupere chaque paramètres
 
@@ -129,7 +137,7 @@ def InterfaceParamètres():
 
     """ Fonction qui affiche les paramètres """
 
-    global fen, NomUser, ValeurCase, EntréPort, Sélection, SélectionRéception, NombreUsersMax, MotDePasse, AffichageMDP, MontrerMDP
+    global fen, NomUser, ValeurCaseSauvegarde, EntréPort, Sélection, SélectionRéception, NombreUsersMax, MotDePasse, AffichageMDP, MontrerMDP, NotifActivées
 
     fen = tk.Tk()
     fen.geometry("550x460")
@@ -183,19 +191,19 @@ def InterfaceParamètres():
 
     def changementValeur():
 
-        """ Cette fonction permet de changer la valeur de la variable Tkinter "ValeurCase. 
+        """ Cette fonction permet de changer la valeur de la variable Tkinter "ValeurCaseSauvegarde. 
         On n'utilise pas le paramètres var sur le Checkbutton car ce dernier ce fonction pas
         quand le fichier est appellée comme module"""
 
-        global ValeurCase
+        global ValeurCaseSauvegarde
 
-        if ValeurCase.get() == True:
-            ValeurCase.set(False)  
+        if ValeurCaseSauvegarde.get() == True:
+            ValeurCaseSauvegarde.set(False)  
         else:
-            ValeurCase.set(True)
+            ValeurCaseSauvegarde.set(True)
 
     
-    ValeurCase = tk.BooleanVar() 
+    ValeurCaseSauvegarde = tk.BooleanVar() 
 
     ConteneurSauvegarde = Frame(CadreGénéral, bg="grey")
     ConteneurSauvegarde.pack()
@@ -205,9 +213,9 @@ def InterfaceParamètres():
 
     if DicoParamètres["Sauvegarde"] == "Activée":
         BouttonActivationSauv.select()
-        ValeurCase.set(True)
+        ValeurCaseSauvegarde.set(True)
     else:
-        ValeurCase.set(False)
+        ValeurCaseSauvegarde.set(False)
 
     Label(ConteneurSauvegarde, text="Activation de la sauvegarde", bg="grey").pack(side="left")
     #####
@@ -227,6 +235,31 @@ def InterfaceParamètres():
 
     #####
 
+    #Partie notification 
+
+    ConteneurNotif = Frame(CadreGénéral, bg="grey")
+    ConteneurNotif.pack()
+
+    #On passe par un boutton car deux checkbox posent problèmes
+
+    def ChangementValeurNotif():
+        global NotifActivées
+
+        if NotifActivées == False:
+            BouttonActivationNotif.configure(text = "Désactiver les notifications")
+            NotifActivées = True
+
+        else:
+            BouttonActivationNotif.configure(text = "Activer les notifications")
+            NotifActivées = False
+
+    NotifActivées = False
+
+    BouttonActivationNotif = Button(ConteneurNotif, text="Activer les notifications", command= ChangementValeurNotif)
+    BouttonActivationNotif.pack(pady=10, padx=10, side="left")
+
+    if DicoParamètres["Notification"] == "Activée":
+        ChangementValeurNotif()
 
     Enregistrer = Button(CadreGénéral, text="Enregistrer", command=EnregistrerParamètres)
     Enregistrer.pack(side="bottom", pady=50)

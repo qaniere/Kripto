@@ -73,7 +73,9 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
     def EasterEgg():
 
         Fact = Kripiti.ChuckNorrisFacts()
-        Envoi(f"[{time.strftime('%H:%M:%S', time.localtime())}] {Fact}", "Annonce")
+        Fact = f"[{time.strftime('%H:%M:%S', time.localtime())}] {Fact}"
+        print(Fact)
+        Envoi(Fact, "Annonce")
 
 
     def Envoi(message, type, Envoyeur = None):
