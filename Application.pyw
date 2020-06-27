@@ -19,46 +19,48 @@ from Modules import ChiffrementRSA, Fonctions, LecteurSauvegarde, Paramètres, S
 
                                           Index
 
-I. Définition de AfficherMenu().......................................................129
+I. Définition de AfficherMenu().......................................................128
 
     La fonction qui affiche le menu principal de l'application. Elle est appellée au 
     démarrage de l'application et quand l'utilisateur retourne au menu.
 
-II. Hôte et clients...................................................................151
+II. Hôte et clients...................................................................150
 
     Les fonctions qui servent à afficher le menus de connexion pour le client et celles 
     qui servent à démarrer le serveur.
 
-    A. Travail spécifique à l'hôte....................................................151
+    A. Travail spécifique à l'hôte....................................................150
 
-        1. Définition de DevenirHôte()................................................151
+        1. Définition de DevenirHôte()................................................150
 
             Cette fonction affiche le menu qui permet à l'hôte de configurer le mode de 
             connexion au serveur (Ip, Port et nom d'utilisateur)
 
-        2. Définition de DémarrerServeur()............................................223
+        2. Définition de DémarrerServeur()............................................222
 
             Cette fonction lance le thread du serveur, en récupérant les informations
             données sur l'interface de connexion.
 
-    B. Fonctions spécifiques au client................................................330
+    B. Fonctions spécifiques au client................................................266
 
-        1. Définition de DevenirClient()..............................................330
+        1. Définition de DevenirClient()..............................................266
 
             Cette fonction affiche l'interface qui permet choisir à quel serveur se 
             connecter 
 
-        2. Définition de SeConnecter()................................................381
+        2. Définition de SeConnecter()................................................367
 
             Fonction qui récupere les informations saisies par l'utilisateur dans la 
             fonction DevenirClient() et qui initie une connexion avec le serveur.
     
 
-III. Connexion et envoi de messages...................................................339
+III. Connexion et envoi de messages...................................................314
 
     Les fonctions dédiées à l'envoi et à la réception de messages au serveur
 
-    A. Définition de Connexion()......................................................339
+    A. Connexion......................................................................314
+
+        1. Définition de Connexion()..................................................314
 
             Cette fonction sert à se connecter au serveur et à Envoyer le nom 
             d'utilisateur, la clé publique, le module de chiffrement au serveur, et on 
@@ -67,13 +69,13 @@ III. Connexion et envoi de messages.............................................
             fonction qui le récupére auprès de l'utilisateur, le chiffre et l'envoi au 
             serveur.
 
-    B. Définition de AffichageConversations().........................................481
+    B. Définition de AffichageConversations().........................................381
 
         Cette fonction sert à générer l'interface de la conversation
    
-    C.Envoyer et Recevoir.............................................................621
+    C.Envoyer et Recevoir.............................................................481
 
-        1. Définition de Envoyer()....................................................621
+        1. Définition de Envoyer()....................................................481
 
             Fonctions qui fonctionne avec deux mode :
 
@@ -83,43 +85,43 @@ III. Connexion et envoi de messages.............................................
                 - Le mode "manuel": La fonction est appellée et envoie le message au 
                 serveur
 
-        2. Définition de Réception()..................................................669
+        2. Définition de Réception()..................................................607
 
             Cette fonction est un thread (Suite d'instructions qui s'exécutent arrière 
             plan de l'application). Il permet de recevoir des messages du serveur.
 
-IV. Barre d'application...............................................................761
+IV. Barre d'application...............................................................687
 
-    A. Définition de RetournerMenu()..................................................761
+    A. Définition de RetournerMenu()..................................................687
 
         Fonction qui efface le contenu de la fenêtre et affiche le menuPrincipal
 
-    B. Définition de InfosServeur()...................................................817
+    B. Définition de InfosServeur()...................................................743
 
         La fenêtre qui affiche les informations sur le serveur
 
-    C. Définition de Aide()...........................................................867
+    C. Définition de Aide()...........................................................787
 
         Fenêtre qui affiche de l'aide
 
-    D. Activer et désactiver le son...................................................908
+    D. Activer et désactiver le son...................................................828
 
         Fonctions triviales
 
-        1. Définition de ActiverSon().................................................908
+        1. Définition de ActiverSon().................................................828
 
-        2. Définition de CouperSon()..................................................917
+        2. Définition de CouperSon()..................................................837
 
-    E. Définition de Contact()........................................................927
+    E. Définition de Contact()........................................................847
 
         Fonction qui permet à l'utilisateur de reporter un bug via les Issues GitHub 
         avec notre bot "Kripiti"
 
-V. Définition de fermeture()..........................................................980
+V. Définition de fermeture()..........................................................900
     
     Fonctions appelée quand l'utilisateur ferme la fenêtre
 
-VI.Lancement du programme.............................................................992
+VI.Lancement du programme.............................................................912
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -219,164 +221,6 @@ def DevenirHôte():
     BouttonDémarrer.pack(pady=20)
 
 def DémarrerServeur():
-    """ Cette fonction sert à se connecter au serveur et à Envoyer le nom d'utilisateur, la clé publique, le module de chiffrement au serveur,
-    et on recoit les informations de chiffrement du serveur, la clé publique et le module de chiffrement. Si le serveur demande un mot de passe,
-    c'est cette fonction qui le récupére auprès de l'utilisateur, le chiffre l'envoi au serveur."
-    """
-
-    global IP, Port, NomUser, InputNom, ConnexionSocket, InputIp, Rôle, CléPublique, CléPubliqueServeur, ModuleServeur
-
-    IP = InputIp.get()
-    NomUser = InputNom.get()
-
-    ConnexionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #On défini notre connexion socket
-    # - AF_INET => Protocole IPV4
-    # - SOCK_STREAM => Stream veut dire cours d'eau, comme un flot continu de donnés qui est envoyé
-
-    ConnexionSocket.settimeout(5)
-    #Si au bout de 5secondes, il n'y pas de réponse (Délai plus que nécéssaire pour des simples paquets TCP) une exception est générée
-
-    try:
-        ConnexionSocket.connect((IP, Port))
-
-    except (ConnectionRefusedError, socket.timeout):
-        #Si on arrive pas à se connecter au serveur
-
-        if Rôle != "Hôte":
-            #Si c'est l'hôte, il a déja recu l'erreur de la part du serveur donc affiche rien
-
-            MessageErreur = "IL semblerait que les coordonées du serveur ne soit pas valides. Réferez vous à l'Aide pour régler ce problème."
-            tkinter.messagebox.showerror(
-                title="Problème de coordonnées", message=MessageErreur)
-
-        return False
-
-    else:
-
-        InfosChiffrement = f"{NomUser}\n{CléPublique}\n{Module}"
-        InfosChiffrement = InfosChiffrement.encode('utf-8')
-
-        ConnexionSocket.send(bytes(InfosChiffrement))
-        #On formate, puis on envoi les informations de chiffrement au serveur
-
-        AutorisationEtDonnées = ConnexionSocket.recv(4096)
-        AutorisationEtDonnées = AutorisationEtDonnées.decode("utf-8")
-        #On recoit de la part du serveur l'autorisation de se connecter, et les informations de chiffrement du serveur
-
-        if AutorisationEtDonnées != "False":
-            #Si le serveur autorise la connexion
-
-            AutorisationEtDonnées = AutorisationEtDonnées.split("|")
-            #On récupere les données sous forme de le liste
-
-            CléPubliqueServeur = int(AutorisationEtDonnées[0])
-            ModuleServeur = int(AutorisationEtDonnées[1])
-            PrésenceMotDePasse = AutorisationEtDonnées[2]
-
-            if PrésenceMotDePasse == "True" and Rôle != "Hôte":
-                # l'hôte n'a pas besoin de se connecter
-
-                ConnexionEnAttente = True
-
-                while ConnexionEnAttente:
-
-                    MotDePasseServeur = tkinter.simpledialog.askstring(
-                        "Mot de passe du serveur", "Ce serveur demande un mot de passe pour se connecter", show="•")
-
-                    if MotDePasseServeur == None or MotDePasseServeur == "":
-                        #Si l'utilisateur annule la connexion, il faut se déconnecter du serveur
-
-                        ConnexionSocket.close()
-                        return False
-
-                    else:
-
-                        MotDePasseServeurChiffré = ChiffrementRSA.chiffrement(
-                            MotDePasseServeur, CléPubliqueServeur, ModuleServeur)
-
-                        ConnexionSocket.send(
-                            bytes(MotDePasseServeurChiffré, "utf-8"))
-
-                        Autorisation = ConnexionSocket.recv(4096)
-                        Autorisation = Autorisation.decode("utf-8")
-
-                        if Autorisation == "OK":
-                            ConnexionEnAttente = False
-
-                        else:
-                            tkinter.messagebox.showwarning(
-                                title="Mot de passe incorrect", message="Le mot de passe est incorrect")
-
-            ConnexionSocket.setblocking(0)
-            #On définit le mode de connexion sur non bloquant (Voir explications dans la fonction réception)
-
-            return True
-            #On retoune que la connexion a été validé
-
-        else:
-            #Si le serveur ne donne pas son autorisation
-
-            motif = ConnexionSocket.recv(4096)
-            #On recoit du serveur le motif du refus de
-
-            tkinter.messagebox.showerror(
-                title="Connexion refusée par le serveur", message=motif.decode("utf-8"))
-            return False
-
-
-def DevenirClient():
-    """ Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter"""
-
-    global InputIp, InputPort, InputNom, CadreParamètres, SousMenuCliqué
-
-    SousMenuCliqué = True
-    #Si l"utilisateur veut retourner au menu, on sait qu'il est dans un sous-menu
-
-    MessageBienvenue.pack_forget()
-    CadreBouttons.pack_forget()
-
-    CadreParamètres = Frame(fen, bg="grey")
-    CadreParamètres.pack()
-
-    #Label Adresse ip du serveur
-    Label(CadreParamètres, text="Adresse IP du serveur",
-          bg="Grey").pack(anchor=CENTER, pady=7)
-
-    InputIp = Entry(CadreParamètres)
-    InputIp.insert("end", "192.168.1.")
-    InputIp.pack(anchor=CENTER)
-
-    PortduServeur = Label(CadreParamètres, text="Port du serveur", bg="Grey")
-    PortduServeur.pack(anchor=CENTER, pady=7)
-
-    InputPort = Entry(CadreParamètres)
-    InputPort.pack(anchor=CENTER)
-
-    #Label de nom
-    Label(CadreParamètres, text="Votre nom d'utilisateur",
-          bg="Grey").pack(anchor=CENTER, pady=7)
-
-    InputNom = Entry(CadreParamètres)
-    InputNom.pack(anchor=CENTER)
-
-    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
-        # Si l'utilisateur a définit un nom d'utilisateur par défaut
-        Fonctions.placeholder(
-            InputNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
-
-    else:
-        SuggestionDeNom = choices(ListeNoms)
-        Fonctions.placeholder(InputNom, SuggestionDeNom[0], True)
-
-    InputNom.bind(
-        "<Button-1>", lambda b: Fonctions.placeholder(InputNom, "", False))
-    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
-
-    Button(CadreParamètres, text="Se connecter",
-           command=SeConnecter).pack(pady=20)
-
-def SeConnecter():
 
     """ Cette fonction récupére les coordonées du serveur saisis dans le menu d'hôte, et lance
     le thread du serveur """
@@ -435,6 +279,162 @@ def SeConnecter():
 
 
 def Connexion():
+
+    """ Cette fonction sert à se connecter au serveur et à Envoyer le nom d'utilisateur, la clé publique, le module de chiffrement au serveur,
+    et on recoit les informations de chiffrement du serveur, la clé publique et le module de chiffrement. Si le serveur demande un mot de passe,
+    c'est cette fonction qui le récupére auprès de l'utilisateur, le chiffre l'envoi au serveur."
+    """
+
+    global IP, Port, NomUser, InputNom, ConnexionSocket, InputIp, Rôle, CléPublique, CléPubliqueServeur, ModuleServeur, NombreConnectés
+
+    IP = InputIp.get()
+
+    try: Port = int(InputPort.get())
+    except ValueError:
+
+        tkinter.messagebox.showerror(title="Problème de port", message="Le port doit être un nombre entier entre 1 et 65535")
+        return False
+    NomUser = InputNom.get()
+
+    ConnexionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #On défini notre connexion socket
+    # - AF_INET => Protocole IPV4
+    # - SOCK_STREAM => Stream veut dire cours d'eau, comme un flot continu de donnés qui est envoyé
+
+    ConnexionSocket.settimeout(5)
+    #Si au bout de 5secondes, il n'y pas de réponse (Délai plus que nécéssaire pour des simples paquets TCP) une exception est générée
+
+    try: ConnexionSocket.connect((IP, Port))
+
+    except (ConnectionRefusedError, socket.timeout):
+    #Si on arrive pas à se connecter au serveur
+
+        if Rôle != "Hôte":
+        #Si c'est l'hôte, il a déja recu l'erreur de la part du serveur donc affiche rien
+
+            MessageErreur = "IL semblerait que les coordonées du serveur ne soit pas valides. Réferez vous à l'Aide pour régler ce problème."
+            tkinter.messagebox.showerror(title = "Problème de coordonnées", message = MessageErreur)
+    
+        return False
+    
+    else:
+
+        InfosChiffrement = f"{NomUser}\n{CléPublique}\n{Module}"
+        InfosChiffrement = InfosChiffrement.encode('utf-8')
+
+        ConnexionSocket.send(bytes(InfosChiffrement))
+        #On formate, puis on envoi les informations de chiffrement au serveur
+
+        AutorisationEtDonnées = ConnexionSocket.recv(4096)
+        AutorisationEtDonnées = AutorisationEtDonnées.decode("utf-8")
+        #On recoit de la part du serveur l'autorisation de se connecter, et les informations de chiffrement du serveur
+
+        if AutorisationEtDonnées != "False":
+        #Si le serveur autorise la connexion
+
+            AutorisationEtDonnées = AutorisationEtDonnées.split("|")
+            #On récupere les données sous forme de le liste
+
+            CléPubliqueServeur = int(AutorisationEtDonnées[0])
+            ModuleServeur = int(AutorisationEtDonnées[1])
+            PrésenceMotDePasse = AutorisationEtDonnées[2]
+            NombreConnectés = int(AutorisationEtDonnées[3])
+
+            if PrésenceMotDePasse == "True" and Rôle != "Hôte":
+            # l'hôte n'a pas besoin de se connecter
+
+                ConnexionEnAttente  = True
+
+                while ConnexionEnAttente:
+
+                    MotDePasseServeur= tkinter.simpledialog.askstring("Mot de passe du serveur", "Ce serveur demande un mot de passe pour se connecter", show="•")
+
+                    if MotDePasseServeur == None or MotDePasseServeur == "":
+                    #Si l'utilisateur annule la connexion, il faut se déconnecter du serveur
+
+                        ConnexionSocket.close()
+                        return False
+
+                    else:
+
+                        MotDePasseServeurChiffré = ChiffrementRSA.chiffrement(MotDePasseServeur, CléPubliqueServeur, ModuleServeur)
+
+                        ConnexionSocket.send(bytes(MotDePasseServeurChiffré, "utf-8"))
+
+                        Autorisation = ConnexionSocket.recv(4096)
+                        Autorisation =  Autorisation.decode("utf-8")
+
+                        if Autorisation == "OK":
+                            ConnexionEnAttente = False
+
+                        else:
+                            tkinter.messagebox.showwarning(title="Mot de passe incorrect", message="Le mot de passe est incorrect")
+
+
+            ConnexionSocket.setblocking(0)
+            #On définit le mode de connexion sur non bloquant (Voir explications dans la fonction réception)
+
+            return True
+            #On retoune que la connexion a été validé
+
+        else:
+        #Si le serveur ne donne pas son autorisation
+
+            motif = ConnexionSocket.recv(4096)
+            #On recoit du serveur le motif du refus de
+
+            tkinter.messagebox.showerror(title="Connexion refusée par le serveur", message=motif.decode("utf-8"))
+            return False
+
+def DevenirClient():
+
+    """ Cette fonction affiche l'interface qui permet choisir à quel serveur se connecter"""
+
+    global InputIp, InputPort, InputNom, CadreParamètres, SousMenuCliqué
+
+    SousMenuCliqué = True
+    #Si l"utilisateur veut retourner au menu, on sait qu'il est dans un sous-menu
+
+    MessageBienvenue.pack_forget()
+    CadreBouttons.pack_forget()
+
+    CadreParamètres = Frame(fen, bg="grey")
+    CadreParamètres.pack()
+
+    #Label Adresse ip du serveur
+    Label(CadreParamètres, text="Adresse IP du serveur", bg="Grey").pack(anchor=CENTER, pady=7)
+
+    InputIp = Entry(CadreParamètres)
+    InputIp.insert("end", "192.168.1.")
+    InputIp.pack(anchor=CENTER)
+
+    PortduServeur = Label(CadreParamètres, text="Port du serveur", bg="Grey")
+    PortduServeur.pack(anchor=CENTER, pady=7)
+
+    InputPort = Entry(CadreParamètres)
+    InputPort.pack(anchor=CENTER)
+
+    #Label de nom
+    Label(CadreParamètres, text="Votre nom d'utilisateur", bg="Grey").pack(anchor=CENTER, pady=7)
+
+    InputNom = Entry(CadreParamètres)
+    InputNom.pack(anchor=CENTER)
+
+    if Paramètres.DicoParamètres["NomUserDéfaut"] != "Inconnu":
+    # Si l'utilisateur a définit un nom d'utilisateur par défaut
+        Fonctions.placeholder(InputNom, Paramètres.DicoParamètres["NomUserDéfaut"], True)
+
+    else:
+        SuggestionDeNom = choices(ListeNoms)
+        Fonctions.placeholder(InputNom, SuggestionDeNom[0], True)
+
+    InputNom.bind("<Button-1>", lambda b: Fonctions.placeholder(InputNom, "", False))
+    #On utilise une fonction anonyme lambda pour pouvoir executer une fonction avec des arguments
+
+    Button(CadreParamètres, text="Se connecter",  command=SeConnecter).pack(pady=20)
+
+
+def SeConnecter():
 
     """ Fonction qui affiche l'interface de discusion si la connexion au serveur est une réussite"""
 
@@ -563,11 +563,6 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
             tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas kicker un client, vous n'êtes pas l'hôte de la disscusion")
             Permission = False
 
-        elif "op" in message and Rôle == "Client":
-
-            tkinter.messagebox.showerror(title = "Erreur de permission", message = "Vous ne pouvez pas kicker un client, vous n'êtes pas l'hôte de la disscusion")
-            Permission = False
-
         if RéponseUser == True and Rôle == "Hôte" or ModeManuel == True or message != "/stop" and Permission == True:
 
             message = Fonctions.formaterPaquet("Commande", message)
@@ -598,7 +593,7 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
 
         EnvoiPossible = False
 
-        messageInterface = f"[{time.strftime('%H:%M:%S', time.localtime())}] {NomUser} → {message}"
+        messageInterface = f"[{time.strftime('%H:%M:%S')}] {NomUser} → {message}"
         #On garde de coté un message avec un formaté spécialement pour l'interface, mais on ne l'utilise que si l'envoi est réussi.
 
         message = Fonctions.formaterPaquet("Message", message)
@@ -671,7 +666,7 @@ def Réception():
     """Cette fonction est un thread (Suite d'instructions qui s'exécutent arrière plan de l'application). Il permet de recevoir 
     des messages du serveur."""
 
-    global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, ConnexionEnCours
+    global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, ConnexionEnCours, NombreConnectés
 
     while ConnexionEnCours == True:
     #Quand Connexion est égal à False, le Thread s'arrête
@@ -723,13 +718,21 @@ def Réception():
                     ConnexionEnCours = False
                     RetournerMenu(ConversationEnCours = True)
 
-                if MessageReçu == "kick":
+                elif MessageReçu == "kick":
 
                     tkinter.messagebox.showinfo(title = "Vous avez été kické", message = "Vous avez été kické du serveur.")
                     ConnexionEnCours = False
                     RetournerMenu(ConversationEnCours = True)
 
-                if len(MessageReçu) > 70:
+                if MessageReçu == "connexion":
+
+                    NombreConnectés += 1
+
+                elif MessageReçu == "déconnexion":
+
+                    NombreConnectés -= 1
+
+                elif len(MessageReçu) > 70:
                 #Si le message à afficher fait plus de 70 caratères
 
                     LignesMessages = Fonctions.couperPhrases(MessageReçu)
@@ -818,12 +821,8 @@ def InfosServeur():
 
     """ Cette fonction affiches les informations du serveur dans une fenêtre en top level"""
 
-    global IP, Port
-
-    def QuitterInfos():
-        """Fonction qui détruit la fenêtre des infos du serveur"""
-        
-
+    global IP, Port, NombreConnectés
+      
     fenInfos = Toplevel()
     fenInfos.geometry("300x280")
     fenInfos.configure(bg="grey")
@@ -846,13 +845,7 @@ def InfosServeur():
     TitreUtilisateursCo = Label(fenInfos, text="Utiliseurs connectées", bg="Grey", font=PoliceTitre)
     TitreUtilisateursCo.pack(pady=10)
 
-    if Rôle == "Hôte":
-        NombresUtilisateursConnectés = str(len(Serveur.ListeDesClientsConnectés))
-    
-    else:
-        NombresUtilisateursConnectés = "N/C"
-
-    UtilisateurCo = Label(fenInfos, text=NombresUtilisateursConnectés, bg="Grey", font=PoliceSousTitre)
+    UtilisateurCo = Label(fenInfos, text = str(NombreConnectés), bg="Grey", font=PoliceSousTitre)
     UtilisateurCo.pack()
 
     BouttonFermer = Button(fenInfos, text="Fermer", command = lambda: fenInfos.destroy())
@@ -1004,6 +997,7 @@ Module, CléPublique, CléPrivée = ChiffrementRSA.génération(16)
 #On génére une clé publique et une clé publique et on garde en mémoire le module de chiffrement
 
 NombreErreurs = 0
+NombreConnectés = 1 #On se compte
 
 EnvoiPossible = True
 SonActivé = True

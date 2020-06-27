@@ -62,7 +62,10 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
         #On supprime les informations du client déconnecté
         #On utilise le mot clé del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
 
-        if Silencieux == False: Envoi(annonce, "Annonce")
+        if Silencieux == False: 
+            Envoi(annonce, "Annonce")
+            time.sleep(0.3)
+            Envoi("déconnexion", "Annonce")
         #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
 
         if HôteVientDePartir: ArrêtServeur()
@@ -183,9 +186,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                     AdresseIp[objetClient] = CoordonnéesClient[0]
 
                     if DonnéesDuClient[0] not in ListeDesPseudos and ClientsMax >= len(ListeDesClientsConnectés) + 1 and ServeurVerrouilé == False and AdresseIp[objetClient] not in ListeDesIpBannies:
-                    #Si le pseudo n'est pas utilité et qu'il reste de la place dans le serveur
-                        
-                        objetClient.send(bytes(f"{str(CléPubliqueServeur)}|{str(Module)}|{str(PrésenceMDP)}", "utf-8"))
+
+                        objetClient.send(bytes(f"{str(CléPubliqueServeur)}|{str(Module)}|{str(PrésenceMDP)}|{str(len(ListeDesClientsConnectés) + 1)}", "utf-8"))
                         #On envoi au client les informations de chiffremment du serveur
 
                         Nom[objetClient] = DonnéesDuClient[0]
@@ -217,6 +219,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                 annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {Nom[objetClient]} vient de rejoindre le chat"
                                 print(annonce)
                                 Envoi(annonce, "Annonce")
+                                time.sleep(0.3)
+                                Envoi("connexion", "Annonce")
 
                         ListeDesClientsConnectés.append(objetClient)
 
@@ -331,14 +335,16 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                             if Rôle[client] == "Hôte":
                                                 
-                                                Envoi(f"[{HeureCommande}] {Nom[client]} vient de verrouiler le serveur", "Annonce")
+                                                Annonce = f"[{HeureCommande}] {Nom[client]} vient de verrouiler le serveur"
+                                                Envoi(Annonce, "Annonce")
                                                 ServeurVerrouilé = True
 
                                         elif Commande == "unlock":
 
                                             if Rôle[client] == "Hôte":
                                                 
-                                                Envoi(f"[{HeureCommande}] {Nom[client]} vient de déverrouiler le serveur", "Annonce")
+                                                Annonce = f"[{HeureCommande}] {Nom[client]} vient de déverrouiler le serveur"
+                                                Envoi(Annonce, "Annonce")
                                                 ServeurVerrouilé = False
 
                                         elif "ban" in Commande:
@@ -376,6 +382,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                     Annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {NomDuBanni} a été banni par {Nom[client]}"
                                                     print(Annonce)
                                                     Envoi(Annonce, "Annonce")
+                                                    time.sleep(0.3) #Le délai évite que les paquets se mélangent
+                                                    Envoi("déconnexion", "Annonce") #On met à jour le compteur des clients
 
                                         elif "kick" in Commande:
 
@@ -410,6 +418,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                     Annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {NomDuKické} a été kické par {Nom[client]}"
                                                     print(Annonce)
                                                     Envoi(Annonce, "Annonce")
+                                                    time.sleep(0.3)
+                                                    Envoi("déconnexion", "Annonce") #On met à jour le compteur des clients
 
                                     else:
                                     #Si le message recu ne respecte aucune forme de message, il est invalide
@@ -452,6 +462,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                     annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {Nom[client]} vient de rejoindre le chat"
                                     print(annonce)
                                     Envoi(annonce, "Annonce")
+                                    time.sleep(0.3)
+                                    Envoi("connexion", "Annonce") #On met à jour le compteur des clients
 
                                 else:
                                     client.send(bytes("Nan", "utf-8"))
