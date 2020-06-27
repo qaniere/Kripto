@@ -26,5 +26,3 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 - Faire le /op pour l'hôte
 
 - Afficher nombres d'utilisateurs connectés pour les clients
-
-- Remettre à jour les lignes de l'index
