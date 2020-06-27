@@ -46,7 +46,9 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 
     - Connectez vous à l'interface web de votre router / box (Généralement http://192.168.1.1)
     - Trouvez l'option "NAT.PAT" (Le nom est peut être différent selon les constructeurs )
-    - Redirigez les requêtes sur la machine qui fait tourner Kripto en mode hôte. Exemple, je fais tourner Kripto sur mon ordinateur qui a l'Ip 192.168.1.29. Le port que j'ai choisi est le 1234, je dois donc redirigez les requêts vers mon ordinateur sur le port 1234.
+    - Redirigez les requêtes sur la machine qui fait tourner Kripto en mode hôte. Exemple, je fais 
+      tourner Kripto sur mon ordinateur qui a l'Ip 192.168.1.29. Le port que j'ai choisi est le 1234, 
+      je dois donc redirigez les requêts vers mon ordinateur sur le port 1234.
     - Communiquez votre adresse Ip publique à vos clients : https://api.ipify.org/
     
 
