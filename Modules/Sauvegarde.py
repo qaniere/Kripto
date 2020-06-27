@@ -203,11 +203,87 @@ def InitialisationSauvegarde(MotDePasse):
         #Si le fichier existe déjà on ne fait rien
         pass
 
-    NomFichier = "Messages sauvegardés/" + time.strftime("%A-%d-%B-%H.%M.%S")+".KriptoFile"
+    if time.strftime("%A", time.localtime()) == "Monday" :
+
+        Jour = "Lundi"
+    
+    elif time.strftime("%A", time.localtime()) == "Tuesday":
+
+        Jour = "Mardi"
+
+    elif time.strftime("%A", time.localtime()) == "Wednesday":
+
+        Jour = "Mercredi"
+
+    elif time.strftime("%A", time.localtime()) == "Thursday":
+
+        Jour = "Jeudi"
+
+    elif time.strftime("%A", time.localtime()) == "Friday":
+
+        Jour = "Vendredi"
+
+    elif time.strftime("%A", time.localtime()) == "Saturday":
+
+        Jour = "Samedi"
+
+    elif time.strftime("%A", time.localtime()) == "Sunday":
+
+        Jour = "Dimanche"
+
+    if time.strftime("%B", time.localtime()) == "January":
+
+        Mois = "Janvier"
+
+    elif time.strftime("%B", time.localtime()) == "February":
+
+        Mois = "Février"
+
+    elif time.strftime("%B", time.localtime()) == "March":
+
+        Mois = "Mars"
+
+    elif time.strftime("%B", time.localtime()) == "April":
+
+        Mois = "Avril"
+
+    elif time.strftime("%B", time.localtime()) == "May":
+
+        Mois = "Mai"
+
+    elif time.strftime("%B", time.localtime()) == "June":
+
+        Mois = "Juin"
+
+    elif time.strftime("%B", time.localtime()) == "July":
+
+        Mois = "Juillet"
+
+    elif time.strftime("%B", time.localtime()) == "August":
+
+        Mois = "Août"
+
+    elif time.strftime("%B", time.localtime()) == "September":
+
+        Mois = "Septembre"
+
+    elif time.strftime("%B", time.localtime()) == "October":
+
+        Mois = "Octobre"
+
+    elif time.strftime("%B", time.localtime()) == "November":
+
+        Mois = "Novembre"
+
+    elif time.strftime("%B", time.localtime()) == "December":
+
+        Mois = "Decembre"
+
+    NomFichier = "Messages sauvegardés/" + Jour + time.strftime("-%d-", time.localtime()) + Mois + time.strftime("-%H.%M.%S", time.localtime()) + ".KriptoFile"
     #On défini le nom du fichier avec le jour, la date, le mois et l'heure de début de la conversation
 
-    DateDébutConversation = time.strftime("%A %d %B")
-    HeureDébutConversation = time.strftime("%H:%M:%S")
+    DateDébutConversation = Jour + time.strftime(" %d ", time.localtime()) + Mois
+    HeureDébutConversation = time.strftime("%H:%M:%S", time.localtime())
     #On récupere l'heure et la début de la conversation 
 
     Annonce = ChiffrementVignère(MotDePasse, str(f"Début de la conversation le {DateDébutConversation} à {HeureDébutConversation}."))

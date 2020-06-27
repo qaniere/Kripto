@@ -45,11 +45,11 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
         else: HôteVientDePartir = False
 
         if Rôle[Client] == "Client" and Silencieux == False:
-            annonce = f"[{time.strftime('%H:%M:%S')}] {Nom[Client]} vient de se déconnecter"
+            annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {Nom[Client]} vient de se déconnecter"
             print(annonce)
 
         elif Silencieux == False:
-            annonce = f"[{time.strftime('%H:%M:%S')}] {Nom[Client]} vient d'arrêter le serveur."
+            annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {Nom[Client]} vient d'arrêter le serveur."
 
         ListeDesClientsConnectés.remove(Client)
         ListeDesPseudos.remove(Nom[Client])
@@ -204,7 +204,8 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                             HôteConnecté = True
                             Rôle[objetClient] = "Hôte"
                             Statut[objetClient] = "Connecté" #L'hôte est toujours connecté, pas besoin de mot de passe
-                            print(f"[{time.strftime('%H:%M:%S')}] L'hôte {Nom[objetClient]} vient de se connecter")
+                            print(
+                                f"[{time.strftime('%H:%M:%S', time.localtime())}] L'hôte {Nom[objetClient]} vient de se connecter")
                             
                         else:
                         #Sinon c'est un client
@@ -213,7 +214,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                             if PrésenceMDP == False:
 
-                                annonce = f"[{time.strftime('%H:%M:%S')}] {Nom[objetClient]} vient de rejoindre le chat"
+                                annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {Nom[objetClient]} vient de rejoindre le chat"
                                 print(annonce)
                                 Envoi(annonce, "Annonce")
 
@@ -351,7 +352,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                                 if Résultat == None: 
 
-                                                    Annonce = f'[{time.strftime("%H:%M:%S")}] Impossible de trouver "{NomDuBanni}"'
+                                                    Annonce = f'[{time.strftime("%H:%M:%S", time.localtime())}] Impossible de trouver "{NomDuBanni}"'
                                                     print(Annonce)
 
                                                     messageEnvoi = ChiffrementRSA.chiffrement(Annonce, CléPublique[client], ModuleDeChiffrement[client])
@@ -372,7 +373,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                                     Déconnexion(Résultat, Silencieux = True)
 
-                                                    Annonce = f"[{time.strftime('%H:%M:%S')}] {NomDuBanni} a été banni par {Nom[client]}"
+                                                    Annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {NomDuBanni} a été banni par {Nom[client]}"
                                                     print(Annonce)
                                                     Envoi(Annonce, "Annonce")
 
@@ -387,7 +388,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                                 if Résultat == None: 
 
-                                                    Annonce = f'[{time.strftime("%H:%M:%S")}] Impossible de trouver "{NomDuKické}"'
+                                                    Annonce = f'[{time.strftime("%H:%M:%S", time.localtime())}] Impossible de trouver "{NomDuKické}"'
                                                     print(Annonce)
 
                                                     messageEnvoi = ChiffrementRSA.chiffrement(Annonce, CléPublique[client], ModuleDeChiffrement[client])
@@ -406,7 +407,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                                     Déconnexion(Résultat, Silencieux = True)
 
-                                                    Annonce = f"[{time.strftime('%H:%M:%S')}] {NomDuKické} a été kické par {Nom[client]}"
+                                                    Annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {NomDuKické} a été kické par {Nom[client]}"
                                                     print(Annonce)
                                                     Envoi(Annonce, "Annonce")
 
@@ -448,7 +449,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                     client.send(bytes("OK", "utf-8"))         
                                     Statut[client] = "Connecté"
 
-                                    annonce = f"[{time.strftime('%H:%M:%S')}] {Nom[client]} vient de rejoindre le chat"
+                                    annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {Nom[client]} vient de rejoindre le chat"
                                     print(annonce)
                                     Envoi(annonce, "Annonce")
 
