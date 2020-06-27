@@ -586,7 +586,7 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
 
         EnvoiPossible = False
 
-        messageInterface = f"[{time.strftime('%H:%M:%S')}] {NomUser} → {message}"
+        messageInterface = f"[{time.strftime('%H:%M:%S', time.localtime())}] {NomUser} → {message}"
         #On garde de coté un message avec un formaté spécialement pour l'interface, mais on ne l'utilise que si l'envoi est réussi.
 
         message = Fonctions.formaterPaquet("Message", message)
