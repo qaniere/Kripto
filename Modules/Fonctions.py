@@ -164,13 +164,26 @@ def callback(url):
 
 def AfficherNotification(Titre, Message):
 
-    toaster.show_toast(Titre,
-    Message,
-    icon_path = "Médias/icone.ico",
-    duration = 6,
-    threaded = True) #Non bloquant
+    toaster.show_toast(
+        Titre,
+        Message,
+        icon_path = "Médias/icone.ico",
+        duration = 6,
+        threaded = True) #Non bloquant
+
+def ParserCommande(Commande):
+
+    """ Retourne la commande et son deuxième argument. Exemple /ban Jean Michel retourne "/ban", "Jean Michel """
+
+    Commande = Commande.split(" ")
+    PremierArgument = Commande.pop(0)
+    DeuxièmeArgument = " ".join(Commande)
+
+    return PremierArgument, DeuxièmeArgument
 
 texteDeBase = {}
 #Initialision du dico néccessaire pour la fonction placeholder
 
-toaster = ToastNotifier()
+try: toaster = ToastNotifier()
+except: pass
+#Initialision des notications, peut échouer si le code n'est pas lancé sur Windows 10

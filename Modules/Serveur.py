@@ -7,7 +7,7 @@ import threading
 from math import inf
 from tkinter import *
 from tkinter import messagebox
-from Modules import ChiffrementRSA, Kripiti
+from Modules import ChiffrementRSA, Kripiti, Fonctions
 
 
 
@@ -235,26 +235,26 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                     #Si le nom est déja pris
 
                         objetClient.send(bytes("False", "utf-8"))
-                        time.sleep(0.5) #Le délai évite que les paquets se mélangent
+                        time.sleep(0.3) #Le délai évite que les paquets se mélangent
                         objetClient.send(bytes("Votre nom d'utilisateur est déja utilisé dans ce serveur, veuillez en changer.", "utf-8"))
   
                     elif ClientsMax < len(ListeDesClientsConnectés) + 1:
                     #Si le serveur est complet
 
                         objetClient.send(bytes("False", "utf-8"))
-                        time.sleep(0.4)
+                        time.sleep(0.3)
                         objetClient.send(bytes("Le serveur a atteint sa capacité maximale", "utf-8"))
 
                     elif ServeurVerrouilé:
 
                         objetClient.send(bytes("False", "utf-8"))
-                        time.sleep(0.4)
+                        time.sleep(0.3)
                         objetClient.send(bytes("Le serveur est verrouilé", "utf-8"))
 
                     elif AdresseIp[objetClient] in ListeDesIpBannies:
 
                         objetClient.send(bytes("False", "utf-8"))
-                        time.sleep(0.4)
+                        time.sleep(0.3)
                         objetClient.send(bytes("Vous avez été banni de ce serveur", "utf-8"))
 
 
@@ -331,14 +331,16 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                         HeureCommande = MessageListe[1]
                                         Commande = MessageListe[2]
 
-                                        if Commande == "stop":
+                                        CommandeParsée, DeuxièmeArgument = Fonctions.ParserCommande(Commande)
+
+                                        if CommandeParsée == "stop":
 
                                             if Rôle[client] == "Hôte":
                                                 
                                                 Envoi(f"[{HeureCommande}] {Nom[client]} vient d'arrêter le serveur", "Annonce")
                                                 ArrêtServeur()
 
-                                        elif Commande == "lock":
+                                        elif CommandeParsée == "lock":
 
                                             if Rôle[client] == "Hôte" or Rôle[client] == "Admin":
                                                 
@@ -346,7 +348,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                 Envoi(Annonce, "Annonce")
                                                 ServeurVerrouilé = True
 
-                                        elif Commande == "unlock":
+                                        elif CommandeParsée == "unlock":
 
                                             if Rôle[client] == "Hôte" or Rôle[client] == "Admin":
                                                 
@@ -354,11 +356,11 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                 Envoi(Annonce, "Annonce")
                                                 ServeurVerrouilé = False
 
-                                        elif "ban" in Commande:
+                                        elif CommandeParsée == "ban":
 
                                             if Rôle[client] == "Hôte" or Rôle[client] == "Admin":
                                             
-                                                NomDuBanni = Commande.replace("ban ", "")
+                                                NomDuBanni = DeuxièmeArgument
 
                                                 Résultat = TrouverClient(NomDuBanni, Nom)
                                                 #On cherche l'objet client associé au pseudo
@@ -402,11 +404,11 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                     time.sleep(0.3) #Le délai évite que les paquets se mélangent
                                                     Envoi("déconnexion", "Annonce") #On met à jour le compteur des clients
 
-                                        elif "kick" in Commande:
+                                        elif CommandeParsée == "kick":
 
                                             if Rôle[client] == "Hôte" or Rôle[client] == "Admin":
                                             
-                                                NomDuKické = Commande.replace("kick ", "")
+                                                NomDuKické = DeuxièmeArgument
 
                                                 Résultat = TrouverClient(NomDuKické, Nom)
                                                 #On cherche l'objet client associé au pseudo
@@ -449,11 +451,11 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                                     time.sleep(0.3)
                                                     Envoi("déconnexion", "Annonce") #On met à jour le compteur des clients
 
-                                        elif "op" in Commande:
+                                        elif CommandeParsée == "op":
 
                                             if Rôle[client] == "Hôte":
                                             
-                                                NomDuPromu = Commande.replace("op ", "")
+                                                NomDuPromu = DeuxièmeArgument
 
                                                 Résultat = TrouverClient(NomDuPromu, Nom)
                                                 #On cherche l'objet client associé au pseudo
