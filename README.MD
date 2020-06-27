@@ -8,18 +8,22 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 ## Fonctionalités
 
  - Discussion peer to peer chiffrée : Seul les participants de la conversations peuvent voir les messages
+ - Options de configuration (Choix des sons d'envoi et de reception de messages)
  - Protection du serveur avec un mot de passe : Seules les personnes qui ont le mot de passe peuvent accéder au serveur
  - Panel de commandes pour les hôtes :
     
     - /stop pour arrêter le serveur
-    - En cours d'ajout
+    - /lock pour interdir l'arrivée de nouveaux clients
+    - /unlock pour autoriser l'arrivée de nouveaux clients
+    - /ban pour bannir un client
+    - /kick pour jeter un client hors du serveur
 
  - Sauvegarde des messages
  - Report de bug
 
 ## Fonctionnement
 
-*En cours de rédaction*
+Pour nous contacter depuis Kripto, merci d'installer le module requests
 
 ## Liste de fonctionnalités à implémenter 
 
