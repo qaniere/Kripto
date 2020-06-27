@@ -63,9 +63,9 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
         #On utilise le mot clé del plutot que d'affecter une valeur vide car sinon la clé resterait conservée en mémoire
 
         if Silencieux == False: 
-            Envoi(annonce, "Annonce")
-            time.sleep(0.3)
             Envoi("déconnexion", "Annonce")
+            time.sleep(0.3)
+            Envoi(annonce, "Annonce")
         #On envoi l'annonce aprés avoir supprimé les infos du client car sinon il serait sur la liste d'envoi
 
         if HôteVientDePartir: ArrêtServeur()
@@ -225,9 +225,9 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                 annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {Nom[objetClient]} vient de rejoindre le chat"
                                 print(annonce)
-                                Envoi(annonce, "Annonce")
-                                time.sleep(0.3)
                                 Envoi("connexion", "Annonce")
+                                time.sleep(0.3)
+                                Envoi(annonce, "Annonce")
 
                         ListeDesClientsConnectés.append(objetClient)
 
@@ -400,9 +400,9 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                                     Annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {NomDuBanni} a été banni par {Nom[client]}"
                                                     print(Annonce)
-                                                    Envoi(Annonce, "Annonce")
-                                                    time.sleep(0.3) #Le délai évite que les paquets se mélangent
                                                     Envoi("déconnexion", "Annonce") #On met à jour le compteur des clients
+                                                    time.sleep(0.3) #Le délai évite que les paquets se mélangent
+                                                    Envoi(Annonce, "Annonce")
 
                                         elif CommandeParsée == "kick":
 
@@ -447,9 +447,9 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                                     Annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {NomDuKické} a été kické par {Nom[client]}"
                                                     print(Annonce)
-                                                    Envoi(Annonce, "Annonce")
-                                                    time.sleep(0.3)
                                                     Envoi("déconnexion", "Annonce") #On met à jour le compteur des clients
+                                                    time.sleep(0.3)
+                                                    Envoi(Annonce, "Annonce")
 
                                         elif CommandeParsée == "op":
 
@@ -543,9 +543,9 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
 
                                     annonce = f"[{time.strftime('%H:%M:%S', time.localtime())}] {Nom[client]} vient de rejoindre le chat"
                                     print(annonce)
-                                    Envoi(annonce, "Annonce")
-                                    time.sleep(0.3)
                                     Envoi("connexion", "Annonce") #On met à jour le compteur des clients
+                                    time.sleep(0.3)
+                                    Envoi(annonce, "Annonce")
 
                                 else:
                                     client.send(bytes("Nan", "utf-8"))

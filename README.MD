@@ -55,8 +55,3 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 ## Fonctionnement
 
 *En cours de rédaction*
-
-
-## Dernières fonctionnalités
-
- - Mieux parser les commandes
