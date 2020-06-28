@@ -39,6 +39,8 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
     - Installez au moins la version 3.6 de Python
     - Installez les dépendances avec la commande `pip install -r requirements.txt`
     - Exécutez "Application.pyw"
+    
+   N'oubliez pas d'autoriser l'accès au pare feu à Kripto (Pour la version code source, ouvrez le pare feu pour Python)
 
 ## Pour communiquer en dehors d'un résau local
 
@@ -54,4 +56,19 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
 
 ## Fonctionnement
 
-*En cours de rédaction*
+Le code est réparti en 9 fichier sources Python (pyw et py) :
+
+  - Application.pyw : Contient le code qui gènere l'interface graphique, le lancement du serveur,
+  la connexion au serveur.
+  
+Dans le dossier modules :
+ 
+ - ChiffrementRSA.py : Permet de générer des clés de chiffrement RSA, de chifffer, de déchiffrer
+ selon l'algorithme RSA
+ - Fonctions.py : Contient quelques fonctions utilitaires (Parser les commandes, sauter des lignes, ect)
+ - Kripiti.py : Permet d'ouvrir une Issue sur Github par l'API
+ - LecteurSauvegarde.py : Permet de générer l'interface qui permet de lire les sauvegardes chiffrées
+ - Paramètres.py : Permet de génerer l'interface qui affiche les paramètres
+ - Sauvegarde.Py : Toutes les fonctions liées à la création, le chiffrement, le déchiffrement des sauvegardes
+ - Serveur.py : Tout le code du serveur (Ne tourne que ches l'hôte de la discussion
+ - __init__.py : Permet de transformer le dossier modules en package importable
