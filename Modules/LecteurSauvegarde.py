@@ -6,12 +6,12 @@ from Modules import Sauvegarde
 
 def LecteurSauvegarde():
 
-    fen = Tk()
-    fen.geometry("550x460")
-    fen.configure(bg="grey")
-    fen.resizable(width=False, height=False)
-    fen.iconbitmap(bitmap="Médias/icone.ico")
-    fen.title("Kripto - Lecture sécurisée des sauvegardes")
+    FenLecteurSauv = Tk()
+    FenLecteurSauv.geometry("550x460")
+    FenLecteurSauv.configure(bg="grey")
+    FenLecteurSauv.resizable(width=False, height=False)
+    FenLecteurSauv.iconbitmap(bitmap="Médias/icone.ico")
+    FenLecteurSauv.title("Kripto - Lecture sécurisée des sauvegardes")
     # Configuration de la fenêtre
 
     def ouverture():
@@ -41,10 +41,15 @@ def LecteurSauvegarde():
         Disscusion = Sauvegarde.LectureSauvegarde(Fichier, MotDePasse)
         # On lis la sauvegarde et on récupere sous forme de liste tout les messages
 
-        for message in Disscusion:
+        if Disscusion.pop(0) == "Fichier déchiffré !":
 
-            Interface.insert("end", message)
+            for message in Disscusion:
 
+                Interface.insert("end", message)
+
+        else: 
+            tkinter.messagebox.showerror(title = "Mauvais mot de passe", message = "Le mot passe de cette sauvegarde n'est pas correct")
+            terminer()
 
 
     def terminer():
@@ -62,18 +67,24 @@ def LecteurSauvegarde():
             # On insère dans l'interface chaque fichier de sauvegarde existant
 
 
-    try:
-        ListeSauvegardes = os.listdir("Messages Sauvegardés")
+    try: ListeSauvegardes = os.listdir("Messages Sauvegardés")
         # On liste chaque fichier du répertoire Messages Sauvegardés
     except OSError:
     # Si le dossier de sauvegarde n'existe pas
 
-        fen.withdraw()
-        tkinter.messagebox.showerror(title="Aïe...", message="Vous n'avez pas de sauvegardes")
-        # On cache la fenêtre et on affiche un message d'erreur
-        return
+        FenLecteurSauv.withdraw()
+        tkinter.messagebox.showwarning(title="Erreur de sauvegarde", message="Vous n'avez pas de sauvegardes")
+        FenLecteurSauv.destroy()
+        return False
 
-    Interface = Listbox(fen, width="70", height="20")
+    if len(ListeSauvegardes) == 0:
+
+        FenLecteurSauv.withdraw()
+        tkinter.messagebox.showwarning(title="Erreur de sauvegarde", message="Vous n'avez pas de sauvegardes")
+        FenLecteurSauv.destroy()
+        return False
+
+    Interface = Listbox(FenLecteurSauv, width="70", height="20")
     Interface.pack(pady=15)
 
     for fichier in ListeSauvegardes:
@@ -81,7 +92,7 @@ def LecteurSauvegarde():
         Interface.insert("end", fichier)
         # On insére dans l'interface chaque fichier de sauvegarde existant
 
-    cadreBouttons = Frame(fen, bg="grey")
+    cadreBouttons = Frame(FenLecteurSauv, bg="grey")
     cadreBouttons.pack(pady=40)
 
     Valider = Button(cadreBouttons, text="Ouvrir ce fichier", command=ouverture, width="20")
@@ -90,4 +101,4 @@ def LecteurSauvegarde():
     Terminer = Button(cadreBouttons, text="Terminer", command=terminer, state=DISABLED, width="20")
     Terminer.pack(side=LEFT, padx=7)
 
-    fen.mainloop()
+    FenLecteurSauv.mainloop()

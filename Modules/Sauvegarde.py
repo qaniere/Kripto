@@ -1,7 +1,7 @@
 # coding: utf8
 import time
-import hashlib
 import base64
+import hashlib
 from os import makedirs
 
 
@@ -277,20 +277,24 @@ def InitialisationSauvegarde(MotDePasse):
 
     elif time.strftime("%B", time.localtime()) == "December":
 
-        Mois = "Decembre"
+        Mois = "Décembre"
 
-    NomFichier = "Messages sauvegardés/" + Jour + time.strftime("-%d-", time.localtime()) + Mois + time.strftime("-%H.%M.%S", time.localtime()) + ".KriptoFile"
+    NomFichier = "Messages sauvegardés/" " Discussion du " + Jour + time.strftime("-%d-", time.localtime()) + Mois + time.strftime("-%H-%M-%S", time.localtime())
     #On défini le nom du fichier avec le jour, la date, le mois et l'heure de début de la conversation
 
     DateDébutConversation = Jour + time.strftime(" %d ", time.localtime()) + Mois
     HeureDébutConversation = time.strftime("%H:%M:%S", time.localtime())
     #On récupere l'heure et la début de la conversation 
 
+    Header = ChiffrementVignère(MotDePasse, "Fichier déchiffré !") 
+    #Cette ligne nous permet de vérifier si le fichier a été déchiffré correctement
     Annonce = ChiffrementVignère(MotDePasse, str(f"Début de la conversation le {DateDébutConversation} à {HeureDébutConversation}."))
     #On chiffre l'annonce du début du fichier
 
     fichier = open(NomFichier, "w")
 
+    fichier.write(Header)
+    fichier.write("\n")
     fichier.write(Annonce)
     fichier.write("\n")
     fichier.close()
