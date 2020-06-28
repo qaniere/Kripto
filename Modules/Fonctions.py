@@ -1,9 +1,20 @@
 # coding: utf8
 import time
 import tkinter
+import platform
 import webbrowser
 from tkinter import *
 from tkinter import messagebox
+
+TrouverOS = lambda : platform.system() + " " + platform.release()
+
+if TrouverOS() == "Windows 10":
+#L'utilisateur est éligibles au notifications
+
+    from win10toast import ToastNotifier
+    toaster = ToastNotifier()
+
+    NotificationActivées = True
 
 
 """ Certains fonctions sont définies ici pour alléger le code de l'application """
@@ -163,7 +174,15 @@ def callback(url):
 
 def AfficherNotification(Titre, Message):
 
-    print("notif")
+    if NotificationActivées:
+
+        toaster.show_toast(
+            Titre,
+            Message,
+            icon_path = "Médias/icone.ico",
+            duration = 6,
+            threaded = True #Non bloquant
+        ) 
 
 def ParserCommande(Commande):
 
