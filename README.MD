@@ -39,6 +39,10 @@ Ce projet a été réalisé par Calixte Pistolet et Quentin Aniere dans le cadre
     - Installez au moins la version 3.6 de Python
     - Installez les dépendances avec la commande `pip install -r requirements.txt`
     - Exécutez "Application.pyw"
+
+    **N'oubliez d'ajouter un fichier "Idenfiants.txt" à la racine du code, qui contient un nom d'utilisateur Github, 
+    un saut de ligne puis le mot de passe. Cela permet se connecter à l'API Github et envoyer des Issues. N'est nécéssaire que
+    si la fonction contact est utilisée**
     
    N'oubliez pas d'autoriser l'accès au pare feu à Kripto (Pour la version code source, ouvrez le pare feu pour Python)
 

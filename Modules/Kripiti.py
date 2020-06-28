@@ -2,6 +2,33 @@ import os
 import json
 import html
 
+def RécupererIdentifiants():
+
+
+    """ Renvoi les identfiants de Kripiti 
+    Si le mode est sur Développement, les idenfiants sont lus depuis le fichier identifiants.txt)
+    Si le mode est production, il doivent être contenu dans les variables """
+
+    Mode = "Développement"
+
+    if Mode == "Production":
+
+        NomUtilisateur = "METTRE_USERNAMEICI"
+        MotDePasseKripti = "MDPLA"
+        #Une fois transformé en exe, impossible de relire le code source
+
+    else:
+
+        fichier = open("Identifiants.txt", "r")
+        contenu = fichier.read()
+        contenu = contenu.split("\n")
+
+        NomUtilisateur = contenu[0]
+        MotDePasseKripti = contenu[1]
+
+    return NomUtilisateur, MotDePasseKripti
+
+    
 def CréerUneIssue(Titre, Message, Plateforme):
 
     import requests
@@ -9,8 +36,7 @@ def CréerUneIssue(Titre, Message, Plateforme):
     #On importe le module requets car il pose problème au niveau de l'installation chez certain utilisateur
     #Donc il n'est importé que si un bug est signalé
 
-    NomUtilisteur = "Kripiti"
-    MotDePasseKripti = "Pass_Word_0"
+    NomUtilisateur, MotDePasseKripti = RécupererIdentifiants()
 
     PropriétaireDuRépertoire = "qaniere"
     NomDuRépetoire = "Kripto"
@@ -18,7 +44,7 @@ def CréerUneIssue(Titre, Message, Plateforme):
     url = f"https://api.github.com/repos/{PropriétaireDuRépertoire}/{NomDuRépetoire}/issues"
 
     session = requests.Session()
-    session.auth = (NomUtilisteur, MotDePasseKripti)
+    session.auth = (NomUtilisateur, MotDePasseKripti)
 
     Issue = {"title": Titre,
              "body": Message + "\r\n" + Plateforme ,
