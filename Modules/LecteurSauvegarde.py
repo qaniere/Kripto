@@ -6,6 +6,8 @@ from Modules import Sauvegarde
 
 def LecteurSauvegarde():
 
+    global ListeSauvegardes
+
     FenLecteurSauv = Tk()
     FenLecteurSauv.geometry("550x460")
     FenLecteurSauv.configure(bg="grey")
@@ -33,6 +35,7 @@ def LecteurSauvegarde():
 
         Terminer.configure(state=ACTIVE)
         Valider.configure(state=DISABLED)
+        Supprimer.configure(state=DISABLED)
         # On change l'état des bouttons
 
         Interface.delete(0,"end")
@@ -51,10 +54,27 @@ def LecteurSauvegarde():
             tkinter.messagebox.showerror(title = "Mauvais mot de passe", message = "Le mot passe de cette sauvegarde n'est pas correct")
             terminer()
 
+    def supprimer():
+
+        global ListeSauvegardes
+
+        try: Fichier = Interface.get(Interface.curselection())
+        #Si rien n'est sélectioné, cela génére toujours une exeception
+        except: pass
+
+        else:
+
+            RéponseUser  = tkinter.messagebox.askokcancel("Suppresion", f"Voulez vraiment supprimer la {Fichier} ? Cette action est irréversible !")
+
+            if RéponseUser == True: 
+                os.remove("Messages Sauvegardés/" + Fichier)
+                ListeSauvegardes.remove(Fichier)
+                terminer()
 
     def terminer():
 
         Terminer.configure(state=DISABLED)
+        Supprimer.configure(state=ACTIVE)
         Valider.configure(state=ACTIVE)
         # On change l'état des bouttons
 
@@ -92,6 +112,7 @@ def LecteurSauvegarde():
         Interface.insert("end", fichier)
         # On insére dans l'interface chaque fichier de sauvegarde existant
 
+
     cadreBouttons = Frame(FenLecteurSauv, bg="grey")
     cadreBouttons.pack(pady=40)
 
@@ -100,5 +121,8 @@ def LecteurSauvegarde():
 
     Terminer = Button(cadreBouttons, text="Terminer", command=terminer, state=DISABLED, width="20")
     Terminer.pack(side=LEFT, padx=7)
+
+    Supprimer = Button(cadreBouttons, text="Supprimer", command=supprimer, width="20")
+    Supprimer.pack(side=LEFT, padx=7)
 
     FenLecteurSauv.mainloop()
