@@ -4,7 +4,6 @@ import tkinter
 import webbrowser
 from tkinter import *
 from tkinter import messagebox
-from win10toast import ToastNotifier
 
 
 """ Certains fonctions sont définies ici pour alléger le code de l'application """
@@ -164,12 +163,7 @@ def callback(url):
 
 def AfficherNotification(Titre, Message):
 
-    toaster.show_toast(
-        Titre,
-        Message,
-        icon_path = "Médias/icone.ico",
-        duration = 6,
-        threaded = True) #Non bloquant
+    print("notif")
 
 def ParserCommande(Commande):
 
@@ -183,7 +177,3 @@ def ParserCommande(Commande):
 
 texteDeBase = {}
 #Initialision du dico néccessaire pour la fonction placeholder
-
-try: toaster = ToastNotifier()
-except: pass
-#Initialision des notications, peut échouer si le code n'est pas lancé sur Windows 10
