@@ -676,11 +676,11 @@ def Réception():
 
     global FilsMessages, ConnexionSocket, CléPrivée, Module, SonActivé, ConnexionEnCours, NombreConnectés, Rôle
 
-    NotifSilencieuse = False
-    #Est égal à true si le client recoit un messsage qui ne doit pas s'afficher (connexion/déconnexion par exemple)
-
     while ConnexionEnCours == True:
     #Quand Connexion est égal à False, le Thread s'arrête
+
+        NotifSilencieuse = False
+        #Est égal à true si le client recoit un messsage qui ne doit pas s'afficher (connexion/déconnexion par exemple)
 
         try: MessageReçu = ConnexionSocket.recv(32768)
         #Cette partie du code est dans un bloc "try, except" car "ConnexionSocket.setblocking(0)" a été défini sur False
@@ -781,11 +781,10 @@ def Réception():
 
                 if FenêtreALeFocus == False and NotifSilencieuse == False and Paramètres.DicoParamètres["Notification"] == "Activée":
 
-                    try: Fonctions.AfficherNotification("Kripto", MessageReçu)
-                    except: pass
-                    #Les notifcations ne sont disponibles que sur Windows 10
+                   Fonctions.AfficherNotification("Kripto", MessageReçu)
 
                 if SonActivé == True and NotifSilencieuse == False:
+
                     if Paramètres.DicoParamètres["SonRéception"] != "Inconnu":
                         winsound.PlaySound("Sons/" + Paramètres.DicoParamètres["SonRéception"], winsound.SND_ASYNC)
                     else:
