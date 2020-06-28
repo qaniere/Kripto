@@ -274,7 +274,10 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                     # Si aucun message n'a été envoyé, on temporise pour éviter de trop consommer des ressources
                     # Exemple, sans temporisation, 38% du processeur, on passe à peine 1% avec un délai non ressenti
                 
-                        time.sleep(0.1)
+                        if ListeDesClientsConnectés[0] == client: time.sleep(0.1)
+                        #On ne pause le programme qu'une fois, car on perdrait trop de temps avec un plus
+                        #grand nombre de clients
+                        
 
                     except ConnectionResetError:
                     #Si jamais un des clients s'est déconnecté

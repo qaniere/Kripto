@@ -1070,7 +1070,5 @@ PoliceSousTitre = tkFont.Font(size=12)
 
 ImageLogo = PhotoImage(file="Médias/Logo.png")
 
-print(Kripiti.RécupererIdentifiants())
-
 AfficherMenu()
 fen.mainloop()
