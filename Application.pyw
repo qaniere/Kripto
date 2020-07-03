@@ -225,7 +225,7 @@ def DémarrerServeur():
     """ Cette fonction récupére les coordonées du serveur saisis dans le menu d'hôte, et lance
     le thread du serveur """
 
-    global InputIp, IP, InputPort, Port, Rôle, InputNom, FichierSauvegarde, MotDePasse, NomUser
+    global InputIp, IP, InputPort, Port, Rôle, InputNom, FichierSauvegarde, MotDePasse, NomUser, SauvegardeUtilisée
 
     if len(InputNom.get()) > 16:
 
@@ -251,6 +251,8 @@ def DémarrerServeur():
     #Si la connexion est une réussite, on affiche les conversations
 
         if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+
+            SauvegardeUtilisée = True
 
             MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="•")
 
@@ -438,7 +440,7 @@ def SeConnecter():
 
     """ Fonction qui affiche l'interface de discusion si la connexion au serveur est une réussite"""
 
-    global InputIp, IP, InputPort, Port, Rôle, FichierSauvegarde, MotDePasse
+    global InputIp, IP, InputPort, Port, Rôle, FichierSauvegarde, MotDePasse, SauvegardeUtilisée
 
     Rôle = "Client"
     IP = InputIp.get()
@@ -452,6 +454,8 @@ def SeConnecter():
     if Connexion() == True:
 
         if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+
+            SauvegardeUtilisée = True
 
             MotDePasse = tkinter.simpledialog.askstring("Mot de passe", "Veuillez saisir le mot de passe de la sauvegarde", show="•")
 
@@ -639,12 +643,12 @@ def Envoyer(ModeManuel = False, MessageManuel = None):
                 for ligne in LignesMessages:
                     FilsMessages.insert(END, ligne)
 
-                    if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+                    if Paramètres.DicoParamètres["Sauvegarde"] == "Activée" and SauvegardeUtilisée:
                         Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, ligne)
             else:
                 FilsMessages.insert(END, messageInterface)
 
-                if Paramètres.DicoParamètres["Sauvegarde"] == "Activée":
+                if Paramètres.DicoParamètres["Sauvegarde"] == "Activée" and SauvegardeUtilisée:
                     Sauvegarde.NouvelleLigne(FichierSauvegarde, MotDePasse, messageInterface)
 
             FilsMessages.yview(END)
@@ -1044,6 +1048,7 @@ NombreConnectés = 1 #On se compte
 EnvoiPossible = True
 SonActivé = True
 SousMenuCliqué = False
+SauvegardeUtilisée = None #On ne sait pas à ce stade si la sauvegarde sera utilsée
 FenêtreALeFocus = True
 #Permet d'envoyer des notifcations uniquement quand la fenêtre est en arrière plan
 
