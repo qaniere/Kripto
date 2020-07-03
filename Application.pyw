@@ -821,6 +821,8 @@ def RetournerMenu(DemandeConfirmation = None, ConversationEnCours = None, Depuis
             BouttonEnvoyer.pack_forget()
 
             fen.unbind_all(ALL)
+            fen.bind("<FocusIn>", lambda x: PasserEnTrue())
+            fen.bind("<FocusOut>", lambda x: PasserEnFalse())
 
             BarreMenu.delete(2)
             BarreMenu.delete(3)
