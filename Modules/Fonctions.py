@@ -22,14 +22,13 @@ def formaterPaquet(TypePaquet, Contenu):
     if TypePaquet == "Message":
     
         Paquet = f"Message|{time.strftime('%H:%M:%S')}|{Contenu}"
-        #La longueur du paquet est indéterminé à ce stade, alors on met un caractére facilement remplaçable à la place.
 
     elif TypePaquet == "Commande":
-        Paquet = None
-        #TODO => Implémenter les commandes
+        
+        Contenu = Contenu.replace("/", "")
+        Paquet = f"Commande|{time.strftime('%H:%M:%S')}|{Contenu}"
+
     return Paquet
-
-
 
 def traitementPhrase(chaine):
     
@@ -164,3 +163,7 @@ def pasCode():
 
 texteDeBase = {}
 #Initialision du dico néccessaire pour la fonction placeholder
+
+if __name__ == "__main__":
+
+    formaterPaquet("Commande", "/stop")

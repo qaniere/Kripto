@@ -1,4 +1,5 @@
 # coding: utf8
+import sys
 import time
 import math
 import socket
@@ -71,7 +72,7 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
         Serveur.close()
         # Fermeture de la connexion
 
-        exit()
+        sys.exit()
 
 
     def envoi(message, type, Envoyeur=None):
@@ -300,6 +301,17 @@ def Démarrer(IP, Port, NombreClientsMax, MotDePasse):
                                         messageFormaté = f"[{HeureMessage}] {nomClient[client]} → {Contenu}"
                                         print(messageFormaté)
                                         envoi(messageFormaté, "Message", client)
+
+                                elif Type == "Commande":
+
+                                    HeureCommande = MessageListe[1]
+                                    Commande = MessageListe[2]
+
+                                    if Commande == "stop":
+
+                                        if RoleClient[client] == "Hôte":
+                                            envoi(f"[{HeureCommande}] {nomClient[client]} vient d'arrêter le serveur", "Annonce")
+                                            arretServeur()
 
                                 else:
                                 #Si le message recu ne respecte aucune forme de message, il est invalide

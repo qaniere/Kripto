@@ -48,8 +48,37 @@ def envoyer():
         return
         #On stoppe l'éxeuction de la fonction
 
-    elif message == "/stop":
+    elif message[0] == "/":
         
+        message = Fonctions.formaterPaquet("Commande", message)
+        #On formate le paquet
+
+        message = ChiffrementRSA.chiffrement(message, CléPubliqueServeur, ModuleServeur)
+        #On transforme le message en liste de chiffres, correspondant à leur identifiant Ascii, puis on chiffre le message
+        #On récupere alors une liste d'entiers
+        
+        messageFinal = f"{len(message)}-{message}"
+        #On rajoute un en tête avec la longueur totale du message
+        messageFinal = messageFinal.encode('utf-8')
+        #On encode le tout en UTF8
+
+        try:
+            ConnexionSocket.send(bytes(messageFinal))
+            #On essaie d'envoyer le message au serveur.
+
+        except (ConnectionResetError, ConnectionAbortedError):
+        #Si le serveur ne répond pas
+    
+            if NombreErreurs < 3:
+                tkinter.messagebox.showerror(title="Aïe...", message="Impossible de joindre le serveur. Veuillez réessayer.")
+                NombreErreurs += 1
+            else:
+            #Si il y'a plus de trois erreurs, on stoppe le programme, en invitant l'utilisateur à se reconnecter
+
+                messsageErreur = "Le serveur est injoignable pour le moment. Veuillez vous reconnecter ou bien référez vous à l'aide"
+                #On stocke le message dans un variable pour diminuer la taille de la ligne d'en dessous
+                tkinter.messagebox.showerror(title="Aïe...", message=messsageErreur)
+                exit() #TODO => Remplacer par retour au menu
         RetournerMenu()
     
     elif len(message) != 0 and EnvoiOK:
